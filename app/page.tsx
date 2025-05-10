@@ -1,4 +1,5 @@
 import { CommandAll } from "@/components/command-demo";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Home() {
   return (
@@ -11,7 +12,10 @@ export default function Home() {
       
       {/* CommandAll positioned in the top right */}
       <div className="fixed top-4 right-4 z-50">
+        <div className="flex items-center gap-2">
         <CommandAll />
+        <ModeToggle />
+        </div>
       </div>
     </div>
   );
