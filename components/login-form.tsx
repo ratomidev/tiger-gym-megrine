@@ -1,17 +1,17 @@
-import Image from "next/image"
+import Image from "next/image";
 
-import { cn } from "@/lib/utils"
-import { Card, CardContent } from "./ui/card"
-import { Label } from "./ui/label"
-import { Input } from "./ui/input"
-import { Button } from "./ui/button"
+import { cn } from "@/lib/utils";
+import { Card, CardContent } from "./ui/card";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 export function LoginForm({
   className,
   imageUrl,
   ...props
 }: React.ComponentProps<"div"> & {
-  imageUrl?: string
+  imageUrl?: string;
 }) {
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -108,5 +108,5 @@ export function LoginForm({
         and <a href="#">Privacy Policy</a>.
       </div>
     </div>
-  )
+  );
 }

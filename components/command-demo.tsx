@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   Calculator,
   Calendar,
@@ -8,7 +8,7 @@ import {
   Settings,
   Smile,
   User,
-} from "lucide-react"
+} from "lucide-react";
 
 import {
   CommandDialog,
@@ -19,37 +19,35 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 
 interface CommandDemoProps {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
- function CommandDemo({ children }: CommandDemoProps) {
-  const [open, setOpen] = React.useState(false)
+function CommandDemo({ children }: CommandDemoProps) {
+  const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "j" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setOpen((open) => !open)
+        e.preventDefault();
+        setOpen((open) => !open);
       }
-    }
+    };
 
-    document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
-  }, [])
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   const handleClick = () => {
-    setOpen(true)
-  }
+    setOpen(true);
+  };
 
   return (
     <>
       {children ? (
-        <div onClick={handleClick}>
-          {children}
-        </div>
+        <div onClick={handleClick}>{children}</div>
       ) : (
         <p className="text-sm text-muted-foreground">
           {" "}
@@ -97,20 +95,19 @@ interface CommandDemoProps {
         </CommandList>
       </CommandDialog>
     </>
-  )
+  );
 }
-export  function CommandAll() {
-    return(
+export function CommandAll() {
+  return (
     <CommandDemo>
-        <div className="flex w-72 items-center justify-between rounded-md border border-input bg-background px-3 py-1 shadow-sm hover:bg-accent/10 cursor-pointer">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-           
-            <span>Search documentation...</span>
-          </div>
-          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-            <span>⌘</span>K
-          </kbd>
+      <div className="flex w-72 items-center justify-between rounded-md border border-input bg-background px-3 py-1 shadow-sm hover:bg-accent/10 cursor-pointer">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>Search documentation...</span>
         </div>
-      </CommandDemo>
-    )
+        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+          <span>⌘</span>K
+        </kbd>
+      </div>
+    </CommandDemo>
+  );
 }
