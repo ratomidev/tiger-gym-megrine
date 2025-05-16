@@ -5,12 +5,10 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { auth } from "@/lib/firebase";
-import { createUserWithEmailAndPassword} from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+
 import { toast, Toaster } from "sonner";
 
-
-const db = getFirestore();
 import { Loader2, User, Mail, Lock, Phone } from "lucide-react";
 import Image from "next/image";
 
@@ -47,19 +45,18 @@ interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {
 
 function UserSigninForm({ className, ...props }: UserSigninFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-    const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = React.useState({
     firstname: "",
     lastname: "",
     email: "",
     password: "",
     phone: "",
-    });
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }));
-};
+  });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+  };
 
-
-    const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -68,7 +65,6 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
         auth,
         formData.email,
         formData.password
-
       );
       const user = userCredential.user;
 
@@ -76,13 +72,13 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
       console.log("User:", user);
 
       toast.success(" created successUserfully!");
-
-    } catch (error: any) {
-        toast.error("Error creating user: " + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error("Error creating user: " + errorMessage);
     } finally {
       setIsLoading(false);
     }
-  }; 
+  };
   return (
     <div className={cn("grid gap-6", className)} {...props}>
       <form onSubmit={handleSubmit}>
@@ -146,8 +142,8 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
               autoCorrect="off"
               disabled={isLoading}
               required
-                value={formData.email}
-                onChange={handleChange}
+              value={formData.email}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -166,7 +162,7 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
               disabled={isLoading}
               required
               value={formData.password}
-                onChange={handleChange}
+              onChange={handleChange}
             />
           </div>
         </div>
