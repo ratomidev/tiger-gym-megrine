@@ -4,6 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import React from "react";
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword} from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { toast, Toaster } from "sonner";
+
+
+const db = getFirestore();
 
 const Icons = {
   spinner: ({ className }: { className?: string }) => (
@@ -100,10 +107,45 @@ interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {
 
 function UserSigninForm({ className, ...props }: UserSigninFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+    const [formData, setFormData] = React.useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: "",
+    phone: "",
+    });
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }));
+};
 
+
+    const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+
+      );
+      const user = userCredential.user;
+
+      // You could store extra info like firstname/lastname in Firestore if needed
+      console.log("User:", user);
+
+      toast.success(" created successUserfully!");
+
+    } catch (error: any) {
+        toast.error("Error creating user: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }; 
   return (
     <div className={cn("grid gap-6", className)} {...props}>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="flex gap-4">
           <div className="grid gap-2 flex-1">
             <Label htmlFor="firstname">First Name</Label>
@@ -121,6 +163,8 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
                 autoCorrect="off"
                 disabled={isLoading}
                 required
+                value={formData.firstname}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -140,6 +184,8 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
                 autoCorrect="off"
                 disabled={isLoading}
                 required
+                value={formData.lastname}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -160,6 +206,8 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
               autoCorrect="off"
               disabled={isLoading}
               required
+                value={formData.email}
+                onChange={handleChange}
             />
           </div>
         </div>
@@ -177,6 +225,8 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
               autoComplete="current-password"
               disabled={isLoading}
               required
+              value={formData.password}
+                onChange={handleChange}
             />
           </div>
         </div>
@@ -194,6 +244,8 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
               autoComplete="tel"
               disabled={isLoading}
               required
+              value={formData.phone}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -275,6 +327,7 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
 export default function SignInPage() {
   return (
     <div className="container flex items-center justify-center min-h-screen">
+      <Toaster position="top-right" richColors />
       <div className="w-full max-w-md space-y-8">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">New in RYX </h1>
