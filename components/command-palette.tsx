@@ -25,7 +25,7 @@ interface CommandDemoProps {
   children?: React.ReactNode;
 }
 
-function CommandDemo({ children }: CommandDemoProps) {
+function Command({ children }: CommandDemoProps) {
   const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -97,9 +97,9 @@ function CommandDemo({ children }: CommandDemoProps) {
     </>
   );
 }
-export function CommandAll() {
+export function CommandPalette() {
   return (
-    <CommandDemo>
+    <Command>
       <div className="flex w-72 items-center justify-between rounded-md border border-input bg-background px-3 py-1 shadow-sm hover:bg-accent/10 cursor-pointer">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>Search documentation...</span>
@@ -108,6 +108,6 @@ export function CommandAll() {
           <span>⌘</span>K
         </kbd>
       </div>
-    </CommandDemo>
+    </Command>
   );
 }
