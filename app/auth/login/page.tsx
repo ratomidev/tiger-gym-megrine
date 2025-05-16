@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 // Define Icons if missing
 const Icons = {
@@ -16,7 +16,7 @@ const Icons = {
   ),
   google: ({ className }: { className?: string }) => (
     <svg
-      xmlns="http://www.w3.org/2000/svg" 
+      xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       className={cn("h-4 w-4", className)}
     >
@@ -51,25 +51,24 @@ const Icons = {
     >
       <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
     </svg>
-  )
-}
+  ),
+};
 
 // Define the props interface for UserAuthForm
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-
 function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   async function onSubmit(event: React.SyntheticEvent) {
-    event.preventDefault()
-    setIsLoading(true)
+    event.preventDefault();
+    setIsLoading(true);
 
     setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+      setIsLoading(false);
+    }, 3000);
   }
 
   return (
@@ -126,16 +125,21 @@ function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         )}{" "}
         Google
       </Button>
-      <Button variant="outline" type="button" disabled={isLoading} className="w-full">
-    {isLoading ? (
-      <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-    ) : (
-      <Icons.phone className="mr-2 h-4 w-4" />
-    )}{" "}
-    Phone
-  </Button>
+      <Button
+        variant="outline"
+        type="button"
+        disabled={isLoading}
+        className="w-full"
+      >
+        {isLoading ? (
+          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <Icons.phone className="mr-2 h-4 w-4" />
+        )}{" "}
+        Phone
+      </Button>
     </div>
-  )
+  );
 }
 
 // Add default export for Next.js page
@@ -144,14 +148,16 @@ export default function LoginPage() {
     <div className="container flex items-center justify-center min-h-screen">
       <div className="w-full max-w-md space-y-8">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Welcome Back</h1>
-          <p className="text-gray-500 dark:text-gray-400">Enter your credentials to sign in</p>
+          <h1 className="text-3xl font-bold">Welcome Back to RYX</h1>
+          <p className="text-gray-500 dark:text-gray-400">
+            Enter your credentials to sign in
+          </p>
         </div>
         <UserAuthForm />
       </div>
     </div>
-  )
+  );
 }
 
 // Export UserAuthForm for reuse elsewhere if needed
-export { UserAuthForm }
+export { UserAuthForm };
