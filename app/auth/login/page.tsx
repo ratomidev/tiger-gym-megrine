@@ -134,6 +134,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-// Export UserAuthForm for reuse elsewhere if needed
-export { UserAuthForm };
