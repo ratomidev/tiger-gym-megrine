@@ -6,7 +6,6 @@ import {
   ChevronUp,
   Home,
   Inbox,
-  Search,
   Settings,
   User2,
   MoreHorizontal,
@@ -74,7 +73,7 @@ const items = [
   {
     title: "Search",
     url: "#",
-    icon: Search,
+    icon: Settings,
   },
   {
     title: "Settings",
@@ -157,38 +156,41 @@ export function AppSidebar() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </SidebarMenuItem>
-              <Collapsible defaultOpen className="group/collapsible">
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild>
-                        <a href="#">
-                          <span>Getting started</span>
-                          <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                        </a>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <SidebarMenuItem>
+              {/* Fix Collapsible menu item structure */}
+              <SidebarMenuItem>
+                <div className="w-full">
+                  <Collapsible defaultOpen className="group/collapsible">
+                    <div className="flex w-full items-center">
+                      <CollapsibleTrigger className="w-full" asChild>
                         <SidebarMenuButton asChild>
-                          <a href="#">
-                            <span>Installation</span>
+                          <a href="#" className="w-full flex items-center">
+                            <span>Getting started</span>
+                            <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                           </a>
                         </SidebarMenuButton>
-                      </SidebarMenuItem>
-                      <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                          <a href="#">
-                            <span>Project structure</span>
-                          </a>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+                      </CollapsibleTrigger>
+                    </div>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild>
+                            <a href="#">
+                              <span>Installation</span>
+                            </a>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild>
+                            <a href="#">
+                              <span>Project structure</span>
+                            </a>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -196,9 +198,11 @@ export function AppSidebar() {
           <SidebarGroup>
             <SidebarGroupLabel asChild>
               <CollapsibleTrigger>
-                <SidebarMenuButton>
-                  Help
-                  <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                <SidebarMenuButton asChild>
+                  <div>
+                    Help
+                    <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                  </div>
                 </SidebarMenuButton>
               </CollapsibleTrigger>
             </SidebarGroupLabel>

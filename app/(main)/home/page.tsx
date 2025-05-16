@@ -30,7 +30,7 @@ export default function Home() {
       {/* CommandAll positioned in the top right */}
       <div className="fixed top-4 right-4 z-50">
         <div className="flex items-center gap-2">
-          <CommandPalette />
+          <CommandPalette/>
           <ModeToggle />
         </div>
       </div>
