@@ -40,7 +40,7 @@ import {
 } from "@radix-ui/react-collapsible";
 
 // for help items support and feedback
-const helpItems = [
+const sidebarItems = [
   {
     title: "Documentation",
     url: "#",
@@ -82,7 +82,7 @@ const items = [
   },
 ];
 
-export function AppSidebar() {
+export function NavigationSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
@@ -209,7 +209,7 @@ export function AppSidebar() {
             <CollapsibleContent>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {helpItems.map((item) => (
+                  {sidebarItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
                         <a href={item.url}>

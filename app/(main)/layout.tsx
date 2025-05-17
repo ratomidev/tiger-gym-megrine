@@ -1,5 +1,5 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import { NavigationSidebar } from "@/components/navigation-sidebar";
 
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -17,12 +17,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           disableTransitionOnChange
         >
           <SidebarProvider>
-            <AppSidebar />
-            <div className="relative">
+            <NavigationSidebar />
+            <div className="relative w-full h-full">
               <div className="fixed top-4 z-50 ">
                 <SidebarTrigger />
               </div>
-              <main>{children}</main>
+              <main className="w-full h-screen pt-30">{children}</main>
             </div>
           </SidebarProvider>
           <div className="fixed top-4 right-4 z-50">
