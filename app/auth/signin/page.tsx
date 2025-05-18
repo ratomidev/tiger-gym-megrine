@@ -4,13 +4,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import React from "react";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-
 import { toast, Toaster } from "sonner";
-
-import { Loader2, User, Mail, Lock, Phone } from "lucide-react";
+import { Loader2, User, Mail, Lock, Phone, MapPin } from "lucide-react";
 import Image from "next/image";
+import { setDoc, doc } from "firebase/firestore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// List of Tunisian states/governorates
+const tunisianStates = [
+  "Ariana", "Béja", "Ben Arous", "Bizerte", "Gabès",
+  "Gafsa", "Jendouba", "Kairouan", "Kasserine", "Kébili",
+  "Kef", "Mahdia", "Manouba", "Médenine", "Monastir",
+  "Nabeul", "Sfax", "Sidi Bouzid", "Siliana", "Sousse",
+  "Tataouine", "Tozeur", "Tunis", "Zaghouan"
+];
 
 const Icons = {
   spinner: ({ className }: { className?: string }) => (
@@ -37,6 +52,9 @@ const Icons = {
   phone: ({ className }: { className?: string }) => (
     <Phone className={cn("h-4 w-4 text-gray-400", className)} />
   ),
+  mapPin: ({ className }: { className?: string }) => (
+    <MapPin className={cn("h-4 w-4 text-gray-400", className)} />
+  ),
 };
 
 interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -51,9 +69,16 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
     email: "",
     password: "",
     phone: "",
+    state: "", // New state field
   });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+  };
+  
+  // Handle state selection change
+  const handleStateChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, state: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,17 +93,27 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
       );
       const user = userCredential.user;
 
-      // You could store extra info like firstname/lastname in Firestore if needed
-      console.log("User:", user);
+      // Store user data including state in Firestore
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          firstname: formData.firstname,
+          lastname: formData.lastname,
+          email: formData.email,
+          phone: formData.phone,
+          state: formData.state, // Add state to document
+          createdAt: new Date().toISOString(),
+        });
 
-      toast.success(" created successUserfully!");
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      toast.error("Error creating user: " + errorMessage);
+      toast.success("Account created successfully!");
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <div className={cn("grid gap-6", className)} {...props}>
       <form onSubmit={handleSubmit}>
@@ -126,6 +161,33 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
             </div>
           </div>
         </div>
+
+        {/* State/Governorate selection field */}
+        <div className="grid gap-2 mt-4">
+          <Label htmlFor="state">State/Governorate</Label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10">
+              <Icons.mapPin />
+            </div>
+            <Select
+              value={formData.state}
+              onValueChange={handleStateChange}
+              disabled={isLoading}
+            >
+              <SelectTrigger id="state" className="pl-10 w-full">
+                <SelectValue placeholder="Select a state" />
+              </SelectTrigger>
+              <SelectContent>
+                {tunisianStates.map((state) => (
+                  <SelectItem key={state} value={state}>
+                    {state}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <div className="grid gap-2 mt-4">
           <Label htmlFor="email">Email</Label>
           <div className="relative">
@@ -192,10 +254,7 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
             disabled={isLoading}
           >
             {isLoading ? (
-              <>
-                <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
-                Processing...
-              </>
+              <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
             ) : (
               "Sign Up"
             )}
