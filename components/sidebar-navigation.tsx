@@ -82,7 +82,7 @@ const items = [
   },
 ];
 
-export function NavigationSidebar() {
+export function SidebarNavigation() {
   return (
     <Sidebar>
       <SidebarHeader>

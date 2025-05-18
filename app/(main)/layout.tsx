@@ -1,8 +1,8 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { NavigationSidebar } from "@/components/navigation-sidebar";
 
 import { CommandPalette } from "@/components/command-palette";
 import { ModeToggle } from "@/components/mode-toggle";
+import { SidebarNavigation } from "@/components/sidebar-navigation";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,7 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </header>
 
         <aside>
-          <NavigationSidebar />
+          <SidebarNavigation />
         </aside>
 
         <main className="flex-1 relative">
