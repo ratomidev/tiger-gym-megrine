@@ -20,11 +20,30 @@ import {
 
 // List of Tunisian states/governorates
 const tunisianStates = [
-  "Ariana", "Béja", "Ben Arous", "Bizerte", "Gabès",
-  "Gafsa", "Jendouba", "Kairouan", "Kasserine", "Kébili",
-  "Kef", "Mahdia", "Manouba", "Médenine", "Monastir",
-  "Nabeul", "Sfax", "Sidi Bouzid", "Siliana", "Sousse",
-  "Tataouine", "Tozeur", "Tunis", "Zaghouan"
+  "Ariana",
+  "Béja",
+  "Ben Arous",
+  "Bizerte",
+  "Gabès",
+  "Gafsa",
+  "Jendouba",
+  "Kairouan",
+  "Kasserine",
+  "Kébili",
+  "Kef",
+  "Mahdia",
+  "Manouba",
+  "Médenine",
+  "Monastir",
+  "Nabeul",
+  "Sfax",
+  "Sidi Bouzid",
+  "Siliana",
+  "Sousse",
+  "Tataouine",
+  "Tozeur",
+  "Tunis",
+  "Zaghouan",
 ];
 
 const Icons = {
@@ -75,7 +94,7 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
-  
+
   // Handle state selection change
   const handleStateChange = (value: string) => {
     setFormData((prev) => ({ ...prev, state: value }));
@@ -94,21 +113,19 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
       const user = userCredential.user;
 
       // Store user data including state in Firestore
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          firstname: formData.firstname,
-          lastname: formData.lastname,
-          email: formData.email,
-          phone: formData.phone,
-          state: formData.state, // Add state to document
-          createdAt: new Date().toISOString(),
-        });
+      await setDoc(doc(db, "users", user.uid), {
+        firstname: formData.firstname,
+        lastname: formData.lastname,
+        email: formData.email,
+        phone: formData.phone,
+        state: formData.state, // Add state to document
+        createdAt: new Date().toISOString(),
+      });
 
       toast.success("Account created successfully!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(error);
-      toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : String(error));
     } finally {
       setIsLoading(false);
     }
