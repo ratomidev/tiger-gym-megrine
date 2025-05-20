@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <CommandPalette />
             <ModeToggle />
-            <UserAuthButton/>
+            <UserAuthButton />
           </div>
         </header>
 

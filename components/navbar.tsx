@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import MobileMenu from "./mobile-menu";
-import { Menu, X } from "lucide-react"; // Import both Menu and X icons
+import { Menu as MenuIcon, X as XIcon } from "lucide-react";
 
 const LINKS = [
   { label: "Home", href: "/" },
@@ -16,25 +15,15 @@ const LINKS = [
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 767px)");
-  const router = useRouter();
-
-  const handleNavigate = (href: string) => {
-    setOpen(false);
-    router.push(href);
-  };
 
   return (
-    <nav className="relative flex items-center justify-between p-6 bg-transparent">
+    <nav className="relative flex items-center justify-between p-6">
       <div className="text-white text-2xl font-bold">Ryx</div>
 
       {isMobile ? (
         <>
-          <button
-            className="text-white p-2 focus:outline-none transition-all duration-200"
-            onClick={() => setOpen(!open)}
-            aria-label={open ? "Close menu" : "Open menu"}
-          >
-            {open ? <X size={24} /> : <Menu size={24} />}
+          <button className="text-white p-2 " onClick={() => setOpen(!open)}>
+            {open ? <XIcon /> : <MenuIcon />}
           </button>
 
           {open && (
@@ -42,7 +31,6 @@ export default function Navbar() {
               open={open}
               onToggle={() => setOpen(!open)}
               links={LINKS}
-              onNavigate={handleNavigate}
             />
           )}
         </>
@@ -52,7 +40,7 @@ export default function Navbar() {
             <Link
               key={href}
               href={href}
-              className="text-white hover:text-gray-300 transition"
+              className="text-white hover:text-gray-300 "
             >
               {label}
             </Link>

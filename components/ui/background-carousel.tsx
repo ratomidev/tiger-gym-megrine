@@ -35,7 +35,6 @@ export default function BackgroundCarousel() {
           />
         </div>
       ))}
-      <div className="absolute inset-0 bg-overlay" />
     </div>
   );
 }

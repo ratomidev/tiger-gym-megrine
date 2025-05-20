@@ -3,7 +3,6 @@ import Link from "next/link";
 export default function HeroSection() {
   return (
     <>
-      {/* Hero Content */}
       <main
         className="relative z-10 flex flex-col items-center justify-center text-center text-white px-6"
         style={{ minHeight: "80vh" }}

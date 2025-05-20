@@ -1,46 +1,31 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useRef, useEffect } from "react";
 
 interface MobileMenuProps {
   open: boolean;
   onToggle: () => void;
-  onNavigate: (href: string) => void;
   links: { label: string; href: string }[];
 }
 
-export default function MobileMenu({
-  open,
-  onToggle,
-  onNavigate,
-  links,
-}: MobileMenuProps) {
+export default function MobileMenu({ open, onToggle, links }: MobileMenuProps) {
+  const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
 
-  // Effect to handle clicks outside the menu
+  const handleNavigate = (href: string) => {
+    onToggle();
+    router.push(href);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // If menu is open and click is outside menu and not on the menu toggle button
-      if (
-        open &&
-        ref.current &&
-        !ref.current.contains(event.target as Node) &&
-        !(event.target as Element).closest(".menu-toggle-button")
-      ) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
         onToggle();
       }
     };
-
-    // Add event listener when component mounts
     document.addEventListener("mousedown", handleClickOutside);
-
-    // Clean up event listener when component unmounts
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, [open, onToggle]);
-
-  if (!open) return null;
 
   return (
     <div
@@ -50,8 +35,8 @@ export default function MobileMenu({
       {links.map(({ href, label }) => (
         <button
           key={href}
-          onClick={() => onNavigate(href)}
-          className="block w-full text-white text-left px-4 py-3 hover:bg-white/20 transition"
+          onClick={() => handleNavigate(href)}
+          className="block w-full text-white text-left px-4 py-3 hover:bg-white/20 "
         >
           {label}
         </button>
