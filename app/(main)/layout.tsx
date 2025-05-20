@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import { ModeToggle } from "@/components/mode-toggle";
 import { CommandPalette } from "@/components/command-palette";
+import { UserAuthButton } from "@/components/user-auth-button";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -27,8 +28,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </SidebarProvider>
           <div className="fixed top-4 right-4 z-50">
             <div className="flex items-center gap-2">
-              <CommandPalette />
-              <ModeToggle />
+              {/* <UserAuthButton /> */}
+              {/* <CommandPalette /> */}
+              {/* <ModeToggle /> */}
             </div>
           </div>
         </ThemeProvider>

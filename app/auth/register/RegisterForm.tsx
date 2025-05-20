@@ -2,64 +2,37 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+import { auth, db } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User } from "firebase/auth";
+import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import React from "react";
-import { auth } from "@/lib/firebase";
-import { createUserWithEmailAndPassword} from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { toast, Toaster } from "sonner";
+import { cn } from "@/lib/utils";
+import { Icons } from "@/components/icons";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-
-const db = getFirestore();
-import { Loader2, User, Mail, Lock, Phone } from "lucide-react";
-import Image from "next/image";
-
-const Icons = {
-  spinner: ({ className }: { className?: string }) => (
-    <Loader2 className={cn("h-4 w-4 animate-spin", className)} />
-  ),
-  google: ({ className }: { className?: string }) => (
-    <Image
-      src="/icons/google.svg"
-      alt="Google"
-      width={16}
-      height={16}
-      className={cn("h-4 w-4", className)}
-    />
-  ),
-  user: ({ className }: { className?: string }) => (
-    <User className={cn("h-4 w-4 text-gray-400", className)} />
-  ),
-  email: ({ className }: { className?: string }) => (
-    <Mail className={cn("h-4 w-4 text-gray-400", className)} />
-  ),
-  lock: ({ className }: { className?: string }) => (
-    <Lock className={cn("h-4 w-4 text-gray-400", className)} />
-  ),
-  phone: ({ className }: { className?: string }) => (
-    <Phone className={cn("h-4 w-4 text-gray-400", className)} />
-  ),
-};
-
-interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {
+interface RegisterFormProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-function UserSigninForm({ className, ...props }: UserSigninFormProps) {
+export function RegisterForm({ className, ...props }: RegisterFormProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-    const [formData, setFormData] = React.useState({
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false);
+  const [formData, setFormData] = React.useState({
     firstname: "",
     lastname: "",
     email: "",
     password: "",
     phone: "",
-    });
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }));
-};
+  });
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }));
+  };
 
-
-    const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -68,21 +41,107 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
         auth,
         formData.email,
         formData.password
-
       );
       const user = userCredential.user;
 
-      // You could store extra info like firstname/lastname in Firestore if needed
       console.log("User:", user);
 
-      toast.success(" created successUserfully!");
+      toast.success("Account created successfully!");
+      
+      // Redirect after successful registration
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 1500);
 
     } catch (error: any) {
-        toast.error("Error creating user: " + error.message);
+      let errorMessage = "Error creating user";
+      
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "Email is already registered";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "Password is too weak";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address";
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  }; 
+  };
+
+  const handleGoogleSignUp = async () => {
+    setIsGoogleLoading(true);
+    
+    try {
+      const googleProvider = new GoogleAuthProvider();
+      googleProvider.addScope('profile');
+      googleProvider.addScope('email');
+      
+      const result = await signInWithPopup(auth, googleProvider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const user = result.user;
+      
+      // Store user data in Firestore
+      await storeUserData(user);
+      
+      toast.success("Successfully signed up with Google!");
+      
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
+      
+    } catch (error: any) {
+      console.error("Google sign-in error:", error);
+      
+      let errorMessage = "Failed to sign up with Google";
+      
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = "Sign-in popup was closed before completing";
+      } else if (error.code === 'auth/popup-blocked') {
+        errorMessage = "Sign-in popup was blocked by your browser";
+      }
+      
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  // Add this function to store user data
+  const storeUserData = async (user: User) => {
+    if (!user) return;
+    
+    try {
+      // Create a reference to the user document
+      const userRef = doc(db, "users", user.uid);
+      
+      // Check if the document already exists
+      const docSnap = await getDoc(userRef);
+      
+      if (!docSnap.exists()) {
+        // Create user document if it doesn't exist
+        await setDoc(userRef, {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          phoneNumber: user.phoneNumber || '',
+          providerId: 'google.com',
+          lastLogin: serverTimestamp(),
+          createdAt: serverTimestamp()
+        });
+      } else {
+        // Update the last login time if the user already exists
+        await setDoc(userRef, {
+          lastLogin: serverTimestamp()
+        }, { merge: true });
+      }
+    } catch (error) {
+      console.error("Error storing user data:", error);
+      toast.error("Failed to save your profile information");
+    }
+  };
+
   return (
     <div className={cn("grid gap-6", className)} {...props}>
       <form onSubmit={handleSubmit}>
@@ -224,8 +283,13 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
         </div>
       </div>
       <div className="flex justify-center gap-4">
-        <Button variant="outline" type="button" disabled={isLoading}>
-          {isLoading ? (
+        <Button 
+          variant="outline" 
+          type="button" 
+          disabled={isLoading || isGoogleLoading}
+          onClick={handleGoogleSignUp}
+        >
+          {isGoogleLoading ? (
             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <Icons.google className="mr-2 h-4 w-4" />
@@ -240,23 +304,6 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
           )}{" "}
           Phone
         </Button>
-      </div>
-    </div>
-  );
-}
-
-export default function SignInPage() {
-  return (
-    <div className="container flex items-center justify-center min-h-screen">
-      <Toaster position="top-right" richColors />
-      <div className="w-full max-w-md space-y-8">
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">New in RYX </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Enter your credentials and start your journey with us
-          </p>
-        </div>
-        <UserSigninForm className="space-y-4" />
       </div>
     </div>
   );
