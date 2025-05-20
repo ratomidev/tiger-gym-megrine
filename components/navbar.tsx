@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import MobileMenu from "./mobile-menu";
-import { Menu } from "lucide-react"; // Import hamburger icon
+import { Menu, X } from "lucide-react"; // Import both Menu and X icons
 
 const LINKS = [
   { label: "Home", href: "/" },
@@ -24,23 +24,23 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="relative z-10 flex items-center justify-between p-6 bg-transparent">
+    <nav className="relative flex items-center justify-between p-6 bg-transparent">
       <div className="text-white text-2xl font-bold">Ryx</div>
 
       {isMobile ? (
         <>
           <button
-            className="text-white p-2 focus:outline-none"
+            className="text-white p-2 focus:outline-none transition-all duration-200"
             onClick={() => setOpen(!open)}
-            aria-label="Menu"
+            aria-label={open ? "Close menu" : "Open menu"}
           >
-            <Menu size={24} /> {/* Visible hamburger icon */}
+            {open ? <X size={24} /> : <Menu size={24} />}
           </button>
 
           {open && (
             <MobileMenu
               open={open}
-              onToggle={() => setOpen((o) => !o)}
+              onToggle={() => setOpen(!open)}
               links={LINKS}
               onNavigate={handleNavigate}
             />

@@ -17,14 +17,27 @@ export default function MobileMenu({
 }: MobileMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Effect to handle clicks outside the menu
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      // If menu is open and click is outside menu and not on the menu toggle button
+      if (
+        open &&
+        ref.current &&
+        !ref.current.contains(event.target as Node) &&
+        !(event.target as Element).closest(".menu-toggle-button")
+      ) {
         onToggle();
       }
     };
-    if (open) document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+
+    // Add event listener when component mounts
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Clean up event listener when component unmounts
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, [open, onToggle]);
 
   if (!open) return null;
