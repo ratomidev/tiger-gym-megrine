@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Search, Star, Trash2, Mail } from "lucide-react";
 
-export default function Inbox() {
+export default function InboxPage() {
   const [messages, setMessages] = useState([
     {
       id: 1,

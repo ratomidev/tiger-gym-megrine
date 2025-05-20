@@ -13,7 +13,7 @@ const LINKS = [
 ];
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (
@@ -22,14 +22,17 @@ export default function Navbar() {
 
       {isMobile ? (
         <>
-          <button className="text-white p-2 " onClick={() => setOpen(!open)}>
-            {open ? <XIcon /> : <MenuIcon />}
+          <button
+            className="text-white p-2 "
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <XIcon /> : <MenuIcon />}
           </button>
 
-          {open && (
+          {isMenuOpen && (
             <MobileMenu
-              open={open}
-              onToggle={() => setOpen(!open)}
+              open={isMenuOpen}
+              onToggle={() => setIsMenuOpen(!isMenuOpen)}
               links={LINKS}
             />
           )}

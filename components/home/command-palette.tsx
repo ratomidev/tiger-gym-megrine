@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   Calculator,
   Calendar,
@@ -20,15 +19,17 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
+import { useEffect, useState } from "react";
+
 
 interface CommandDemoProps {
   children?: React.ReactNode;
 }
 
 function Command({ children }: CommandDemoProps) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "j" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();

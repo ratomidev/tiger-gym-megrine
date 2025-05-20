@@ -1,6 +1,6 @@
 "use client";
 
-import { StoryViewer } from "@/components/story-viewer";
+import { StoryViewer } from "@/components/swipe/story-viewer";
 
 export default function SwipePage() {
   // Stories data with images
