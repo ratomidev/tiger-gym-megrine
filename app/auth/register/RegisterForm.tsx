@@ -2,38 +2,37 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import React from "react";
 import { auth, db } from "@/lib/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { toast, Toaster } from "sonner";
-import { Loader2, User, Mail, Lock, Phone, MapPin } from "lucide-react";
-import Image from "next/image";
-import { setDoc, doc } from "firebase/firestore";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import React from "react";
+import { cn } from "@/lib/utils";
+import { Icons } from "@/components/icons";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FirebaseError } from "firebase/app";
 
-// List of Tunisian states/governorates
+interface RegisterFormProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string;
+}
+
 const tunisianStates = [
   "Ariana",
-  "Béja",
+  "Beja",
   "Ben Arous",
   "Bizerte",
-  "Gabès",
+  "Gabes",
   "Gafsa",
   "Jendouba",
   "Kairouan",
   "Kasserine",
-  "Kébili",
+  "Kebili",
   "Kef",
   "Mahdia",
   "Manouba",
-  "Médenine",
+  "Medenine",
   "Monastir",
   "Nabeul",
   "Sfax",
@@ -43,61 +42,67 @@ const tunisianStates = [
   "Tataouine",
   "Tozeur",
   "Tunis",
-  "Zaghouan",
+  "Zaghouan"
 ];
 
-const Icons = {
-  spinner: ({ className }: { className?: string }) => (
-    <Loader2 className={cn("h-4 w-4 animate-spin", className)} />
-  ),
-  google: ({ className }: { className?: string }) => (
-    <Image
-      src="/icons/google.svg"
-      alt="Google"
-      width={16}
-      height={16}
-      className={cn("h-4 w-4", className)}
-    />
-  ),
-  user: ({ className }: { className?: string }) => (
-    <User className={cn("h-4 w-4 text-gray-400", className)} />
-  ),
-  email: ({ className }: { className?: string }) => (
-    <Mail className={cn("h-4 w-4 text-gray-400", className)} />
-  ),
-  lock: ({ className }: { className?: string }) => (
-    <Lock className={cn("h-4 w-4 text-gray-400", className)} />
-  ),
-  phone: ({ className }: { className?: string }) => (
-    <Phone className={cn("h-4 w-4 text-gray-400", className)} />
-  ),
-  mapPin: ({ className }: { className?: string }) => (
-    <MapPin className={cn("h-4 w-4 text-gray-400", className)} />
-  ),
-};
-
-interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-}
-
-function UserSigninForm({ className, ...props }: UserSigninFormProps) {
+export function RegisterForm({ className, ...props }: RegisterFormProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false);
   const [formData, setFormData] = React.useState({
     firstname: "",
     lastname: "",
     email: "",
     password: "",
     phone: "",
-    state: "", // New state field
+    state: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
-  };
+  const handleGoogleSignUp = async () => {
+    setIsGoogleLoading(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      const userCredential = await signInWithPopup(auth, provider);
+      const user = userCredential.user;
+      console.log("User:", user);
 
-  // Handle state selection change
+      // Check if the user already exists in Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        // Create a new user document in Firestore
+        await setDoc(userDocRef, {
+          uid: user.uid,
+          email: user.email,
+          displayName: `${formData.firstname} ${formData.lastname}`,
+          phone: formData.phone,
+          state: formData.state,
+          createdAt: serverTimestamp(),
+        });
+      }
+
+      toast.success("Account created successfully!");
+      
+      // Redirect after successful registration
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 1500);
+
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+      toast.error("Error signing in with Google");
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  }
+
   const handleStateChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, state: value }));
+    setFormData(prev => ({ ...prev, state: value }));
+  };
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,20 +117,30 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
       );
       const user = userCredential.user;
 
-      // Store user data including state in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        firstname: formData.firstname,
-        lastname: formData.lastname,
-        email: formData.email,
-        phone: formData.phone,
-        state: formData.state, // Add state to document
-        createdAt: new Date().toISOString(),
-      });
+      console.log("User:", user);
 
       toast.success("Account created successfully!");
+      
+      // Redirect after successful registration
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 1500);
+
     } catch (error: unknown) {
-      console.log(error);
-      toast.error(error instanceof Error ? error.message : String(error));
+      let errorMessage = "Error creating user";
+      
+      // Type check for FirebaseError before accessing the code property
+      if (error instanceof FirebaseError) {
+        if (error.code === "auth/email-already-in-use") {
+          errorMessage = "Email is already registered";
+        } else if (error.code === "auth/weak-password") {
+          errorMessage = "Password is too weak";
+        } else if (error.code === "auth/invalid-email") {
+          errorMessage = "Invalid email address";
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -296,8 +311,13 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
         </div>
       </div>
       <div className="flex justify-center gap-4">
-        <Button variant="outline" type="button" disabled={isLoading}>
-          {isLoading ? (
+        <Button 
+          variant="outline" 
+          type="button" 
+          disabled={isLoading || isGoogleLoading}
+          onClick={handleGoogleSignUp}
+        >
+          {isGoogleLoading ? (
             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <Icons.google className="mr-2 h-4 w-4" />
@@ -312,23 +332,6 @@ function UserSigninForm({ className, ...props }: UserSigninFormProps) {
           )}{" "}
           Phone
         </Button>
-      </div>
-    </div>
-  );
-}
-
-export default function SignInPage() {
-  return (
-    <div className="container flex items-center justify-center min-h-screen">
-      <Toaster position="top-right" richColors />
-      <div className="w-full max-w-md space-y-8">
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">New in RYX </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Enter your credentials and start your journey with us
-          </p>
-        </div>
-        <UserSigninForm className="space-y-4" />
       </div>
     </div>
   );
