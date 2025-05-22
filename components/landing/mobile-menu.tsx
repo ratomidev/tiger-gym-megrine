@@ -9,6 +9,7 @@ interface MobileMenuProps {
   links: { label: string; href: string }[];
 }
 
+
 export default function MobileMenu({ open, onToggle, links }: MobileMenuProps) {
   const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);

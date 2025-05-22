@@ -1,5 +1,5 @@
 "use client";
-export default function Home() {
+export default function HomePage() {
   return (
     <div className="relative h-full w-full">
       <div className="w-full max-w-6xl px-4 mx-auto">
@@ -138,9 +138,8 @@ export default function Home() {
               </p>
 
               <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-6 italic">
-                The most successful businesses will be those that can
-                seamlessly integrate digital technologies with human-centered
-                experiences.
+                The most successful businesses will be those that can seamlessly
+                integrate digital technologies with human-centered experiences.
                 <footer className="text-sm mt-2">
                   — Industry Analysis Report, Q1 2025
                 </footer>

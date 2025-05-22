@@ -1,8 +1,8 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
-import { CommandPalette } from "@/components/command-palette";
-import { ModeToggle } from "@/components/mode-toggle";
-import { SidebarNavigation } from "@/components/sidebar-navigation";
+import { CommandPalette } from "@/components/home/command-palette";
+import { ModeToggle } from "@/components/home/mode-toggle";
+import { SidebarNavigation } from "@/components/home/sidebar-navigation";
 import { UserAuthButton } from "@/components/user-auth-button";
 
 export default function Layout({ children }: { children: React.ReactNode }) {

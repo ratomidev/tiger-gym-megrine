@@ -1,10 +1,10 @@
 "use client";
 
-import HeroSection from "@/components/hero-section";
-import Navbar from "@/components/navbar";
-import BackgroundCarousel from "@/components/ui/background-carousel";
+import HeroSection from "@/components/landing/hero-section";
+import Navbar from "@/components/landing/navbar";
+import BackgroundCarousel from "@/components/landing/background-carousel";
 
-export default function HomePage() {
+export default function LandingPage() {
   return (
     <div className="relative min-h-screen">
       <BackgroundCarousel />
