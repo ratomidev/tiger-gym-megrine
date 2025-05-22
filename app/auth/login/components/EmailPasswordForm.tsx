@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { auth } from "@/lib/firebase";
-import { sign } from "crypto";
 import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword, User } from "firebase/auth";
 import React from "react";
@@ -98,6 +97,16 @@ export function EmailPasswordForm({
             disabled={isLoading}
             required
           />
+        </div>
+        <div>
+            <span className="text-sm text-muted-foreground">
+                <a 
+                    href="/auth/forgot-password"
+                    className="text-primary underline underline-offset-4 hover:text-primary/80"
+                >
+                    forgot password ?
+                </a>
+            </span>
         </div>
         <Button className="mt-2" disabled={isLoading} type="submit">
           {isLoading && (

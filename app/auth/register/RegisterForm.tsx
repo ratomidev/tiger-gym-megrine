@@ -1,10 +1,8 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { auth, db } from "@/lib/firebase";
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons";
@@ -48,7 +46,6 @@ const tunisianStates = [
 export function RegisterForm({ className, ...props }: RegisterFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false);
   const [formData, setFormData] = React.useState({
     firstname: "",
     lastname: "",
@@ -57,45 +54,6 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
     phone: "",
     state: "",
   });
-
-  const handleGoogleSignUp = async () => {
-    setIsGoogleLoading(true);
-    const provider = new GoogleAuthProvider();
-    try {
-      const userCredential = await signInWithPopup(auth, provider);
-      const user = userCredential.user;
-      console.log("User:", user);
-
-      // Check if the user already exists in Firestore
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (!userDoc.exists()) {
-        // Create a new user document in Firestore
-        await setDoc(userDocRef, {
-          uid: user.uid,
-          email: user.email,
-          displayName: `${formData.firstname} ${formData.lastname}`,
-          phone: formData.phone,
-          state: formData.state,
-          createdAt: serverTimestamp(),
-        });
-      }
-
-      toast.success("Account created successfully!");
-      
-      // Redirect after successful registration
-      setTimeout(() => {
-        router.push("/auth/login");
-      }, 1500);
-
-    } catch (error) {
-      console.error("Error signing in with Google:", error);
-      toast.error("Error signing in with Google");
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  }
 
   const handleStateChange = (value: string) => {
     setFormData(prev => ({ ...prev, state: value }));
@@ -300,39 +258,6 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
           </p>
         </div>
       </form>
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or register with
-          </span>
-        </div>
-      </div>
-      <div className="flex justify-center gap-4">
-        <Button 
-          variant="outline" 
-          type="button" 
-          disabled={isLoading || isGoogleLoading}
-          onClick={handleGoogleSignUp}
-        >
-          {isGoogleLoading ? (
-            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Icons.google className="mr-2 h-4 w-4" />
-          )}{" "}
-          Google
-        </Button>
-        <Button variant="outline" type="button" disabled={isLoading}>
-          {isLoading ? (
-            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Icons.phone className="mr-2 h-4 w-4" />
-          )}{" "}
-          Phone
-        </Button>
-      </div>
     </div>
   );
 }

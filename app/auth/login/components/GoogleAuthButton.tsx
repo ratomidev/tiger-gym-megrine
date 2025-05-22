@@ -54,7 +54,7 @@ export default function GoogleAuthButton({
       await createOrUpdateUserInFirestore(user);
 
       onSuccess?.(user);
-    } catch (error) {
+    } catch {
       onError?.("Google sign-in failed");
     } finally {
       setLoading(false);

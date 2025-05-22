@@ -58,11 +58,25 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
               </span>
             </div>
           </div>
-          <GoogleAuthButton 
-            onSuccess={handleAuthSuccess} 
-            onError={handleAuthError} 
-          />
-          <PhoneAuthButton onClick={handlePhoneAuthClick} />
+          <div className="grid grid-cols-2 gap-2 w-full"> 
+              <GoogleAuthButton 
+                  onSuccess={handleAuthSuccess} 
+                  onError={handleAuthError} 
+                  
+              />
+              <PhoneAuthButton onClick={handlePhoneAuthClick} />
+          </div>
+          <div className="relative items-center flex justify-center text-xs">
+            <span className="text-sm text-muted-foreground">
+              Don&apos;t have an account?{" "}
+              <a
+                href="/auth/register"
+                className="text-primary underline underline-offset-4 hover:text-primary/80"
+              >
+                Sign up
+              </a>
+            </span>
+          </div>
         </>
       ) : (
         <PhoneAuthForm
