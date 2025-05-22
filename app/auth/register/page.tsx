@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Toaster } from "sonner";
-import { RegisterForm } from "./RegisterForm";
+import { RegisterForm } from "../../../components/auth/RegisterForm";
 
 
 

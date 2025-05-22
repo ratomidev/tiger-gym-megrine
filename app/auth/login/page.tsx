@@ -1,7 +1,7 @@
 // app/(auth)/login/page.tsx
 
 import { Toaster } from "sonner";
-import { LoginForm } from "./LoginForm";
+import { LoginForm } from "../../../components/auth/LoginForm";
 
 export default function LoginPage() {
   return (
