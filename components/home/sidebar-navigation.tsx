@@ -39,31 +39,17 @@ import {
   CollapsibleTrigger,
 } from "@radix-ui/react-collapsible";
 
-// for help items support and feedback
-const sidebarItems = [
-  {
-    title: "Documentation",
-    url: "#",
-    icon: BookOpenText,
-  },
-  {
-    title: "Support",
-    url: "#",
-    icon: Globe,
-  },
-];
-
 // Menu items.
 const items = [
   {
     title: "Home",
-    url: "#",
+    url: "/home",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
+    title: "Users",
+    url: "/users",
+    icon: User2,
   },
   {
     title: "Calendar",
@@ -74,42 +60,17 @@ const items = [
     title: "Search",
     url: "#",
     icon: Settings,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
+  }
 ];
 
 export function SidebarNavigation() {
   return (
     <Sidebar>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  Select Workspace
-                  <ChevronDown className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-                <DropdownMenuItem>
-                  <span>Acme Inc</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Acme Corp.</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      <SidebarHeader className="flex items-center justify-between font-bold">
+        TigerGym Megrine
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -122,40 +83,8 @@ export function SidebarNavigation() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <Settings />
-                    <span>new</span>
-                  </a>
-                </SidebarMenuButton>
-                <SidebarMenuBadge>New</SidebarMenuBadge>
-              </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <Home />
-                    <span>Project</span>
-                  </a>
-                </SidebarMenuButton>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuAction>
-                      <MoreHorizontal />
-                    </SidebarMenuAction>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent side="right" align="start">
-                    <DropdownMenuItem>
-                      <span>Edit Project</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <span>Delete Project</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
+              
               {/* Fix Collapsible menu item structure */}
               <SidebarMenuItem>
                 <div className="w-full">
@@ -194,36 +123,6 @@ export function SidebarNavigation() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <Collapsible defaultOpen className="group/collapsible">
-          <SidebarGroup>
-            <SidebarGroupLabel asChild>
-              <CollapsibleTrigger>
-                <SidebarMenuButton asChild>
-                  <div>
-                    Help
-                    <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                  </div>
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-            </SidebarGroupLabel>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {sidebarItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
-                        <a href={item.url}>
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </a>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
       </SidebarContent>
 
       <SidebarFooter>

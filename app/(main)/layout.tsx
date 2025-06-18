@@ -11,7 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <SidebarProvider>
         <header className="fixed top-4 right-4 z-50">
           <div className="flex items-center gap-2">
-            <CommandPalette />
+            {/* <CommandPalette /> */}
             <ModeToggle />
             {/* <UserAuthButton /> */}
           </div>

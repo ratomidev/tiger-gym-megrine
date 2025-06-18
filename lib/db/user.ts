@@ -18,3 +18,15 @@ export function excludePassword(user: any): User {
   const { password, ...userWithoutPassword } = user;
   return userWithoutPassword;
 }
+
+export function getAllUsers() {
+  return prisma.user.findMany({
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      createdAt: true,
+      updatedAt: true
+    }
+  });
+}
