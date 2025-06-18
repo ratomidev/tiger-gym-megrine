@@ -3,13 +3,10 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { User } from "firebase/auth";
 import { toast } from "sonner";
 import { EmailPasswordForm } from "./EmailPasswordForm";
-import GoogleAuthButton from "./GoogleAuthButton";
-// import { GoogleAuthButton } from "./components/GoogleAuthButton";
-import { PhoneAuthButton } from "./PhoneAuthButton";
-import { PhoneAuthForm } from "./PhoneAuthForm";
+import { User } from "@/lib/auth/types";
+import { useAuth } from "@/context/AuthContext";
 
 interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
@@ -17,13 +14,11 @@ interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function LoginForm({ className, ...props }: LoginFormProps) {
   const router = useRouter();
-  const [authMethod, setAuthMethod] = React.useState<"email" | "phone" | null>(
-    "email"
-  );
+  const { login } = useAuth();
 
   const handleAuthSuccess = (user: User) => {
-    localStorage.setItem("user", JSON.stringify(user));
-    toast.success("Welcome back! " + user.displayName);
+    login(user);
+    toast.success("Welcome back! " + (user.name || user.email));
     setTimeout(() => {
       router.push("/home");
     }, 1000);
@@ -33,57 +28,12 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
     toast.error(message);
   };
 
-  const handlePhoneAuthClick = () => {
-    setAuthMethod("phone");
-  };
-
-  // Cancel phone auth and go back to email login
-  const handleCancelPhoneAuth = () => {
-    setAuthMethod("email");
-  };
-
   return (
     <div className={cn("grid gap-6", className)} {...props}>
-      {authMethod === "email" ? (
-        <>
-          <EmailPasswordForm onSuccess={handleAuthSuccess} />
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-2 w-full">
-            <GoogleAuthButton
-              onSuccess={handleAuthSuccess}
-              onError={handleAuthError}
-            />
-            <PhoneAuthButton onClick={handlePhoneAuthClick} />
-          </div>
-          <div className="relative items-center flex justify-center text-xs">
-            <span className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <a
-                href="/auth/register"
-                className="text-primary underline underline-offset-4 hover:text-primary/80"
-              >
-                Sign up
-              </a>
-            </span>
-          </div>
-        </>
-      ) : (
-        <PhoneAuthForm
-          onSuccess={handleAuthSuccess}
-          onError={handleAuthError}
-          onCancel={handleCancelPhoneAuth}
-        />
-      )}
+      <EmailPasswordForm 
+        onSuccess={handleAuthSuccess} 
+        onError={handleAuthError} 
+      />
     </div>
   );
 }

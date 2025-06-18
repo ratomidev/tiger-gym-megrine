@@ -3,7 +3,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { CommandPalette } from "@/components/home/command-palette";
 import { ModeToggle } from "@/components/home/mode-toggle";
 import { SidebarNavigation } from "@/components/home/sidebar-navigation";
-import { UserAuthButton } from "@/components/user-auth-button";
+// import { UserAuthButton } from "@/components/user-auth-button";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,9 +11,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <SidebarProvider>
         <header className="fixed top-4 right-4 z-50">
           <div className="flex items-center gap-2">
-            <CommandPalette />
+            {/* <CommandPalette /> */}
             <ModeToggle />
-            <UserAuthButton />
+            {/* <UserAuthButton /> */}
           </div>
         </header>
 
