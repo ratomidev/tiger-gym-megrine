@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { EmailPasswordForm } from "./EmailPasswordForm";
-import { User } from "@/lib/login"; // Import our custom User type
+import { User } from "@/lib/auth/types";
+import { useAuth } from "@/context/AuthContext";
 
 interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
@@ -13,9 +14,10 @@ interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function LoginForm({ className, ...props }: LoginFormProps) {
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleAuthSuccess = (user: User) => {
-    localStorage.setItem("user", JSON.stringify(user));
+    login(user);
     toast.success("Welcome back! " + (user.name || user.email));
     setTimeout(() => {
       router.push("/home");
