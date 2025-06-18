@@ -9,7 +9,7 @@ export default function LoginPage() {
       <Toaster position="top-right" richColors />
       <div className="w-full max-w-md space-y-8">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Welcome Back to RYX</h1>
+          <h1 className="text-3xl font-bold">Tiger Gym Dashboard</h1>
           <p className="text-gray-500 dark:text-gray-400">
             Enter your credentials to sign in
           </p>
