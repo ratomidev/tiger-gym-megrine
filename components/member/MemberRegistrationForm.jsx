@@ -67,18 +67,80 @@ function RegistrationForm() {
     }
   };
 
-
-  const onSubmit = (data) => {
-    // Add files to the data
-    const formData = {
-      ...data,
-      photo,
-      medicalCertificateFile
-    };
-    
-    console.log("Form submitted:", formData);
-    // Add API call or state management here
-    alert("Contact form submitted successfully!");
+  const onSubmit = async (data) => {
+    try {
+      const formData = new FormData();
+      
+      // Add basic member data
+      formData.append("membershipNumber", data.membershipNumber);
+      formData.append("firstname", data.firstname);
+      formData.append("lastname", data.lastname);
+      formData.append("email", data.email);
+      formData.append("tel", data.tel);
+      formData.append("sexe", data.sexe);
+      formData.append("birthdate", data.birthdate);
+      
+      // Add address data
+      formData.append("address.street", data.address.street);
+      formData.append("address.city", data.address.city);
+      formData.append("address.postalCode", data.address.postalCode);
+      formData.append("address.country", data.address.country);
+      
+      // Add subscription data
+      formData.append("inscriptionDate", data.inscriptionDate);
+      formData.append("subscriptionType", data.subscriptionType);
+      formData.append("subscriptionStartDate", data.subscriptionStartDate);
+      formData.append("subscriptionEndDate", data.subscriptionEndDate);
+      formData.append("subscriptionStatus", data.subscriptionStatus);
+      
+      // Add services data
+      formData.append("services.musculation", data.services.musculation);
+      formData.append("services.cardio", data.services.cardio);
+      formData.append("services.fitness", data.services.fitness);
+      formData.append("services.boxing", data.services.boxing);
+      formData.append("services.yoga", data.services.yoga);
+      
+      // Add medical data
+      formData.append("medicalCertificateDate", data.medicalCertificateDate);
+      formData.append("hasMedicalCertificate", data.hasMedicalCertificate);
+      formData.append("allergies", data.allergies);
+      formData.append("healthIssues", data.healthIssues);
+      formData.append("specialPermissions", data.specialPermissions);
+      formData.append("contraindications", data.contraindications);
+      
+      // Add notes
+      formData.append("notes", data.notes);
+      
+      // Add files
+      if (photo) {
+        formData.append("photo", photo);
+      }
+      
+      if (medicalCertificateFile) {
+        formData.append("medicalCertificateFile", medicalCertificateFile);
+      }
+      
+      console.log("Submitting form...");
+      
+      const response = await fetch('/api/members', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log("Member registered successfully:", result.member);
+        alert("Adhérent enregistré avec succès!");
+        // Reset form or redirect as needed
+      } else {
+        console.error("Failed to register member:", result.error);
+        alert("Erreur lors de l'enregistrement de l'adhérent: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Une erreur s'est produite lors de l'envoi du formulaire");
+    }
   };
 
   return (

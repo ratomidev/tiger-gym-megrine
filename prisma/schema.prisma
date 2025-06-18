@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
 }
 
 datasource db {
@@ -21,4 +20,79 @@ model User {
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+
+model Member {
+  id               String   @id @default(cuid())
+  membershipNumber String   @unique
+  firstname        String
+  lastname         String
+  email            String?
+  tel              String?
+  sexe             String?
+  birthdate        DateTime?
+  photoUrl         String?  // URL to stored photo
+  
+  // Address information
+  address          Address?
+
+  // Membership information
+  inscriptionDate         DateTime @default(now())
+  subscriptionType        String   // monthly, quarterly, biannual, annual
+  subscriptionStartDate   DateTime
+  subscriptionEndDate     DateTime
+  subscriptionStatus      String   @default("actif") // actif, expiré, suspendu
+  
+  // Services as a relation to ServiceSubscription
+  services               ServiceSubscription?
+  
+  // Medical information
+  medicalRecord          MedicalRecord?
+  
+  // Notes
+  notes                  String?
+  
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model Address {
+  id         String  @id @default(cuid())
+  street     String?
+  city       String?
+  postalCode String?
+  country    String  @default("Tunisie")
+  
+  // Relation to Member
+  memberId   String  @unique
+  member     Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model ServiceSubscription {
+  id          String  @id @default(cuid())
+  musculation Boolean @default(false)
+  cardio      Boolean @default(false)
+  fitness     Boolean @default(false)
+  boxing      Boolean @default(false)
+  yoga        Boolean @default(false)
+  
+  // Relation to Member
+  memberId    String  @unique
+  member      Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model MedicalRecord {
+  id                     String   @id @default(cuid())
+  medicalCertificateDate DateTime?
+  hasMedicalCertificate  Boolean  @default(false)
+  medicalCertificateUrl  String?  // URL to stored medical certificate
+  allergies              String?
+  healthIssues           String?
+  specialPermissions     String?
+  contraindications      String?
+  
+  // Relation to Member
+  memberId               String   @unique
+  member                 Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
 }
