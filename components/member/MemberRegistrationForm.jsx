@@ -126,23 +126,32 @@ function RegistrationForm() {
       }
       
       console.log("Submitting form...");
-      
-      const response = await fetch('/api/members', {
+        const response = await fetch('/api/members', {
         method: 'POST',
         body: formData,
       });
       
       const result = await response.json();
-        if (result.success) {
-        console.log("Member registered successfully:", result.member);
+      if (result.success) {
+        console.log("Member registered successfully:", result.member);        
         toast.success("Adhérent enregistré avec succès!", {
           description: `${result.member.firstname} ${result.member.lastname} a été enregistré.`,
           style: { backgroundColor: "#f0fdf4", borderLeft: "4px solid #22c55e" },
         });
-        // Redirect to the member list page after a short delay
-        setTimeout(() => {
-          router.push('/list-member');
-        }, 1500);
+        
+        // Ensure we have a valid ID before redirecting
+        if (result.member && result.member.id) {
+          // Redirect to the member details page after a short delay
+          setTimeout(() => {
+            router.push(`/details-member?id=${result.member.id}`);
+          }, 1500);
+        } else {
+          console.error("Missing member ID in response");
+          // Fallback to the list page if ID is missing
+          setTimeout(() => {
+            router.push('/list-member');
+          }, 1500);
+        }
       } else {
         console.error("Failed to register member:", result.error);
         toast.error("Erreur lors de l'enregistrement de l'adhérent", {
