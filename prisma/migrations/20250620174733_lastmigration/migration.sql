@@ -77,9 +77,6 @@ CREATE TABLE "MedicalRecord" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Member_membershipNumber_key" ON "Member"("membershipNumber");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Address_memberId_key" ON "Address"("memberId");
 
 -- CreateIndex
