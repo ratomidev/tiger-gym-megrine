@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { toast } from "sonner";
 
 function RegistrationForm() {
   const { control, handleSubmit, register, formState: { errors } } = useForm({
@@ -131,15 +134,24 @@ function RegistrationForm() {
       
       if (result.success) {
         console.log("Member registered successfully:", result.member);
-        alert("Adhérent enregistré avec succès!");
+        toast.success("Adhérent enregistré avec succès!", {
+          description: `${result.member.firstname} ${result.member.lastname} a été enregistré.`,
+          style: { backgroundColor: "#f0fdf4", borderLeft: "4px solid #22c55e" },
+        });
         // Reset form or redirect as needed
       } else {
         console.error("Failed to register member:", result.error);
-        alert("Erreur lors de l'enregistrement de l'adhérent: " + result.error);
+        toast.error("Erreur lors de l'enregistrement de l'adhérent", {
+          description: result.error,
+          style: { backgroundColor: "#fef2f2", borderLeft: "4px solid #ef4444" },
+        });
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert("Une erreur s'est produite lors de l'envoi du formulaire");
+      toast.error("Une erreur s'est produite lors de l'envoi du formulaire", {
+        description: "Problème de connexion au serveur.",
+        style: { backgroundColor: "#fef2f2", borderLeft: "4px solid #ef4444" },
+      });
     }
   };
 

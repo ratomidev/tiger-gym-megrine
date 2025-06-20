@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
+import * as React from "react";
+import { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,11 +13,11 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,8 +26,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,48 +35,51 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 // Define Member type based on your schema
 type Member = {
-  id: string
-  membershipNumber: string
-  firstname: string
-  lastname: string
-  email: string | null
-  tel: string | null
-  sexe: string | null
-  subscriptionType: string
-  subscriptionStatus: string
-  subscriptionEndDate: string
-}
+  id: string;
+  membershipNumber: string;
+  firstname: string;
+  lastname: string;
+  email: string | null;
+  tel: string | null;
+  sexe: string | null;
+  subscriptionType: string;
+  subscriptionStatus: string;
+  subscriptionEndDate: string;
+};
 
 export default function MemberListPage() {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = useState({})
-  const [members, setMembers] = useState<Member[]>([])
-  const [loading, setLoading] = useState(true)
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch('/api/members/list')
+        const response = await fetch("/api/members/list");
         if (!response.ok) {
-          throw new Error('Failed to fetch members')
+          throw new Error("Failed to fetch members");
         }
-        const data = await response.json()
-        setMembers(data)
+        const data = await response.json();
+        setMembers(data);
       } catch (error) {
-        console.error('Error fetching members:', error)
+        console.error("Error fetching members:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchMembers()
-  }, [])
+    fetchMembers();
+  }, []);
 
   const columns: ColumnDef<Member>[] = [
     {
@@ -126,7 +130,7 @@ export default function MemberListPage() {
             Email
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
       cell: ({ row }) => <div>{row.getValue("email")}</div>,
     },
@@ -145,10 +149,10 @@ export default function MemberListPage() {
       header: "Status",
       cell: ({ row }) => (
         <div className="capitalize">
-          <span 
+          <span
             className={`px-2 py-1 rounded-full text-xs font-medium ${
-              row.getValue("subscriptionStatus") === "actif" 
-                ? "bg-green-100 text-green-800" 
+              row.getValue("subscriptionStatus") === "actif"
+                ? "bg-green-100 text-green-800"
                 : row.getValue("subscriptionStatus") === "expiré"
                 ? "bg-red-100 text-red-800"
                 : "bg-yellow-100 text-yellow-800"
@@ -163,15 +167,15 @@ export default function MemberListPage() {
       accessorKey: "subscriptionEndDate",
       header: "Expiry Date",
       cell: ({ row }) => {
-        const date = new Date(row.getValue("subscriptionEndDate"))
-        return <div>{date.toLocaleDateString()}</div>
+        const date = new Date(row.getValue("subscriptionEndDate"));
+        return <div>{date.toLocaleDateString()}</div>;
       },
     },
     {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
-        const member = row.original
+        const member = row.original;
 
         return (
           <DropdownMenu>
@@ -191,13 +195,15 @@ export default function MemberListPage() {
               <DropdownMenuSeparator />
               <DropdownMenuItem>View member details</DropdownMenuItem>
               <DropdownMenuItem>Edit member</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">Delete member</DropdownMenuItem>
+              <DropdownMenuItem className="text-red-600">
+                Delete member
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 
   const table = useReactTable({
     data: members,
@@ -216,10 +222,14 @@ export default function MemberListPage() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   if (loading) {
-    return <div className="flex justify-center items-center h-96">Loading members...</div>
+    return (
+      <div className="flex justify-center items-center h-96">
+        Loading members...
+      </div>
+    );
   }
 
   return (
@@ -229,7 +239,9 @@ export default function MemberListPage() {
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter by name..."
-            value={(table.getColumn("firstname")?.getFilterValue() as string) ?? ""}
+            value={
+              (table.getColumn("firstname")?.getFilterValue() as string) ?? ""
+            }
             onChange={(event) =>
               table.getColumn("firstname")?.setFilterValue(event.target.value)
             }
@@ -257,7 +269,7 @@ export default function MemberListPage() {
                     >
                       {column.id}
                     </DropdownMenuCheckboxItem>
-                  )
+                  );
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -277,7 +289,7 @@ export default function MemberListPage() {
                               header.getContext()
                             )}
                       </TableHead>
-                    )
+                    );
                   })}
                 </TableRow>
               ))}
@@ -338,5 +350,5 @@ export default function MemberListPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

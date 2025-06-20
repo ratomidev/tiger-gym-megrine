@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    // Fetch members with all their related information
     const members = await prisma.member.findMany({
       select: {
         id: true,
@@ -13,27 +14,20 @@ export async function GET() {
         email: true,
         tel: true,
         sexe: true,
-        birthdate: true,
-        photoUrl: true,
         subscriptionType: true,
-        subscriptionStartDate: true,
-        subscriptionEndDate: true,
         subscriptionStatus: true,
-        inscriptionDate: true,
-        createdAt: true,
-        updatedAt: true,
+        subscriptionEndDate: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
-    // Return the members data
     return NextResponse.json(members);
   } catch (error) {
     console.error("Error fetching members:", error);
     return NextResponse.json(
-      { error: "Failed to fetch members: " + (error as Error).message },
+      { error: "Failed to fetch members" },
       { status: 500 }
     );
   }
