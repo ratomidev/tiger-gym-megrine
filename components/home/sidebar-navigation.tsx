@@ -1,14 +1,10 @@
 import {
   Calendar,
-  Globe,
-  BookOpenText,
-  ChevronDown,
   ChevronUp,
   Home,
-  Inbox,
   Settings,
   User2,
-  MoreHorizontal,
+  UserPlus,
   ChevronRight,
 } from "lucide-react";
 
@@ -18,11 +14,8 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -47,6 +40,11 @@ const items = [
     icon: Home,
   },
   {
+    title: "Adherents",
+    url: "/list-member",
+    icon: UserPlus,
+  },
+  {
     title: "Users",
     url: "/users",
     icon: User2,
@@ -60,7 +58,7 @@ const items = [
     title: "Search",
     url: "#",
     icon: Settings,
-  }
+  },
 ];
 
 export function SidebarNavigation() {
@@ -84,7 +82,6 @@ export function SidebarNavigation() {
                 </SidebarMenuItem>
               ))}
 
-              
               {/* Fix Collapsible menu item structure */}
               <SidebarMenuItem>
                 <div className="w-full">

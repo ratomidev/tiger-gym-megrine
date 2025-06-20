@@ -3,6 +3,7 @@ import RegistrationForm from '@/components/member/MemberRegistrationForm';
 import { Toaster } from 'sonner';
 
 const Page = () => {
+
   return (
     <div className="container mx-auto py-10">
       <Toaster 
@@ -19,6 +20,7 @@ const Page = () => {
           }
         }}
       />
+      
       <RegistrationForm />
     </div>
   );

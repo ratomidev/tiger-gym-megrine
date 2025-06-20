@@ -231,17 +231,27 @@ export default function MemberListPage() {
       </div>
     );
   }
-  
+
   return (
     <div className="relative h-full w-full">
       <div className="w-full max-w-6xl px-4 mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-center">Liste des Adhérents</h1>
-        
+        {" "}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Liste des Adhérents</h1>
+          <Button
+            onClick={() => (window.location.href = "/add-member")}
+            className="bg-black hover:bg-gray-800 text-white"
+          >
+            Ajouter un adhérent
+          </Button>
+        </div>
         <div className="w-full bg-white/5 border border-gray-200 dark:border-gray-800 rounded-lg p-6">
           <div className="flex items-center py-4">
             <Input
               placeholder="Filtrer par nom..."
-              value={(table.getColumn("firstname")?.getFilterValue() as string) ?? ""}
+              value={
+                (table.getColumn("firstname")?.getFilterValue() as string) ?? ""
+              }
               onChange={(event) =>
                 table.getColumn("firstname")?.setFilterValue(event.target.value)
               }
@@ -327,7 +337,8 @@ export default function MemberListPage() {
           <div className="flex items-center justify-end space-x-2 py-4">
             <div className="text-muted-foreground flex-1 text-sm">
               {table.getFilteredSelectedRowModel().rows.length} sur{" "}
-              {table.getFilteredRowModel().rows.length} adhérent(s) sélectionné(s).
+              {table.getFilteredRowModel().rows.length} adhérent(s)
+              sélectionné(s).
             </div>
             <div className="space-x-2">
               <Button

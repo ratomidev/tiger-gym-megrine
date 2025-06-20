@@ -158,7 +158,6 @@ function RegistrationForm() {
       });
     }
   };
-
   return (
     <div className="relative h-full w-full">
       <div className="w-full max-w-6xl px-4 mx-auto">
