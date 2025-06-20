@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import Loading from "./loading";
 
 type MemberDetails = {
   id: string;
@@ -96,14 +97,10 @@ export default function MemberDetailsPage() {
     };
 
     fetchMember();
-  }, [id]);
-
+  }, [id]); // Loading state is now handled by the loading.tsx file
+  // This will only be shown if loading is true due to some client-side state change
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        Chargement des informations...
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error || !member) {
