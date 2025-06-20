@@ -192,9 +192,21 @@ export default function MemberListPage() {
               >
                 Copy member ID
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>View member details</DropdownMenuItem>
-              <DropdownMenuItem>Edit member</DropdownMenuItem>
+              <DropdownMenuSeparator />{" "}
+              <DropdownMenuItem
+                onClick={() =>
+                  (window.location.href = `/details-member?id=${member.id}`)
+                }
+              >
+                Voir les détails
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  (window.location.href = `/edit-member?id=${member.id}`)
+                }
+              >
+                Modifier
+              </DropdownMenuItem>
               <DropdownMenuItem className="text-red-600">
                 Delete member
               </DropdownMenuItem>
@@ -305,11 +317,16 @@ export default function MemberListPage() {
                 ))}
               </TableHeader>
               <TableBody>
+                {" "}
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
+                      className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                      onClick={() =>
+                        (window.location.href = `/details-member?id=${row.original.id}`)
+                      }
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
