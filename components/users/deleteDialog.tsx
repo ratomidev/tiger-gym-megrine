@@ -3,14 +3,15 @@
 import { useState, useEffect } from "react";
 import { User } from "@/lib/auth/types";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
 interface DeleteDialogProps {
@@ -58,10 +59,9 @@ export function DeleteDialog({
     }
   };
 
+  // Important: Reset document styles when dialog closes
   useEffect(() => {
-    // When dialog closes, reset document body styles
     if (!isOpen) {
-      // Allow a moment for transitions to complete
       const timer = setTimeout(() => {
         document.body.style.pointerEvents = '';
       }, 150);
@@ -74,50 +74,46 @@ export function DeleteDialog({
   if (!isOpen) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open && !isDeleting) {
-        setTimeout(() => onClose(), 0);
-      }
-    }}>
-      <DialogContent 
-        className="sm:max-w-[425px]"
-        onPointerDownOutside={(e) => {
-          // Prevent events from bubbling through
-          e.preventDefault();
-        }}
-      >
-        <DialogHeader>
-          <DialogTitle className="text-red-600">Delete User</DialogTitle>
-          <DialogDescription>
+    <AlertDialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        if (!open && !isDeleting) {
+          setTimeout(() => onClose(), 0);
+        }
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-red-600">Delete User</AlertDialogTitle>
+          <AlertDialogDescription>
             This action cannot be undone. This will permanently delete the user
             account for <span className="font-medium">{user?.name || user?.email || "this user"}</span>.
-          </DialogDescription>
-        </DialogHeader>
-        
-        <DialogFooter className="gap-2 sm:gap-0 mt-4">
-          <Button
-            variant="outline"
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="gap-4 flex flex-col sm:flex-row items-stretch sm:items-center">
+          <AlertDialogCancel 
             onClick={(e) => {
               e.stopPropagation();
               if (!isDeleting) onClose();
             }}
             disabled={isDeleting}
+            className="mb-2 sm:mb-0"
           >
             Cancel
-          </Button>
-          <Button
-            variant="destructive"
+          </AlertDialogCancel>
+          <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               handleDelete();
             }}
             disabled={isDeleting}
+            className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
           >
             {isDeleting ? "Deleting..." : "Delete User"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

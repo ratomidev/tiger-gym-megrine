@@ -34,7 +34,6 @@ export function ActionsMenu({ user, onEditClick, onDeleteClick }: ActionsMenuPro
           <Pencil className="mr-2 h-4 w-4" />
           Edit
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => onDeleteClick && onDeleteClick(user)}
           className="flex items-center text-red-600 cursor-pointer focus:text-red-600"
