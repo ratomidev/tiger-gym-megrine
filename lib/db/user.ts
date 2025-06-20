@@ -13,7 +13,7 @@ export async function findUserById(id: string) {
   });
 }
 
-export function excludePassword(user: any): User {
+export function excludePassword(user: any): User | null {
   if (!user) return null;
   const { password, ...userWithoutPassword } = user;
   return userWithoutPassword;

@@ -27,7 +27,12 @@ const formSchema = z.object({
     .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
     .regex(/[0-9]/, { message: "Password must contain at least one number" }),
   name: z.string().optional(),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .optional()
+    .refine(val => !val || /^\d{8}$/.test(val), {
+      message: "Phone number should be 8 digits (e.g., 54806948)"
+    }),
 });
 
 export type NewUserFormValues = z.infer<typeof formSchema>;

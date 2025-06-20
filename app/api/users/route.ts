@@ -33,6 +33,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate phone number format (Tunisian format - 8 digits)
+    if (phone && !/^\d{8}$/.test(phone)) {
+      return NextResponse.json(
+        { error: "Phone number should be 8 digits (e.g., 54806948)" },
+        { status: 400 }
+      );
+    }
+
     // Hash password
     const hashedPassword = await hash(password, 10);
 
@@ -42,6 +50,7 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         name: name || null,
+        // phone: phone || null,
       },
     });
 
