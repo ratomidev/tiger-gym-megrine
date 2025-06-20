@@ -3,8 +3,10 @@
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function RegistrationForm() {
+  const router = useRouter();
   const { control, handleSubmit, register, formState: { errors } } = useForm({
     defaultValues: {
       // Informations personnelles
@@ -131,14 +133,16 @@ function RegistrationForm() {
       });
       
       const result = await response.json();
-      
-      if (result.success) {
+        if (result.success) {
         console.log("Member registered successfully:", result.member);
         toast.success("Adhérent enregistré avec succès!", {
           description: `${result.member.firstname} ${result.member.lastname} a été enregistré.`,
           style: { backgroundColor: "#f0fdf4", borderLeft: "4px solid #22c55e" },
         });
-        // Reset form or redirect as needed
+        // Redirect to the member list page after a short delay
+        setTimeout(() => {
+          router.push('/list-member');
+        }, 1500);
       } else {
         console.error("Failed to register member:", result.error);
         toast.error("Erreur lors de l'enregistrement de l'adhérent", {
