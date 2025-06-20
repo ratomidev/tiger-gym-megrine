@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import RegistrationForm from '@/components/member/MemberRegistrationForm';
-import { Toaster } from 'sonner';
-import Loading from './loading';
+import { useState, useEffect } from "react";
+import RegistrationForm from "@/components/member/MemberRegistrationForm";
+import { Toaster } from "sonner";
+import Loading from "./loading";
 
-const Page = () => {  const [isLoading, setIsLoading] = useState(true);
+const Page = () => {
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if all required resources are loaded
@@ -19,7 +20,9 @@ const Page = () => {  const [isLoading, setIsLoading] = useState(true);
   }
 
   return (
-    <div className="container mx-auto py-10">      <Toaster 
+    <div className="container mx-auto py-10">
+      {" "}
+      <Toaster
         position="top-right"
         toastOptions={{
           className: "rounded-md",
@@ -31,10 +34,9 @@ const Page = () => {  const [isLoading, setIsLoading] = useState(true);
           error: {
             className: "bg-red-50 text-red-800 border-red-500",
             descriptionClassName: "text-red-700",
-          }
+          },
         }}
       />
-      
       <RegistrationForm />
     </div>
   );
