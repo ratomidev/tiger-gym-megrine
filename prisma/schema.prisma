@@ -27,7 +27,7 @@ model User {
 
 model Member {
   id               String   @id @default(cuid())
-  membershipNumber String   @unique
+  membershipNumber String   
   firstname        String
   lastname         String
   email            String?

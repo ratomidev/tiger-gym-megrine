@@ -1,7 +1,12 @@
+'use client';
+
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function RegistrationForm() {
+  const router = useRouter();
   const { control, handleSubmit, register, formState: { errors } } = useForm({
     defaultValues: {
       // Informations personnelles
@@ -121,28 +126,47 @@ function RegistrationForm() {
       }
       
       console.log("Submitting form...");
-      
-      const response = await fetch('/api/members', {
+        const response = await fetch('/api/members', {
         method: 'POST',
         body: formData,
       });
       
       const result = await response.json();
-      
       if (result.success) {
-        console.log("Member registered successfully:", result.member);
-        alert("Adhérent enregistré avec succès!");
-        // Reset form or redirect as needed
+        console.log("Member registered successfully:", result.member);        
+        toast.success("Adhérent enregistré avec succès!", {
+          description: `${result.member.firstname} ${result.member.lastname} a été enregistré.`,
+          style: { backgroundColor: "#f0fdf4", borderLeft: "4px solid #22c55e" },
+        });
+        
+        // Ensure we have a valid ID before redirecting
+        if (result.member && result.member.id) {
+          // Redirect to the member details page after a short delay
+          setTimeout(() => {
+            router.push(`/details-member?id=${result.member.id}`);
+          }, 1500);
+        } else {
+          console.error("Missing member ID in response");
+          // Fallback to the list page if ID is missing
+          setTimeout(() => {
+            router.push('/list-member');
+          }, 1500);
+        }
       } else {
         console.error("Failed to register member:", result.error);
-        alert("Erreur lors de l'enregistrement de l'adhérent: " + result.error);
+        toast.error("Erreur lors de l'enregistrement de l'adhérent", {
+          description: result.error,
+          style: { backgroundColor: "#fef2f2", borderLeft: "4px solid #ef4444" },
+        });
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert("Une erreur s'est produite lors de l'envoi du formulaire");
+      toast.error("Une erreur s'est produite lors de l'envoi du formulaire", {
+        description: "Problème de connexion au serveur.",
+        style: { backgroundColor: "#fef2f2", borderLeft: "4px solid #ef4444" },
+      });
     }
   };
-
   return (
     <div className="relative h-full w-full">
       <div className="w-full max-w-6xl px-4 mx-auto">
