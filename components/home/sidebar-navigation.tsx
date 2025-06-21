@@ -6,6 +6,8 @@ import {
   User2,
   UserPlus,
   ChevronRight,
+  Dumbbell,
+  CalendarCog
 } from "lucide-react";
 
 import {
@@ -48,6 +50,11 @@ const items = [
     title: "Users",
     url: "/users",
     icon: User2,
+  },
+  {
+    title: "Subscriptions",
+    url: "#",
+    icon: CalendarCog,
   },
   {
     title: "Calendar",
