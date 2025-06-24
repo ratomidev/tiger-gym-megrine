@@ -1,24 +1,7 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import RegistrationForm from "@/components/member/MemberRegistrationForm";
 import { Toaster } from "sonner";
-import Loading from "./loading";
 
-const Page = () => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check if all required resources are loaded
-    // In a real application, this might check if form configurations
-    // or necessary data has been fetched from the server
-    setIsLoading(false);
-  }, []);
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
+export default async function Page() {
   return (
     <div className="container mx-auto py-10">
       {" "}
@@ -40,6 +23,4 @@ const Page = () => {
       <RegistrationForm />
     </div>
   );
-};
-
-export default Page;
+}

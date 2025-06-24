@@ -1,10 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -78,14 +91,16 @@ const initialSubscriptions: Subscription[] = [
 ];
 
 export default function ListSubscriptions() {
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>(initialSubscriptions);
+  const [subscriptions, setSubscriptions] =
+    useState<Subscription[]>(initialSubscriptions);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
-  
+  const [selectedSubscription, setSelectedSubscription] =
+    useState<Subscription | null>(null);
+
   // Form states
-  const [formData, setFormData] = useState<Omit<Subscription, 'id'>>({
+  const [formData, setFormData] = useState<Omit<Subscription, "id">>({
     name: "",
     description: "",
     price: 0,
@@ -113,8 +128,8 @@ export default function ListSubscriptions() {
     }
 
     // Remove empty features
-    const features = formData.features.filter(f => f.trim() !== "");
-    
+    const features = formData.features.filter((f) => f.trim() !== "");
+
     const newSubscription: Subscription = {
       ...formData,
       features,
@@ -129,7 +144,7 @@ export default function ListSubscriptions() {
 
   const handleEditSubscription = () => {
     if (!selectedSubscription) return;
-    
+
     // Simple validation
     if (!formData.name || formData.price <= 0) {
       toast.error("Please fill in all required fields");
@@ -137,11 +152,11 @@ export default function ListSubscriptions() {
     }
 
     // Remove empty features
-    const features = formData.features.filter(f => f.trim() !== "");
-    
-    const updatedSubscriptions = subscriptions.map(sub => 
-      sub.id === selectedSubscription.id 
-        ? { ...formData, features, id: selectedSubscription.id } 
+    const features = formData.features.filter((f) => f.trim() !== "");
+
+    const updatedSubscriptions = subscriptions.map((sub) =>
+      sub.id === selectedSubscription.id
+        ? { ...formData, features, id: selectedSubscription.id }
         : sub
     );
 
@@ -154,11 +169,11 @@ export default function ListSubscriptions() {
 
   const handleDeleteSubscription = () => {
     if (!selectedSubscription) return;
-    
+
     const updatedSubscriptions = subscriptions.filter(
-      sub => sub.id !== selectedSubscription.id
+      (sub) => sub.id !== selectedSubscription.id
     );
-    
+
     setSubscriptions(updatedSubscriptions);
     setIsDeleteDialogOpen(false);
     setSelectedSubscription(null);
@@ -186,7 +201,7 @@ export default function ListSubscriptions() {
   const addFeatureField = () => {
     setFormData({
       ...formData,
-      features: [...formData.features, ""]
+      features: [...formData.features, ""],
     });
   };
 
@@ -195,7 +210,7 @@ export default function ListSubscriptions() {
     newFeatures[index] = value;
     setFormData({
       ...formData,
-      features: newFeatures
+      features: newFeatures,
     });
   };
 
@@ -204,7 +219,7 @@ export default function ListSubscriptions() {
     const newFeatures = formData.features.filter((_, i) => i !== index);
     setFormData({
       ...formData,
-      features: newFeatures
+      features: newFeatures,
     });
   };
 
@@ -212,23 +227,27 @@ export default function ListSubscriptions() {
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Membership Plans</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Membership Plans
+          </h2>
           <p className="text-muted-foreground mt-2">
             Manage your gym's membership plans
           </p>
         </div>
-        <Button onClick={() => {
-          resetForm();
-          setIsAddDialogOpen(true);
-        }}>
+        <Button
+          onClick={() => {
+            resetForm();
+            setIsAddDialogOpen(true);
+          }}
+        >
           <Plus className="mr-2 h-4 w-4" /> Add New Plan
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {subscriptions.map((subscription) => (
-          <Card 
-            key={subscription.id} 
+          <Card
+            key={subscription.id}
             className={`flex flex-col h-full ${
               subscription.isPopular ? "border-primary shadow-md" : ""
             }`}
@@ -264,11 +283,14 @@ export default function ListSubscriptions() {
             </CardHeader>
             <CardContent className="flex-grow pt-2">
               <div className="flex items-baseline mb-4">
-                <span className="text-2xl font-bold">{subscription.price} DT</span>
+                <span className="text-2xl font-bold">
+                  {subscription.price} DT
+                </span>
                 <span className="text-muted-foreground ml-2">
-                  / {subscription.duration === 1 
-                     ? "day" 
-                     : `${subscription.duration} days`}
+                  /{" "}
+                  {subscription.duration === 1
+                    ? "day"
+                    : `${subscription.duration} days`}
                 </span>
               </div>
               <ul className="space-y-2 text-sm">
@@ -290,7 +312,8 @@ export default function ListSubscriptions() {
           <DialogHeader>
             <DialogTitle>Add New Membership Plan</DialogTitle>
             <DialogDescription>
-              Create a new membership plan for your gym. Click save when you're done.
+              Create a new membership plan for your gym. Click save when you're
+              done.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4 overflow-y-auto">
@@ -301,7 +324,9 @@ export default function ListSubscriptions() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="col-span-3"
               />
             </div>
@@ -312,7 +337,9 @@ export default function ListSubscriptions() {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 className="col-span-3"
               />
             </div>
@@ -324,7 +351,9 @@ export default function ListSubscriptions() {
                 id="price"
                 type="number"
                 value={formData.price}
-                onChange={(e) => setFormData({...formData, price: Number(e.target.value)})}
+                onChange={(e) =>
+                  setFormData({ ...formData, price: Number(e.target.value) })
+                }
                 className="col-span-3"
               />
             </div>
@@ -336,7 +365,9 @@ export default function ListSubscriptions() {
                 id="duration"
                 type="number"
                 value={formData.duration}
-                onChange={(e) => setFormData({...formData, duration: Number(e.target.value)})}
+                onChange={(e) =>
+                  setFormData({ ...formData, duration: Number(e.target.value) })
+                }
                 className="col-span-3"
               />
             </div>
@@ -347,14 +378,14 @@ export default function ListSubscriptions() {
               <div className="col-span-3">
                 <Switch
                   checked={formData.isPopular}
-                  onCheckedChange={(checked) => setFormData({...formData, isPopular: checked})}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, isPopular: checked })
+                  }
                 />
               </div>
             </div>
             <div className="grid grid-cols-4 gap-4">
-              <Label className="text-right mt-2">
-                Features
-              </Label>
+              <Label className="text-right mt-2">Features</Label>
               <div className="col-span-3 space-y-2">
                 {formData.features.map((feature, index) => (
                   <div key={index} className="flex gap-2">
@@ -394,7 +425,7 @@ export default function ListSubscriptions() {
       </Dialog>
 
       {/* Edit Subscription Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} >
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[550px] max-h-[85vh] overflow-y-auto scrollbar-hide">
           <DialogHeader>
             <DialogTitle>Edit Membership Plan</DialogTitle>
@@ -410,7 +441,9 @@ export default function ListSubscriptions() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="col-span-3"
               />
             </div>
@@ -421,7 +454,9 @@ export default function ListSubscriptions() {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 className="col-span-3"
               />
             </div>
@@ -433,7 +468,9 @@ export default function ListSubscriptions() {
                 id="price"
                 type="number"
                 value={formData.price}
-                onChange={(e) => setFormData({...formData, price: Number(e.target.value)})}
+                onChange={(e) =>
+                  setFormData({ ...formData, price: Number(e.target.value) })
+                }
                 className="col-span-3"
               />
             </div>
@@ -445,7 +482,9 @@ export default function ListSubscriptions() {
                 id="duration"
                 type="number"
                 value={formData.duration}
-                onChange={(e) => setFormData({...formData, duration: Number(e.target.value)})}
+                onChange={(e) =>
+                  setFormData({ ...formData, duration: Number(e.target.value) })
+                }
                 className="col-span-3"
               />
             </div>
@@ -456,14 +495,14 @@ export default function ListSubscriptions() {
               <div className="col-span-3">
                 <Switch
                   checked={formData.isPopular}
-                  onCheckedChange={(checked) => setFormData({...formData, isPopular: checked})}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, isPopular: checked })
+                  }
                 />
               </div>
             </div>
             <div className="grid grid-cols-4 gap-4">
-              <Label className="text-right mt-2">
-                Features
-              </Label>
+              <Label className="text-right mt-2">Features</Label>
               <div className="col-span-3 space-y-2">
                 {formData.features.map((feature, index) => (
                   <div key={index} className="flex gap-2">
@@ -494,7 +533,10 @@ export default function ListSubscriptions() {
             </div>
           </div>
           <DialogFooter className="sticky bottom-0 pt-2 bg-background">
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={handleEditSubscription}>Save Changes</Button>
@@ -506,20 +548,22 @@ export default function ListSubscriptions() {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="text-destructive">Delete Membership Plan</DialogTitle>
+            <DialogTitle className="text-destructive">
+              Delete Membership Plan
+            </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete the "{selectedSubscription?.name}" plan? 
-              This action cannot be undone.
+              Are you sure you want to delete the "{selectedSubscription?.name}"
+              plan? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
               Cancel
             </Button>
-            <Button 
-              variant="destructive" 
-              onClick={handleDeleteSubscription}
-            >
+            <Button variant="destructive" onClick={handleDeleteSubscription}>
               Delete
             </Button>
           </DialogFooter>
