@@ -18,6 +18,7 @@ import { FilterInput } from "./FilterInput";
 import { ColumnVisibilityToggle } from "./ColumnVisibilityToggle";
 import { TablePagination } from "./TablePagination";
 import { StatusFilterDropdown } from "./StatusFilterDropdown";
+import { DateRangeFilterDropdown } from "./DateRangeFilterDropdown";
 
 import {
   Table,
@@ -82,6 +83,7 @@ export function MemberTable({
           placeholder="Filtrer par nom..."
         />
         <StatusFilterDropdown table={table} columnId="subscriptionStatus" />
+        <DateRangeFilterDropdown table={table} columnId="subscriptionEndDate" />
         <ColumnVisibilityToggle
           table={table}
           defaultColumnVisibility={defaultColumnVisibility}

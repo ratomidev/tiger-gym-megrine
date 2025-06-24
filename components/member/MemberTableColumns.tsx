@@ -142,6 +142,20 @@ export function getMemberColumns({
         const date = new Date(row.getValue("subscriptionEndDate"));
         return <div>{date.toLocaleDateString()}</div>;
       },
+      filterFn: (row, id, value) => {
+        // Handle date range filtering
+        if (Array.isArray(value) && value.length === 2) {
+          const [start, end] = value;
+          const cellDate = new Date(row.getValue(id));
+
+          // Check if the cell date is within the selected range
+          const isAfterStart = start ? cellDate >= new Date(start) : true;
+          const isBeforeEnd = end ? cellDate <= new Date(end) : true;
+
+          return isAfterStart && isBeforeEnd;
+        }
+        return true;
+      },
     },
     {
       id: "actions",
