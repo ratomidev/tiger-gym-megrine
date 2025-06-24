@@ -3,8 +3,10 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Member, MemberTable } from "@/components/member/MemberTable";
+import { MemberTable } from "@/components/member/MemberTable";
 import Loading from "./loading";
+import { Member } from "@/components/member/types";
+import { sub } from "date-fns";
 export default function MemberListPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +45,17 @@ export default function MemberListPage() {
           Ajouter un adhérent
         </Button>
       </div>
-      <MemberTable members={members} />
+      <MemberTable
+        members={members}
+        defaultColumnVisibility={{
+          firstname: true,
+          lastname: true,
+          tel: true,
+          subscriptionStatus: true,
+          subscriptionType: true,
+          subscriptionEndDate: true,
+        }}
+      />
     </div>
   );
 }

@@ -2,32 +2,23 @@
 
 import * as React from "react";
 import {
-  ColumnDef,
   ColumnFiltersState,
-  flexRender,
+  SortingState,
+  VisibilityState,
+  useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
+  flexRender,
 } from "@tanstack/react-table";
 
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { getMemberColumns } from "./MemberTableColumns";
+import { FilterInput } from "./FilterInput";
+import { ColumnVisibilityToggle } from "./ColumnVisibilityToggle";
+import { TablePagination } from "./TablePagination";
+import { StatusFilterDropdown } from "./StatusFilterDropdown";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -36,25 +27,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-export type Member = {
-  id: string;
-  membershipNumber: string;
-  firstname: string;
-  lastname: string;
-  email: string | null;
-  tel: string | null;
-  sexe: string | null;
-  subscriptionType: string;
-  subscriptionStatus: string;
-  subscriptionEndDate: string;
-};
+import { Member } from "./types";
 
 type MemberTableProps = {
   members: Member[];
+  defaultColumnVisibility?: Partial<Record<string, boolean>>;
 };
 
-export function MemberTable({ members }: MemberTableProps) {
+export function MemberTable({
+  members,
+  defaultColumnVisibility = {},
+}: MemberTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -63,223 +46,68 @@ export function MemberTable({ members }: MemberTableProps) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const columns: ColumnDef<Member>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
+  const columns = getMemberColumns({
+    onView: (id) => (window.location.href = `/details-member?id=${id}`),
+    onEdit: (id) => (window.location.href = `/edit-member?id=${id}`),
+    onDelete: (id) => {
+      console.log("Delete member:", id);
     },
-    {
-      accessorKey: "membershipNumber",
-      header: "Membership No.",
-      cell: ({ row }) => <div>{row.getValue("membershipNumber")}</div>,
-    },
-    {
-      accessorKey: "firstname",
-      header: "First Name",
-      cell: ({ row }) => <div>{row.getValue("firstname")}</div>,
-    },
-    {
-      accessorKey: "lastname",
-      header: "Last Name",
-      cell: ({ row }) => <div>{row.getValue("lastname")}</div>,
-    },
-    {
-      accessorKey: "email",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Email
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => <div>{row.getValue("email")}</div>,
-    },
-    {
-      accessorKey: "tel",
-      header: "Phone",
-      cell: ({ row }) => <div>{row.getValue("tel")}</div>,
-    },
-    {
-      accessorKey: "subscriptionType",
-      header: "Subscription",
-      cell: ({ row }) => <div>{row.getValue("subscriptionType")}</div>,
-    },
-    {
-      accessorKey: "subscriptionStatus",
-      header: "Status",
-      cell: ({ row }) => (
-        <div className="capitalize">
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${
-              row.getValue("subscriptionStatus") === "actif"
-                ? "bg-green-100 text-green-800"
-                : row.getValue("subscriptionStatus") === "expiré"
-                ? "bg-red-100 text-red-800"
-                : "bg-yellow-100 text-yellow-800"
-            }`}
-          >
-            {row.getValue("subscriptionStatus")}
-          </span>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "subscriptionEndDate",
-      header: "Expiry Date",
-      cell: ({ row }) => {
-        const date = new Date(row.getValue("subscriptionEndDate"));
-        return <div>{date.toLocaleDateString()}</div>;
-      },
-    },
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: ({ row }) => {
-        const member = row.original;
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(member.id)}
-              >
-                Copy member ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() =>
-                  (window.location.href = `/details-member?id=${member.id}`)
-                }
-              >
-                Voir les détails
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  (window.location.href = `/edit-member?id=${member.id}`)
-                }
-              >
-                Modifier
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">
-                Delete member
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-    },
-  ];
+  });
 
   const table = useReactTable({
     data: members,
     columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
     },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
   });
 
   return (
     <div className="w-full bg-white/5 border border-gray-200 dark:border-gray-800 rounded-lg p-6">
-      <div className="flex items-center py-4">
-        <Input
+      <div className="flex items-center py-4 gap-2 flex-wrap">
+        <FilterInput
+          table={table}
+          columnId="fullName" // Changed from "firstname" to "fullName"
           placeholder="Filtrer par nom..."
-          value={
-            (table.getColumn("firstname")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("firstname")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Colonnes <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <StatusFilterDropdown table={table} columnId="subscriptionStatus" />
+        <ColumnVisibilityToggle
+          table={table}
+          defaultColumnVisibility={defaultColumnVisibility}
+        />
       </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -312,30 +140,8 @@ export function MemberTable({ members }: MemberTableProps) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} sur{" "}
-          {table.getFilteredRowModel().rows.length} adhérent(s) sélectionné(s).
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Précédent
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Suivant
-          </Button>
-        </div>
-      </div>
+
+      <TablePagination table={table} />
     </div>
   );
 }
