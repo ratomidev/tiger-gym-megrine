@@ -3,10 +3,10 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MemberTable } from "@/components/member/MemberTable";
+import { MemberTable } from "@/components/member/table/MemberTable";
 import Loading from "./loading";
-import { Member } from "@/components/member/types";
-import { sub } from "date-fns";
+import { Member } from "@/types/Member";
+
 export default function MemberListPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);

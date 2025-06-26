@@ -28,7 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Member } from "./types";
+import { Member } from "../types";
 
 type MemberTableProps = {
   members: Member[];

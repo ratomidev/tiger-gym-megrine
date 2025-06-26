@@ -14,13 +14,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import React from "react";
-import { Member } from "./types";
-
-// Utility function to capitalize first letter
-function capitalizeFirstLetter(text: string | null | undefined): string {
-  if (!text) return "";
-  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-}
+import { Member } from "../types";
 
 export function getMemberColumns({
   onView,
@@ -56,30 +50,18 @@ export function getMemberColumns({
     },
     {
       accessorKey: "membershipNumber",
-      header: "N° Adhérent",
+      header: "Membership No.",
       cell: ({ row }) => <div>{row.getValue("membershipNumber")}</div>,
     },
     {
-      // Combined column for firstname and lastname
-      id: "fullName",
-      header: "Nom",
-      accessorFn: (row) => `${row.firstname} ${row.lastname}`,
-      cell: ({ row }) => {
-        const firstName = capitalizeFirstLetter(row.original.firstname);
-        const lastName = capitalizeFirstLetter(row.original.lastname);
-
-        return (
-          <div className="font-medium">
-            {firstName} {lastName}
-          </div>
-        );
-      },
-      // Add this filterFn to enable case-insensitive text filtering
-      filterFn: (row, id, filterValue) => {
-        const fullName =
-          `${row.original.firstname} ${row.original.lastname}`.toLowerCase();
-        return fullName.includes(String(filterValue).toLowerCase());
-      },
+      accessorKey: "firstname",
+      header: "First Name",
+      cell: ({ row }) => <div>{row.getValue("firstname")}</div>,
+    },
+    {
+      accessorKey: "lastname",
+      header: "Last Name",
+      cell: ({ row }) => <div>{row.getValue("lastname")}</div>,
     },
     {
       accessorKey: "email",
@@ -96,17 +78,17 @@ export function getMemberColumns({
     },
     {
       accessorKey: "tel",
-      header: "Téléphone",
+      header: "Phone",
       cell: ({ row }) => <div>{row.getValue("tel")}</div>,
     },
     {
       accessorKey: "subscriptionType",
-      header: "Type d'abonnement",
+      header: "Subscription",
       cell: ({ row }) => <div>{row.getValue("subscriptionType")}</div>,
     },
     {
       accessorKey: "subscriptionStatus",
-      header: "Statut",
+      header: "Status",
       cell: ({ row }) => {
         const status = row.getValue("subscriptionStatus");
         const colorClass =
@@ -126,40 +108,17 @@ export function getMemberColumns({
           </div>
         );
       },
-      filterFn: (row, id, value) => {
-        if (Array.isArray(value)) {
-          // If filtering by multiple statuses
-          return value.includes(row.getValue(id));
-        }
-        // Single status filter (string)
-        return value === row.getValue(id);
-      },
     },
     {
       accessorKey: "subscriptionEndDate",
-      header: "Date d'expiration",
+      header: "Expiry Date",
       cell: ({ row }) => {
         const date = new Date(row.getValue("subscriptionEndDate"));
         return <div>{date.toLocaleDateString()}</div>;
       },
-      filterFn: (row, id, value) => {
-        // Handle date range filtering
-        if (Array.isArray(value) && value.length === 2) {
-          const [start, end] = value;
-          const cellDate = new Date(row.getValue(id));
-
-          // Check if the cell date is within the selected range
-          const isAfterStart = start ? cellDate >= new Date(start) : true;
-          const isBeforeEnd = end ? cellDate <= new Date(end) : true;
-
-          return isAfterStart && isBeforeEnd;
-        }
-        return true;
-      },
     },
     {
       id: "actions",
-      header: "Actions",
       enableHiding: false,
       cell: ({ row }) => {
         const member = row.original;
@@ -172,7 +131,10 @@ export function getMemberColumns({
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent
+              align="end"
+              onClick={(e) => e.stopPropagation()}
+            >
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(member.id)}
@@ -199,3 +161,4 @@ export function getMemberColumns({
     },
   ];
 }
+// This file will contain the actions dropdown menu component for table rows

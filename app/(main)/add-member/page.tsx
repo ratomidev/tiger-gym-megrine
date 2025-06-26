@@ -1,4 +1,4 @@
-import RegistrationForm from "@/components/member/MemberRegistrationForm";
+import RegistrationForm from "@/components/member/form/MemberRegistrationForm";
 import { Toaster } from "sonner";
 
 export default async function Page() {
