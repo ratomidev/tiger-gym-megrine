@@ -1,9 +1,14 @@
 "use client";
 
-import React, { forwardRef, useImperativeHandle, useEffect } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useEffect,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import { SubscriptionFormValues } from "@/types/subscription";
-import { format } from "date-fns";
+import { format, addMonths, addYears } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,12 +33,15 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
 
     // Format dates for input fields
     const formattedToday = format(today, "yyyy-MM-dd");
-    const formattedNextMonth = format(nextMonth, "yyyy-MM-dd");
+    const [formattedEndDate, setFormattedEndDate] = useState(
+      format(nextMonth, "yyyy-MM-dd")
+    );
 
     const {
       register,
       handleSubmit,
       setValue,
+      watch,
       formState: { errors },
     } = useForm<SubscriptionFormValues>({
       defaultValues: {
@@ -47,6 +55,54 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       },
     });
 
+    // Calculate end date based on plan and start date
+    const calculateEndDate = (plan: string, start: Date) => {
+      switch (plan) {
+        case "1 mois":
+          return addMonths(start, 1);
+        case "3 mois":
+          return addMonths(start, 3);
+        case "6 mois":
+          return addMonths(start, 6);
+        case "1 an":
+          return addYears(start, 1);
+        default:
+          return addMonths(start, 1);
+      }
+    };
+
+    // Update the end date based on the plan and start date
+    const updateEndDate = (plan: string, startDate: Date) => {
+      const endDate = calculateEndDate(plan, startDate);
+      const formattedEnd = format(endDate, "yyyy-MM-dd");
+
+      setFormattedEndDate(formattedEnd);
+      setValue("endDate", endDate);
+
+      // Update the input field directly
+      const endDateInput = document.getElementById(
+        "endDate"
+      ) as HTMLInputElement;
+      if (endDateInput) {
+        endDateInput.value = formattedEnd;
+      }
+    };
+
+    // Handle plan change
+    const handlePlanChange = (value: string) => {
+      setValue("plan", value);
+      const startDate = new Date(watch("startDate"));
+      updateEndDate(value, startDate);
+    };
+
+    // Handle start date change
+    const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newStartDate = new Date(e.target.value);
+      setValue("startDate", newStartDate);
+      const currentPlan = watch("plan");
+      updateEndDate(currentPlan, newStartDate);
+    };
+
     // Ensure date inputs are set with today's date on component mount
     useEffect(() => {
       const startDateInput = document.getElementById(
@@ -55,7 +111,10 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       if (startDateInput) {
         startDateInput.value = formattedToday;
       }
-    }, [formattedToday]);
+
+      // Calculate initial end date
+      updateEndDate("1 mois", today);
+    }, []);
 
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({
@@ -81,10 +140,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
           {/* Plan */}
           <div className="space-y-2">
             <Label htmlFor="plan">Type d&apos;Abonnement</Label>
-            <Select
-              defaultValue="1 mois"
-              onValueChange={(value) => setValue("plan", value)}
-            >
+            <Select defaultValue="1 mois" onValueChange={handlePlanChange}>
               <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
                 <SelectValue placeholder="Sélectionner une durée" />
               </SelectTrigger>
@@ -129,6 +185,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
                 required: "La date de début est requise",
               })}
               defaultValue={formattedToday}
+              onChange={handleStartDateChange}
               className="border-gray-200 focus:border-gray-400 transition-colors"
             />
             {errors.startDate && (
@@ -145,12 +202,17 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
               {...register("endDate", {
                 required: "La date de fin est requise",
               })}
-              defaultValue={formattedNextMonth}
-              className="border-gray-200 focus:border-gray-400 transition-colors"
+              defaultValue={formattedEndDate}
+              readOnly
+              className="border-gray-200 focus:border-gray-400 transition-colors bg-gray-50"
             />
             {errors.endDate && (
               <p className="text-red-500 text-sm">{errors.endDate.message}</p>
             )}
+            <p className="text-xs text-gray-500">
+              Calculée automatiquement selon le type d&apos;abonnement et la
+              date de début.
+            </p>
           </div>
 
           {/* Status */}
