@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
-import { Search, X, CirclePlus, Check } from "lucide-react";
+import {
+  Search,
+  X,
+  CirclePlus,
+  Check,
+  Calendar as CalendarIcon,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,19 +19,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface InputSearchProps {
   onSearch: (searchTerm: string) => void;
   onStatusFilter: (status: string | null) => void;
+  onDateFilter: (date: Date | null) => void;
   placeholder?: string;
   selectedStatus: string | null;
+  selectedDate: Date | null;
 }
 
 export function InputSearch({
   onSearch,
   onStatusFilter,
+  onDateFilter,
   placeholder = "Rechercher un adhérent...",
   selectedStatus,
+  selectedDate,
 }: InputSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -74,7 +92,7 @@ export function InputSearch({
   };
 
   return (
-    <div className="flex gap-2 w-full">
+    <div className="flex flex-wrap gap-2 w-full">
       <div className="relative flex-grow max-w-sm">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
           <Search className="h-4 w-4 text-gray-400" />
@@ -131,6 +149,56 @@ export function InputSearch({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Date Filter */}
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={`flex items-center gap-2 ${
+              selectedDate ? "bg-blue-50 text-blue-600 border-blue-200" : ""
+            }`}
+          >
+            <CalendarIcon className="h-4 w-4" />
+            {selectedDate ? (
+              <span>{format(selectedDate, "dd/MM/yyyy", { locale: fr })}</span>
+            ) : (
+              <span>Date d'expiration</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="end">
+          <Calendar
+            mode="single"
+            selected={selectedDate || undefined}
+            onSelect={(date) => {
+              // Toggle date if same date is selected
+              if (
+                date &&
+                selectedDate &&
+                date.getTime() === selectedDate.getTime()
+              ) {
+                onDateFilter(null);
+              } else {
+                onDateFilter(date);
+              }
+            }}
+            initialFocus
+          />
+          {selectedDate && (
+            <div className="p-2 border-t flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDateFilter(null)}
+                className="text-xs text-gray-500 hover:text-gray-700"
+              >
+                Effacer
+              </Button>
+            </div>
+          )}
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }

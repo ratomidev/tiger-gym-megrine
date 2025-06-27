@@ -24,6 +24,7 @@ import { MoreHorizontal, Edit, Trash, Eye } from "lucide-react";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { InputSearch } from "@/components/member/table/InputSearch";
+import { isSameDay } from "date-fns";
 
 interface MemberTableProps {
   data: Adherent[];
@@ -32,6 +33,7 @@ interface MemberTableProps {
 export function MemberTable({ data }: MemberTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState<Date | null>(null);
 
   const filteredData = useMemo(() => {
     return data.filter((adherent) => {
@@ -56,9 +58,19 @@ export function MemberTable({ data }: MemberTableProps) {
         }
       }
 
-      return matchesSearchTerm && matchesStatus;
+      // Filter by expiration date
+      let matchesDate = true;
+      if (dateFilter && adherent.subscription?.endDate) {
+        const endDate = new Date(adherent.subscription.endDate);
+        matchesDate = isSameDay(endDate, dateFilter);
+      } else if (dateFilter) {
+        // If filtering by date but no subscription/endDate exists
+        matchesDate = false;
+      }
+
+      return matchesSearchTerm && matchesStatus && matchesDate;
     });
-  }, [data, searchTerm, statusFilter]);
+  }, [data, searchTerm, statusFilter, dateFilter]);
 
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -92,7 +104,9 @@ export function MemberTable({ data }: MemberTableProps) {
         <InputSearch
           onSearch={setSearchTerm}
           onStatusFilter={setStatusFilter}
+          onDateFilter={setDateFilter}
           selectedStatus={statusFilter}
+          selectedDate={dateFilter}
           placeholder="Rechercher par nom ou prénom..."
         />
         <div className="text-sm text-gray-500">

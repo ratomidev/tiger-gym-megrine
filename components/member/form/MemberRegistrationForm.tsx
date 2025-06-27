@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { useForm } from "react-hook-form";
@@ -10,7 +10,7 @@ interface AdherentFormValues extends BaseAdherentFormValues {
 }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -24,7 +24,12 @@ export interface AdherentFormRef {
 }
 
 const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<AdherentFormValues>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<AdherentFormValues>({
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -33,9 +38,9 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
       birthDate: new Date(),
       Address: "",
       sexe: "M",
-    }
+    },
   });
-  
+
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
@@ -44,18 +49,20 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
     validateAndGetValues: async () => {
       // Return a promise that resolves with form data or null if invalid
       return new Promise((resolve) => {
-        handleSubmit((data) => {
-          resolve({
-            ...data,
-            photoFile
-          });
-        }, 
-        // On validation error
-        () => {
-          resolve(null);
-        })();
+        handleSubmit(
+          (data) => {
+            resolve({
+              ...data,
+              photoFile,
+            });
+          },
+          // On validation error
+          () => {
+            resolve(null);
+          }
+        )();
       });
-    }
+    },
   }));
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,14 +93,18 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
               <Label htmlFor="firstName">First Name</Label>
               <Input
                 id="firstName"
-                {...register("firstName", { required: "First name is required" })}
+                {...register("firstName", {
+                  required: "First name is required",
+                })}
                 placeholder="First name"
               />
               {errors.firstName && (
-                <p className="text-red-500 text-sm">{errors.firstName.message}</p>
+                <p className="text-red-500 text-sm">
+                  {errors.firstName.message}
+                </p>
               )}
             </div>
-            
+
             {/* Last Name */}
             <div className="space-y-2">
               <Label htmlFor="lastName">Last Name</Label>
@@ -103,22 +114,24 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
                 placeholder="Last name"
               />
               {errors.lastName && (
-                <p className="text-red-500 text-sm">{errors.lastName.message}</p>
+                <p className="text-red-500 text-sm">
+                  {errors.lastName.message}
+                </p>
               )}
             </div>
-            
+
             {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                {...register("email", { 
+                {...register("email", {
                   required: "Email is required",
                   pattern: {
                     value: /\S+@\S+\.\S+/,
-                    message: "Invalid email format"
-                  }
+                    message: "Invalid email format",
+                  },
                 })}
                 placeholder="email@example.com"
               />
@@ -126,7 +139,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
                 <p className="text-red-500 text-sm">{errors.email.message}</p>
               )}
             </div>
-            
+
             {/* Phone */}
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
@@ -139,20 +152,24 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
                 <p className="text-red-500 text-sm">{errors.phone.message}</p>
               )}
             </div>
-            
+
             {/* Birth Date */}
             <div className="space-y-2">
               <Label htmlFor="birthDate">Birth Date</Label>
               <Input
                 id="birthDate"
                 type="date"
-                {...register("birthDate", { required: "Birth date is required" })}
+                {...register("birthDate", {
+                  required: "Birth date is required",
+                })}
               />
               {errors.birthDate && (
-                <p className="text-red-500 text-sm">{errors.birthDate.message}</p>
+                <p className="text-red-500 text-sm">
+                  {errors.birthDate.message}
+                </p>
               )}
             </div>
-            
+
             {/* Gender */}
             <div className="space-y-2">
               <Label htmlFor="sexe">Gender</Label>
@@ -173,7 +190,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
               )}
             </div>
           </div>
-          
+
           {/* Address */}
           <div className="space-y-2">
             <Label htmlFor="Address">Address</Label>
@@ -186,7 +203,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
               <p className="text-red-500 text-sm">{errors.Address.message}</p>
             )}
           </div>
-          
+
           {/* Photo */}
           <div className="space-y-2">
             <Label htmlFor="photo">Photo (optional)</Label>
@@ -199,9 +216,9 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
             />
             {photoPreview && (
               <div className="mt-2">
-                <img 
-                  src={photoPreview} 
-                  alt="Preview" 
+                <img
+                  src={photoPreview}
+                  alt="Preview"
                   className="w-32 h-32 object-cover rounded-md border"
                 />
               </div>

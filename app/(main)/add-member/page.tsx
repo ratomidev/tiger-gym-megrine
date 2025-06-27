@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -6,7 +6,6 @@ import { toast, Toaster } from "sonner";
 import { AdherentFormValues, SubscriptionFormValues } from "@/types";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -33,7 +32,8 @@ export default function Page() {
 
     try {
       // Get adherent data
-      const adherentData = await adherentFormRef.current?.validateAndGetValues();
+      const adherentData =
+        await adherentFormRef.current?.validateAndGetValues();
       if (!adherentData) {
         toast.error("Please fill in all required member information");
         setIsLoading(false);
@@ -41,7 +41,8 @@ export default function Page() {
       }
 
       // Get subscription data - always required now
-      const subscriptionData = await subscriptionFormRef.current?.validateAndGetValues();
+      const subscriptionData =
+        await subscriptionFormRef.current?.validateAndGetValues();
       if (!subscriptionData) {
         toast.error("Please fill in all required subscription information");
         setIsLoading(false);
@@ -71,7 +72,10 @@ export default function Page() {
     formData.append("lastName", adherentData.lastName);
     formData.append("email", adherentData.email);
     formData.append("phone", adherentData.phone);
-    formData.append("birthDate", new Date(adherentData.birthDate).toISOString());
+    formData.append(
+      "birthDate",
+      new Date(adherentData.birthDate).toISOString()
+    );
     formData.append("Address", adherentData.Address);
     formData.append("sexe", adherentData.sexe);
     formData.append("hasSubscription", "true"); // Always true now
@@ -79,10 +83,19 @@ export default function Page() {
     // Add subscription data
     formData.append("plan", subscriptionData.plan);
     formData.append("price", subscriptionData.price.toString());
-    formData.append("startDate", new Date(subscriptionData.startDate).toISOString());
-    formData.append("endDate", new Date(subscriptionData.endDate).toISOString());
+    formData.append(
+      "startDate",
+      new Date(subscriptionData.startDate).toISOString()
+    );
+    formData.append(
+      "endDate",
+      new Date(subscriptionData.endDate).toISOString()
+    );
     formData.append("status", subscriptionData.status);
-    formData.append("hasCardioMusculation", subscriptionData.hasCardioMusculation.toString());
+    formData.append(
+      "hasCardioMusculation",
+      subscriptionData.hasCardioMusculation.toString()
+    );
     formData.append("hasCours", subscriptionData.hasCours.toString());
 
     // Add photo if present
@@ -102,10 +115,12 @@ export default function Page() {
       });
 
       setTimeout(() => {
-        router.push("/adherents");
+        router.push("/list-adherent");
       }, 1500);
     } else {
-      throw new Error(result.error || "Failed to register member with subscription");
+      throw new Error(
+        result.error || "Failed to register member with subscription"
+      );
     }
   };
 
@@ -130,7 +145,9 @@ export default function Page() {
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Add New Member</CardTitle>
-          <CardDescription>Register a new member with subscription details</CardDescription>
+          <CardDescription>
+            Register a new member with subscription details
+          </CardDescription>
         </CardHeader>
       </Card>
 
@@ -145,11 +162,7 @@ export default function Page() {
 
       {/* Save Button at the bottom */}
       <div className="flex justify-end mt-8">
-        <Button
-          size="lg"
-          onClick={handleSubmit}
-          disabled={isLoading}
-        >
+        <Button size="lg" onClick={handleSubmit} disabled={isLoading}>
           {isLoading ? "Saving..." : "Save Member"}
         </Button>
       </div>
