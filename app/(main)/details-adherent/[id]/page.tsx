@@ -299,66 +299,87 @@ export default function DetailsAdherent() {
 
           <CardContent className="flex-1">
             {adherent.subscription ? (
-              <div className="space-y-6 h-full flex flex-col">
-                <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
-                  <CreditCard className="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className="font-medium">Plan</p>
-                    <p className="text-gray-600 text-lg font-medium">
-                      {adherent.subscription.plan}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
-                  <div className="h-5 w-5 flex items-center justify-center bg-gray-100 rounded-full">
-                    <span className="text-xs font-bold text-gray-600">DT</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">Prix</p>
-                    <p className="text-gray-600">
-                      {adherent.subscription.price} DT
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
-                  <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className="font-medium">Période d'abonnement</p>
-                    <div className="space-y-1 mt-1">
-                      <div className="flex gap-2 text-gray-600">
-                        <span className="font-medium min-w-[100px]">
-                          Début:
-                        </span>
-                        {formatDate(adherent.subscription.startDate.toString())}
+              <div className="h-full flex flex-col">
+                {/* Plan Information Section */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-4 pb-2 border-b">
+                    Détails de l'abonnement
+                  </h3>
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
+                      <CreditCard className="h-5 w-5 text-gray-500 mt-0.5" />
+                      <div>
+                        <p className="font-medium">Plan</p>
+                        <p className="text-gray-600 text-lg font-medium">
+                          {adherent.subscription.plan}
+                        </p>
                       </div>
-                      <div className="flex gap-2 text-gray-600">
-                        <span className="font-medium min-w-[100px]">
-                          Expiration:
+                    </div>
+
+                    <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
+                      <div className="h-5 w-5 flex items-center justify-center bg-gray-100 rounded-full">
+                        <span className="text-xs font-bold text-gray-600">
+                          DT
                         </span>
-                        {formatDate(adherent.subscription.endDate.toString())}
+                      </div>
+                      <div>
+                        <p className="font-medium">Prix</p>
+                        <p className="text-gray-600">
+                          {adherent.subscription.price} DT
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t mt-auto">
-                  <p className="font-medium mb-3">Options</p>
+                {/* Time Period Section */}
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">
+                    Période d'abonnement
+                  </h4>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">
+                          Date de début
+                        </p>
+                        <p className="font-medium">
+                          {formatDate(
+                            adherent.subscription.startDate.toString()
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">
+                          Date d'expiration
+                        </p>
+                        <p className="font-medium">
+                          {formatDate(adherent.subscription.endDate.toString())}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Options Section */}
+                <div className="pt-3 border-t mt-auto">
+                  <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">
+                    Options incluses
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {adherent.subscription.hasCardioMusculation && (
-                      <Badge className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100">
+                      <Badge className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 py-1.5">
                         Cardio & Musculation
                       </Badge>
                     )}
                     {adherent.subscription.hasCours && (
-                      <Badge className="bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100">
+                      <Badge className="bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100 py-1.5">
                         Cours collectifs
                       </Badge>
                     )}
                     {!adherent.subscription.hasCardioMusculation &&
                       !adherent.subscription.hasCours && (
-                        <span className="text-gray-500 text-sm">
+                        <span className="text-gray-500 text-sm italic">
                           Aucune option sélectionnée
                         </span>
                       )}
