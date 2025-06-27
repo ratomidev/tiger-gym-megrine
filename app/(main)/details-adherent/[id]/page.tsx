@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
-  ArrowLeft,
   Edit,
   Trash,
   Mail,
@@ -122,7 +121,7 @@ export default function DetailsAdherent() {
 
   if (loading) {
     return (
-      <div className="container max-w-4xl mx-auto py-8 px-4 flex items-center justify-center min-h-[60vh]">
+      <div className="w-full max-w-6xl mx-auto py-6 px-4 flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-2">
           <div className="h-8 w-8 rounded-full border-2 border-black border-t-transparent animate-spin"></div>
           <p className="text-sm font-medium text-gray-600">Chargement...</p>
@@ -133,7 +132,7 @@ export default function DetailsAdherent() {
 
   if (error || !adherent) {
     return (
-      <div className="container max-w-4xl mx-auto py-8 px-4">
+      <div className="w-full max-w-6xl mx-auto py-6 px-4">
         <Card className="text-center py-8">
           <CardContent>
             <div className="flex flex-col items-center gap-4">
@@ -144,7 +143,6 @@ export default function DetailsAdherent() {
                 onClick={() => router.push("/list-adherent")}
                 variant="outline"
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
                 Retour à la liste
               </Button>
             </div>
@@ -155,7 +153,7 @@ export default function DetailsAdherent() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4 sm:px-6">
+    <div className="w-full max-w-6xl mx-auto py-6 px-4">
       <Toaster
         position="top-right"
         toastOptions={{
@@ -171,17 +169,9 @@ export default function DetailsAdherent() {
         }}
       />
 
-      {/* Header with Back Button and Actions */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <Link href="/list-adherent">
-            <Button variant="outline" size="icon" className="h-9 w-9">
-              <ArrowLeft className="h-5 w-5" />
-              <span className="sr-only">Retour</span>
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold">Détails de l&apos;Adhérent</h1>
-        </div>
+      {/* Header with title and actions */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Détails de l&apos;Adhérent</h1>
         <div className="flex gap-3">
           <Link href={`/edit-adherent/${adherent.id}`}>
             <Button variant="outline" size="sm" className="gap-2 h-9">
@@ -203,7 +193,7 @@ export default function DetailsAdherent() {
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Personal Info Card */}
-        <Card className="h-fit">
+        <Card className="h-full flex flex-col">
           <CardHeader>
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16 border-2 border-gray-100">
@@ -235,7 +225,7 @@ export default function DetailsAdherent() {
             </div>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="flex-1">
             <h3 className="text-lg font-semibold mb-6 pb-2 border-b">
               Informations personnelles
             </h3>
@@ -278,7 +268,7 @@ export default function DetailsAdherent() {
         </Card>
 
         {/* Subscription Card */}
-        <Card className="h-fit">
+        <Card className="h-full flex flex-col">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl">Abonnement</CardTitle>
@@ -307,9 +297,9 @@ export default function DetailsAdherent() {
             </div>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="flex-1">
             {adherent.subscription ? (
-              <div className="space-y-6">
+              <div className="space-y-6 h-full flex flex-col">
                 <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
                   <CreditCard className="h-5 w-5 text-gray-500 mt-0.5" />
                   <div>
@@ -353,7 +343,7 @@ export default function DetailsAdherent() {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t">
+                <div className="pt-2 border-t mt-auto">
                   <p className="font-medium mb-3">Options</p>
                   <div className="flex flex-wrap gap-2">
                     {adherent.subscription.hasCardioMusculation && (
@@ -376,7 +366,7 @@ export default function DetailsAdherent() {
                 </div>
               </div>
             ) : (
-              <div className="py-8 px-6 bg-gray-50 rounded-md text-center">
+              <div className="py-8 px-6 bg-gray-50 rounded-md text-center h-full flex flex-col justify-center">
                 <p className="text-gray-500">Aucun abonnement actif</p>
                 <Link
                   href={`/add-subscription/${adherent.id}`}
