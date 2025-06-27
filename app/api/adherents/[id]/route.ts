@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const id = params.id;
-    
+
     if (!id) {
       return NextResponse.json(
         { success: false, error: "Adherent ID is required" },
@@ -18,11 +18,11 @@ export async function GET(
 
     const adherent = await prisma.adherent.findUnique({
       where: {
-        id: id
+        id: id,
       },
       include: {
-        subscription: true
-      }
+        subscription: true,
+      },
     });
 
     if (!adherent) {
@@ -36,7 +36,10 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching adherent by ID:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to fetch adherent: " + (error as Error).message },
+      {
+        success: false,
+        error: "Failed to fetch adherent: " + (error as Error).message,
+      },
       { status: 500 }
     );
   }
@@ -53,27 +56,32 @@ export async function PUT(
 
     const updatedAdherent = await prisma.adherent.update({
       where: {
-        id: id
+        id: id,
       },
       data: {
         ...data,
-        subscription: data.subscription ? {
-          update: {
-            where: { adherentId: id },
-            data: data.subscription
-          }
-        } : undefined
+        subscription: data.subscription
+          ? {
+              update: {
+                where: { adherentId: id },
+                data: data.subscription,
+              },
+            }
+          : undefined,
       },
       include: {
-        subscription: true
-      }
+        subscription: true,
+      },
     });
 
     return NextResponse.json({ success: true, adherent: updatedAdherent });
   } catch (error) {
     console.error("Error updating adherent:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to update adherent: " + (error as Error).message },
+      {
+        success: false,
+        error: "Failed to update adherent: " + (error as Error).message,
+      },
       { status: 500 }
     );
   }
@@ -90,26 +98,29 @@ export async function DELETE(
     // First delete the subscription to avoid foreign key constraint issues
     await prisma.subscription.deleteMany({
       where: {
-        adherentId: id
-      }
+        adherentId: id,
+      },
     });
 
     // Then delete the adherent
     const deletedAdherent = await prisma.adherent.delete({
       where: {
-        id: id
-      }
+        id: id,
+      },
     });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: "Adherent successfully deleted",
-      adherent: deletedAdherent 
+      adherent: deletedAdherent,
     });
   } catch (error) {
     console.error("Error deleting adherent:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to delete adherent: " + (error as Error).message },
+      {
+        success: false,
+        error: "Failed to delete adherent: " + (error as Error).message,
+      },
       { status: 500 }
     );
   }

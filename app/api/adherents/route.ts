@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
       email: formData.get("email") as string,
       phone: formData.get("phone") as string,
       birthDate: new Date(formData.get("birthDate") as string),
-      Address: formData.get("Address") as string, 
-      sexe: formData.get("sexe") as 'M' | 'F',
+      Address: formData.get("Address") as string,
+      sexe: formData.get("sexe") as "M" | "F",
     };
 
     // Process photo file if provided
@@ -34,25 +34,25 @@ export async function POST(request: NextRequest) {
     if (photo && photo.size > 0) {
       const bytes = await photo.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      
+
       // Ensure directory exists
       const uploadDir = join(process.cwd(), "public", "uploads", "photos");
       await ensureDirectoryExists(uploadDir);
-      
+
       // Generate a unique filename
-      const fileName = `${Date.now()}-${photo.name.replace(/\s+/g, '-')}`;
+      const fileName = `${Date.now()}-${photo.name.replace(/\s+/g, "-")}`;
       const photoPath = join(uploadDir, fileName);
-      
+
       // Write the file
       await writeFile(photoPath, buffer);
-      
+
       // Set the URL (relative to public)
       photoUrl = `/uploads/photos/${fileName}`;
     }
 
     // Check if subscription data is provided
     const hasSubscription = formData.get("hasSubscription") === "true";
-    
+
     // Create adherent with or without subscription
     if (hasSubscription) {
       const subscriptionData = {
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         price: parseFloat(formData.get("price") as string),
         startDate: new Date(formData.get("startDate") as string),
         endDate: new Date(formData.get("endDate") as string),
-        status: formData.get("status") as string || "actif",
+        status: (formData.get("status") as string) || "actif",
         hasCardioMusculation: formData.get("hasCardioMusculation") === "true",
         hasCours: formData.get("hasCours") === "true",
       };
@@ -72,12 +72,12 @@ export async function POST(request: NextRequest) {
           photoUrl,
           isValidated: true,
           subscription: {
-            create: subscriptionData
-          }
+            create: subscriptionData,
+          },
         },
         include: {
-          subscription: true
-        }
+          subscription: true,
+        },
       });
 
       return NextResponse.json({ success: true, adherent });
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
           ...adherentData,
           photoUrl,
           isValidated: false,
-        }
+        },
       });
 
       return NextResponse.json({ success: true, adherent });
@@ -96,29 +96,35 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error creating adherent:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to create adherent: " + (error as Error).message },
+      {
+        success: false,
+        error: "Failed to create adherent: " + (error as Error).message,
+      },
       { status: 500 }
     );
   }
 }
 
 // GET endpoint to retrieve all adherents
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const adherents = await prisma.adherent.findMany({
       include: {
-        subscription: true
+        subscription: true,
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     return NextResponse.json({ success: true, adherents });
   } catch (error) {
     console.error("Error fetching adherents:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to fetch adherents: " + (error as Error).message },
+      {
+        success: false,
+        error: "Failed to fetch adherents: " + (error as Error).message,
+      },
       { status: 500 }
     );
   }
