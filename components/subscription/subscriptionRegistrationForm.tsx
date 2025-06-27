@@ -26,16 +26,15 @@ export interface SubscriptionFormRef {
 
 const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
   (props, ref) => {
-    // Calculate default dates - today and 1 month from today
     const today = new Date();
-    const nextMonth = new Date();
-    nextMonth.setMonth(today.getMonth() + 1);
+    const nextMonth = addMonths(today, 1);
 
-    // Format dates for input fields
     const formattedToday = format(today, "yyyy-MM-dd");
     const [formattedEndDate, setFormattedEndDate] = useState(
       format(nextMonth, "yyyy-MM-dd")
     );
+    const [formattedStartDate, setFormattedStartDate] =
+      useState(formattedToday);
 
     const {
       register,
@@ -55,7 +54,6 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       },
     });
 
-    // Calculate end date based on plan and start date
     const calculateEndDate = (plan: string, start: Date) => {
       switch (plan) {
         case "1 mois":
@@ -71,61 +69,38 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       }
     };
 
-    // Update the end date based on the plan and start date
     const updateEndDate = (plan: string, startDate: Date) => {
       const endDate = calculateEndDate(plan, startDate);
       const formattedEnd = format(endDate, "yyyy-MM-dd");
-
       setFormattedEndDate(formattedEnd);
       setValue("endDate", endDate);
-
-      // Update the input field directly
-      const endDateInput = document.getElementById(
-        "endDate"
-      ) as HTMLInputElement;
-      if (endDateInput) {
-        endDateInput.value = formattedEnd;
-      }
     };
 
-    // Handle plan change
     const handlePlanChange = (value: string) => {
       setValue("plan", value);
       const startDate = new Date(watch("startDate"));
       updateEndDate(value, startDate);
     };
 
-    // Handle start date change
     const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newStartDate = new Date(e.target.value);
+      const inputDate = e.target.value;
+      const newStartDate = new Date(inputDate);
+      setFormattedStartDate(inputDate); // keep input synced
       setValue("startDate", newStartDate);
-      const currentPlan = watch("plan");
-      updateEndDate(currentPlan, newStartDate);
+      updateEndDate(watch("plan"), newStartDate);
     };
 
-    // Ensure date inputs are set with today's date on component mount
     useEffect(() => {
-      const startDateInput = document.getElementById(
-        "startDate"
-      ) as HTMLInputElement;
-      if (startDateInput) {
-        startDateInput.value = formattedToday;
-      }
-
-      // Calculate initial end date
       updateEndDate("1 mois", today);
     }, []);
 
-    // Expose methods to parent component
     useImperativeHandle(ref, () => ({
       validateAndGetValues: async () => {
-        // Return a promise that resolves with form data or null if invalid
         return new Promise((resolve) => {
           handleSubmit(
             (data) => {
               resolve(data);
             },
-            // On validation error
             () => {
               resolve(null);
             }
@@ -181,10 +156,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
             <Input
               id="startDate"
               type="date"
-              {...register("startDate", {
-                required: "La date de début est requise",
-              })}
-              defaultValue={formattedToday}
+              value={formattedStartDate}
               onChange={handleStartDateChange}
               className="border-gray-200 focus:border-gray-400 transition-colors"
             />
@@ -199,10 +171,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
             <Input
               id="endDate"
               type="date"
-              {...register("endDate", {
-                required: "La date de fin est requise",
-              })}
-              defaultValue={formattedEndDate}
+              value={formattedEndDate}
               readOnly
               className="border-gray-200 focus:border-gray-400 transition-colors bg-gray-50"
             />
