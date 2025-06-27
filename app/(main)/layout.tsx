@@ -1,6 +1,5 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
-import { CommandPalette } from "@/components/home/command-palette";
 import { ModeToggle } from "@/components/home/mode-toggle";
 import { SidebarNavigation } from "@/components/home/sidebar-navigation";
 // import { UserAuthButton } from "@/components/user-auth-button";

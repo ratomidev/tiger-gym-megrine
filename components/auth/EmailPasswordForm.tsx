@@ -39,6 +39,7 @@ export function EmailPasswordForm({ onSuccess, onError }: EmailPasswordFormProps
       }
     } catch (error) {
       onError("An unexpected error occurred");
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }

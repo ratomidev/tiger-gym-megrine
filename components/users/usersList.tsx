@@ -26,7 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Search, MoreHorizontal } from "lucide-react";
+import { Search } from "lucide-react";
 import { User } from "@/lib/auth/types";
 import { NewUserForm, NewUserFormValues } from "./newUserForm";
 import { toast } from "sonner";

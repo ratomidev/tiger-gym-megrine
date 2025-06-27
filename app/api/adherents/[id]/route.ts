@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET endpoint to retrieve adherent by ID
+// GET a single adherent by ID
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -9,17 +9,8 @@ export async function GET(
   try {
     const id = params.id;
 
-    if (!id) {
-      return NextResponse.json(
-        { success: false, error: "Adherent ID is required" },
-        { status: 400 }
-      );
-    }
-
     const adherent = await prisma.adherent.findUnique({
-      where: {
-        id: id,
-      },
+      where: { id },
       include: {
         subscription: true,
       },
@@ -27,19 +18,16 @@ export async function GET(
 
     if (!adherent) {
       return NextResponse.json(
-        { success: false, error: "Adherent not found" },
+        { error: "Adherent not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, adherent });
+    return NextResponse.json({ adherent });
   } catch (error) {
-    console.error("Error fetching adherent by ID:", error);
+    console.error("Error fetching adherent:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch adherent: " + (error as Error).message,
-      },
+      { error: "An error occurred while fetching the adherent" },
       { status: 500 }
     );
   }

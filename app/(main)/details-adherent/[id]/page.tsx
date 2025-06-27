@@ -335,7 +335,7 @@ export default function DetailsAdherent() {
                 <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
                   <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
                   <div>
-                    <p className="font-medium">Période d'abonnement</p>
+                    <p className="font-medium">Période d&apos;abonnement</p>
                     <div className="space-y-1 mt-1">
                       <div className="flex gap-2 text-gray-600">
                         <span className="font-medium min-w-[100px]">

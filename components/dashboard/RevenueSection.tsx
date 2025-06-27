@@ -265,7 +265,7 @@ export default async function RevenueSection() {
         <CardHeader>
           <CardTitle>Répartition des Revenus par Plan</CardTitle>
           <CardDescription>
-            Distribution des revenus selon les différents types d'abonnements
+            Distribution des revenus selon les différents types d&apos;abonnements
           </CardDescription>
         </CardHeader>
         <CardContent>

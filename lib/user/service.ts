@@ -1,10 +1,10 @@
 // fetch all the users from the database
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getAllUsers } from "@/lib/db/user";
 import { excludePassword } from "@/lib/db/user";
 import { User } from "@/lib/auth/types";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const users = await getAllUsers();
     const sanitizedUsers: User[] = users.map(excludePassword);

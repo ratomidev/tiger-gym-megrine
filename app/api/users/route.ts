@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAllUsers } from "@/lib/db/user";
+import { getAllUsers, excludePassword } from "@/lib/db/user";
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const users = await getAllUsers();
     return NextResponse.json({ users });
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Return user without password
-    const { password: _, ...userWithoutPassword } = user;
+    const userWithoutPassword = excludePassword(user);
 
     return NextResponse.json({ user: userWithoutPassword });
   } catch (error) {

@@ -6,7 +6,6 @@ import {
   User2,
   UserPlus,
   ChevronRight,
-  Dumbbell,
   CalendarCog
 } from "lucide-react";
 
