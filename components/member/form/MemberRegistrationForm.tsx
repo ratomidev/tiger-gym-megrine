@@ -3,6 +3,7 @@
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { useForm } from "react-hook-form";
 import { AdherentFormValues as BaseAdherentFormValues } from "@/types/adherent";
+import Image from "next/image";
 
 // Extend the base type to include photoFile
 interface AdherentFormValues extends BaseAdherentFormValues {
@@ -216,10 +217,12 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
             />
             {photoPreview && (
               <div className="mt-2">
-                <img
+                <Image
                   src={photoPreview}
                   alt="Preview"
-                  className="w-32 h-32 object-cover rounded-md border"
+                  width={128}
+                  height={128}
+                  className="object-cover rounded-md border"
                 />
               </div>
             )}

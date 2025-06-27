@@ -163,7 +163,7 @@ export function InputSearch({
             {selectedDate ? (
               <span>{format(selectedDate, "dd/MM/yyyy", { locale: fr })}</span>
             ) : (
-              <span>Date d'expiration</span>
+              <span>Date d&apos;expiration</span>
             )}
           </Button>
         </PopoverTrigger>
@@ -180,7 +180,7 @@ export function InputSearch({
               ) {
                 onDateFilter(null);
               } else {
-                onDateFilter(date);
+                onDateFilter(date || null);
               }
             }}
             initialFocus

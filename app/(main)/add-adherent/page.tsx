@@ -9,10 +9,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft, Save } from "lucide-react";
 import AdherentRegistrationForm from "@/components/member/form/MemberRegistrationForm";
 import SubscriptionRegistrationForm from "@/components/subscription/subscriptionRegistrationForm";
+import Link from "next/link";
 
 export default function Page() {
   const router = useRouter();
@@ -125,7 +128,7 @@ export default function Page() {
   };
 
   return (
-    <div className="container mx-auto py-10 space-y-6">
+    <div className="container max-w-5xl mx-auto py-8 px-4 sm:px-6">
       <Toaster
         position="top-right"
         toastOptions={{
@@ -142,28 +145,77 @@ export default function Page() {
         }}
       />
 
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Add New Member</CardTitle>
-          <CardDescription>
-            Register a new member with subscription details
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      {/* Vertical layout - Member Info first */}
-      <div className="space-y-6">
-        {/* Member Information Card */}
-        <AdherentRegistrationForm ref={adherentFormRef} />
-
-        {/* Subscription Card - Always shown */}
-        <SubscriptionRegistrationForm ref={subscriptionFormRef} />
+      {/* Header with Back Button */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Link href="/list-adherent">
+            <Button variant="outline" size="icon" className="h-8 w-8">
+              <ArrowLeft className="h-4 w-4" />
+              <span className="sr-only">Retour</span>
+            </Button>
+          </Link>
+          <h1 className="text-2xl font-bold">Ajouter un Adhérent</h1>
+        </div>
       </div>
 
-      {/* Save Button at the bottom */}
-      <div className="flex justify-end mt-8">
-        <Button size="lg" onClick={handleSubmit} disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Member"}
+      {/* Forms Container */}
+      <div className="space-y-6">
+        {/* Member Information Card */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-medium">
+              Informations Personnelles
+            </CardTitle>
+            <CardDescription>Détails de l&apos;adhérent</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AdherentRegistrationForm ref={adherentFormRef} />
+          </CardContent>
+        </Card>
+
+        {/* Subscription Card */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-medium">
+              Détails de l&apos;Abonnement
+            </CardTitle>
+            <CardDescription>Plan, durée et options</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SubscriptionRegistrationForm ref={subscriptionFormRef} />
+          </CardContent>
+          {isLoading && (
+            <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-md">
+              <div className="flex flex-col items-center gap-2">
+                <div className="h-8 w-8 rounded-full border-2 border-black border-t-transparent animate-spin"></div>
+                <p className="text-sm font-medium text-gray-600">
+                  Chargement...
+                </p>
+              </div>
+            </div>
+          )}
+        </Card>
+      </div>
+
+      {/* Save Button - Sticky at Bottom */}
+      <div className="sticky bottom-4 mt-8 pt-4 bg-white flex justify-end">
+        <Button
+          size="lg"
+          onClick={handleSubmit}
+          disabled={isLoading}
+          className="px-6 bg-black hover:bg-gray-800 text-white flex items-center gap-2"
+        >
+          {isLoading ? (
+            <>
+              <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin mr-2"></div>
+              Enregistrement...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              Enregistrer l&apos;adhérent
+            </>
+          )}
         </Button>
       </div>
     </div>
