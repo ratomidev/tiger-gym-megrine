@@ -1,5 +1,4 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-
 import { ModeToggle } from "@/components/home/mode-toggle";
 import { SidebarNavigation } from "@/components/home/sidebar-navigation";
 // import { UserAuthButton } from "@/components/user-auth-button";
@@ -24,7 +23,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="absolute top-4 left-4 z-50">
             <SidebarTrigger />
           </div>
-          <div className="w-full h-screen pt-30">{children}</div>
+          <div className="w-full h-screen pt-20">{children}</div>
         </main>
       </SidebarProvider>
     </div>

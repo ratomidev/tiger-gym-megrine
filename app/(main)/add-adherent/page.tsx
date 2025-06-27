@@ -4,18 +4,10 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 import { AdherentFormValues, SubscriptionFormValues } from "@/types";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import AdherentRegistrationForm from "@/components/member/form/MemberRegistrationForm";
 import SubscriptionRegistrationForm from "@/components/subscription/subscriptionRegistrationForm";
-import Link from "next/link";
 
 export default function Page() {
   const router = useRouter();
@@ -38,7 +30,9 @@ export default function Page() {
       const adherentData =
         await adherentFormRef.current?.validateAndGetValues();
       if (!adherentData) {
-        toast.error("Please fill in all required member information");
+        toast.error(
+          "Veuillez remplir toutes les informations requises du membre"
+        );
         setIsLoading(false);
         return;
       }
@@ -47,7 +41,9 @@ export default function Page() {
       const subscriptionData =
         await subscriptionFormRef.current?.validateAndGetValues();
       if (!subscriptionData) {
-        toast.error("Please fill in all required subscription information");
+        toast.error(
+          "Veuillez remplir toutes les informations requises de l'abonnement"
+        );
         setIsLoading(false);
         return;
       }
@@ -56,7 +52,7 @@ export default function Page() {
       await submitAdherentWithSubscription(adherentData, subscriptionData);
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error("An error occurred while saving", {
+      toast.error("Une erreur s'est produite lors de l'enregistrement", {
         description: (error as Error).message,
       });
     } finally {
@@ -113,8 +109,8 @@ export default function Page() {
 
     const result = await response.json();
     if (result.success) {
-      toast.success("Member registered successfully", {
-        description: `${adherentData.firstName} ${adherentData.lastName} has been registered with a subscription.`,
+      toast.success("Membre enregistré avec succès", {
+        description: `${adherentData.firstName} ${adherentData.lastName} a été enregistré avec un abonnement.`,
       });
 
       setTimeout(() => {
@@ -122,7 +118,7 @@ export default function Page() {
       }, 1500);
     } else {
       throw new Error(
-        result.error || "Failed to register member with subscription"
+        result.error || "Échec de l'enregistrement du membre avec abonnement"
       );
     }
   };
@@ -145,45 +141,35 @@ export default function Page() {
         }}
       />
 
-      {/* Header with Back Button */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Link href="/list-adherent">
-            <Button variant="outline" size="icon" className="h-8 w-8">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="sr-only">Retour</span>
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold">Ajouter un Adhérent</h1>
-        </div>
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Ajouter un Adhérent</h1>
       </div>
 
       {/* Forms Container */}
-      <div className="space-y-6">
-        {/* Member Information Card */}
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium">
-              Informations Personnelles
-            </CardTitle>
-            <CardDescription>Détails de l&apos;adhérent</CardDescription>
-          </CardHeader>
-          <CardContent>
+      <div className="space-y-12">
+        {/* Member Information Section */}
+        <div className="bg-white rounded-lg p-6 border border-gray-200">
+          <h2 className="text-lg font-medium mb-1">
+            Informations Personnelles
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Détails de l&apos;adhérent
+          </p>
+          <div className="mt-6">
             <AdherentRegistrationForm ref={adherentFormRef} />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Subscription Card */}
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium">
-              Détails de l&apos;Abonnement
-            </CardTitle>
-            <CardDescription>Plan, durée et options</CardDescription>
-          </CardHeader>
-          <CardContent>
+        {/* Subscription Section */}
+        <div className="bg-white rounded-lg p-6 relative border border-gray-200">
+          <h2 className="text-lg font-medium mb-1">
+            Détails de l&apos;Abonnement
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">Plan, durée et options</p>
+          <div className="mt-6">
             <SubscriptionRegistrationForm ref={subscriptionFormRef} />
-          </CardContent>
+          </div>
           {isLoading && (
             <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-md">
               <div className="flex flex-col items-center gap-2">
@@ -194,16 +180,16 @@ export default function Page() {
               </div>
             </div>
           )}
-        </Card>
+        </div>
       </div>
 
       {/* Save Button - Sticky at Bottom */}
-      <div className="sticky bottom-4 mt-8 pt-4 bg-white flex justify-end">
+      <div className="sticky bottom-4 mt-10 pt-4 bg-white flex justify-end">
         <Button
           size="lg"
           onClick={handleSubmit}
           disabled={isLoading}
-          className="px-6 bg-black hover:bg-gray-800 text-white flex items-center gap-2"
+          className="px-8 py-6 bg-black hover:bg-gray-800 text-white flex items-center gap-2 shadow-md"
         >
           {isLoading ? (
             <>

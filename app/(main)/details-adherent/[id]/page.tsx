@@ -17,7 +17,14 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
-  ArrowLeft,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Edit,
   Trash,
   Mail,
@@ -25,6 +32,7 @@ import {
   Calendar,
   MapPin,
   CreditCard,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -35,6 +43,8 @@ export default function DetailsAdherent() {
   const [adherent, setAdherent] = useState<Adherent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchAdherent = async () => {
@@ -93,36 +103,46 @@ export default function DetailsAdherent() {
     }
   };
 
-  const handleDelete = async () => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cet adhérent?")) {
-      try {
-        const response = await fetch(`/api/adherents/${id}`, {
-          method: "DELETE",
-        });
+  const handleDeleteClick = () => {
+    setShowDeleteDialog(true);
+  };
 
-        const data = await response.json();
+  const handleDeleteConfirm = async () => {
+    try {
+      setIsDeleting(true);
+      const response = await fetch(`/api/adherents/${id}`, {
+        method: "DELETE",
+      });
 
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to delete adherent");
-        }
+      const data = await response.json();
 
-        if (data.success) {
-          toast.success("Adhérent supprimé avec succès");
-          setTimeout(() => {
-            router.push("/list-adherent");
-          }, 1500);
-        }
-      } catch (err) {
-        toast.error("Erreur lors de la suppression", {
-          description: (err as Error).message,
-        });
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to delete adherent");
       }
+
+      if (data.success) {
+        setShowDeleteDialog(false);
+        toast.success("Adhérent supprimé avec succès");
+        setTimeout(() => {
+          router.push("/list-adherent");
+        }, 1500);
+      }
+    } catch (err) {
+      toast.error("Erreur lors de la suppression", {
+        description: (err as Error).message,
+      });
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteDialog(false);
   };
 
   if (loading) {
     return (
-      <div className="container max-w-4xl mx-auto py-8 px-4 flex items-center justify-center min-h-[60vh]">
+      <div className="w-full max-w-6xl mx-auto py-6 px-4 flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-2">
           <div className="h-8 w-8 rounded-full border-2 border-black border-t-transparent animate-spin"></div>
           <p className="text-sm font-medium text-gray-600">Chargement...</p>
@@ -133,7 +153,7 @@ export default function DetailsAdherent() {
 
   if (error || !adherent) {
     return (
-      <div className="container max-w-4xl mx-auto py-8 px-4">
+      <div className="w-full max-w-6xl mx-auto py-6 px-4">
         <Card className="text-center py-8">
           <CardContent>
             <div className="flex flex-col items-center gap-4">
@@ -144,7 +164,6 @@ export default function DetailsAdherent() {
                 onClick={() => router.push("/list-adherent")}
                 variant="outline"
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
                 Retour à la liste
               </Button>
             </div>
@@ -155,25 +174,64 @@ export default function DetailsAdherent() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4 sm:px-6">
+    <div className="w-full max-w-6xl mx-auto py-6 px-4">
       <Toaster
         position="top-right"
         className="rounded-md"
       />
 
-      {/* Header with Back Button and Actions */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <Link href="/list-adherent">
-            <Button variant="outline" size="icon" className="h-9 w-9">
-              <ArrowLeft className="h-5 w-5" />
-              <span className="sr-only">Retour</span>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              Confirmer la suppression
+            </DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer cet adhérent? Cette action est
+              irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-3">
+            <p className="text-sm font-medium">
+              Vous allez supprimer l&apos;adhérent suivant:
+            </p>
+            <p className="mt-1 text-sm bg-gray-50 p-2 rounded border border-gray-100">
+              {adherent?.firstName} {adherent?.lastName}
+            </p>
+          </div>
+          <DialogFooter className="sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={handleDeleteCancel}
+              disabled={isDeleting}
+            >
+              Annuler
             </Button>
-          </Link>
-          <h1 className="text-2xl font-bold">Détails de l&apos;Adhérent</h1>
-        </div>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <span className="h-4 w-4 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                  Suppression...
+                </>
+              ) : (
+                "Supprimer"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Header with title and actions */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Détails de l&apos;Adhérent</h1>
         <div className="flex gap-3">
-          <Link href={`/edit-adherent/${adherent.id}`}>
+          <Link href={`/edit-adherent/${adherent?.id}`}>
             <Button variant="outline" size="sm" className="gap-2 h-9">
               <Edit className="h-4 w-4" />
               <span className="hidden sm:inline">Modifier</span>
@@ -182,7 +240,7 @@ export default function DetailsAdherent() {
           <Button
             variant="destructive"
             size="sm"
-            onClick={handleDelete}
+            onClick={handleDeleteClick}
             className="gap-2 h-9"
           >
             <Trash className="h-4 w-4" />
@@ -193,7 +251,7 @@ export default function DetailsAdherent() {
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Personal Info Card */}
-        <Card className="h-fit">
+        <Card className="h-full flex flex-col">
           <CardHeader>
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16 border-2 border-gray-100">
@@ -225,7 +283,7 @@ export default function DetailsAdherent() {
             </div>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="flex-1">
             <h3 className="text-lg font-semibold mb-6 pb-2 border-b">
               Informations personnelles
             </h3>
@@ -268,7 +326,7 @@ export default function DetailsAdherent() {
         </Card>
 
         {/* Subscription Card */}
-        <Card className="h-fit">
+        <Card className="h-full flex flex-col">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl">Abonnement</CardTitle>
@@ -297,68 +355,89 @@ export default function DetailsAdherent() {
             </div>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="flex-1">
             {adherent.subscription ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
-                  <CreditCard className="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className="font-medium">Plan</p>
-                    <p className="text-gray-600 text-lg font-medium">
-                      {adherent.subscription.plan}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
-                  <div className="h-5 w-5 flex items-center justify-center bg-gray-100 rounded-full">
-                    <span className="text-xs font-bold text-gray-600">DT</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">Prix</p>
-                    <p className="text-gray-600">
-                      {adherent.subscription.price} DT
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
-                  <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className="font-medium">Période d&apos;abonnement</p>
-                    <div className="space-y-1 mt-1">
-                      <div className="flex gap-2 text-gray-600">
-                        <span className="font-medium min-w-[100px]">
-                          Début:
-                        </span>
-                        {formatDate(adherent.subscription.startDate.toString())}
+              <div className="h-full flex flex-col">
+                {/* Plan Information Section */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-4 pb-2 border-b">
+                    Détails de l'abonnement
+                  </h3>
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
+                      <CreditCard className="h-5 w-5 text-gray-500 mt-0.5" />
+                      <div>
+                        <p className="font-medium">Plan</p>
+                        <p className="text-gray-600 text-lg font-medium">
+                          {adherent.subscription.plan}
+                        </p>
                       </div>
-                      <div className="flex gap-2 text-gray-600">
-                        <span className="font-medium min-w-[100px]">
-                          Expiration:
+                    </div>
+
+                    <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
+                      <div className="h-5 w-5 flex items-center justify-center bg-gray-100 rounded-full">
+                        <span className="text-xs font-bold text-gray-600">
+                          DT
                         </span>
-                        {formatDate(adherent.subscription.endDate.toString())}
+                      </div>
+                      <div>
+                        <p className="font-medium">Prix</p>
+                        <p className="text-gray-600">
+                          {adherent.subscription.price} DT
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t">
-                  <p className="font-medium mb-3">Options</p>
+                {/* Time Period Section */}
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">
+                    Période d'abonnement
+                  </h4>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">
+                          Date de début
+                        </p>
+                        <p className="font-medium">
+                          {formatDate(
+                            adherent.subscription.startDate.toString()
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">
+                          Date d'expiration
+                        </p>
+                        <p className="font-medium">
+                          {formatDate(adherent.subscription.endDate.toString())}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Options Section */}
+                <div className="pt-3 border-t mt-auto">
+                  <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">
+                    Options incluses
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {adherent.subscription.hasCardioMusculation && (
-                      <Badge className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100">
+                      <Badge className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 py-1.5">
                         Cardio & Musculation
                       </Badge>
                     )}
                     {adherent.subscription.hasCours && (
-                      <Badge className="bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100">
+                      <Badge className="bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100 py-1.5">
                         Cours collectifs
                       </Badge>
                     )}
                     {!adherent.subscription.hasCardioMusculation &&
                       !adherent.subscription.hasCours && (
-                        <span className="text-gray-500 text-sm">
+                        <span className="text-gray-500 text-sm italic">
                           Aucune option sélectionnée
                         </span>
                       )}
@@ -366,7 +445,7 @@ export default function DetailsAdherent() {
                 </div>
               </div>
             ) : (
-              <div className="py-8 px-6 bg-gray-50 rounded-md text-center">
+              <div className="py-8 px-6 bg-gray-50 rounded-md text-center h-full flex flex-col justify-center">
                 <p className="text-gray-500">Aucun abonnement actif</p>
                 <Link
                   href={`/add-subscription/${adherent.id}`}
