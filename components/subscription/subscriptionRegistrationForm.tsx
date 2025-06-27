@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useImperativeHandle } from "react";
+import React, { forwardRef, useImperativeHandle, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { SubscriptionFormValues } from "@/types/subscription";
 import { format } from "date-fns";
@@ -26,6 +26,10 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
     const nextMonth = new Date();
     nextMonth.setMonth(today.getMonth() + 1);
 
+    // Format dates for input fields
+    const formattedToday = format(today, "yyyy-MM-dd");
+    const formattedNextMonth = format(nextMonth, "yyyy-MM-dd");
+
     const {
       register,
       handleSubmit,
@@ -33,7 +37,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       formState: { errors },
     } = useForm<SubscriptionFormValues>({
       defaultValues: {
-        plan: "Basic",
+        plan: "1 mois",
         price: 50,
         startDate: today,
         endDate: nextMonth,
@@ -42,6 +46,16 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
         hasCours: false,
       },
     });
+
+    // Ensure date inputs are set with today's date on component mount
+    useEffect(() => {
+      const startDateInput = document.getElementById(
+        "startDate"
+      ) as HTMLInputElement;
+      if (startDateInput) {
+        startDateInput.value = formattedToday;
+      }
+    }, [formattedToday]);
 
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({
@@ -66,19 +80,19 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Plan */}
           <div className="space-y-2">
-            <Label htmlFor="plan">Type d'Abonnement</Label>
+            <Label htmlFor="plan">Type d&apos;Abonnement</Label>
             <Select
-              defaultValue="Basic"
+              defaultValue="1 mois"
               onValueChange={(value) => setValue("plan", value)}
             >
               <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
-                <SelectValue placeholder="Sélectionner un plan" />
+                <SelectValue placeholder="Sélectionner une durée" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Basic">Basique</SelectItem>
-                <SelectItem value="Standard">Standard</SelectItem>
-                <SelectItem value="Premium">Premium</SelectItem>
-                <SelectItem value="VIP">VIP</SelectItem>
+                <SelectItem value="1 mois">1 mois</SelectItem>
+                <SelectItem value="3 mois">3 mois</SelectItem>
+                <SelectItem value="6 mois">6 mois</SelectItem>
+                <SelectItem value="1 an">1 an</SelectItem>
               </SelectContent>
             </Select>
             {errors.plan && (
@@ -114,7 +128,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
               {...register("startDate", {
                 required: "La date de début est requise",
               })}
-              defaultValue={format(today, "yyyy-MM-dd")}
+              defaultValue={formattedToday}
               className="border-gray-200 focus:border-gray-400 transition-colors"
             />
             {errors.startDate && (
@@ -131,7 +145,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
               {...register("endDate", {
                 required: "La date de fin est requise",
               })}
-              defaultValue={format(nextMonth, "yyyy-MM-dd")}
+              defaultValue={formattedNextMonth}
               className="border-gray-200 focus:border-gray-400 transition-colors"
             />
             {errors.endDate && (

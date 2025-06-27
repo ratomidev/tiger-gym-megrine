@@ -198,7 +198,7 @@ export function MemberTable({ data }: MemberTableProps) {
                       {adherent.subscription ? (
                         <Badge
                           variant="outline"
-                          className={`px-2.5 py-0.5 text-xs font-medium rounded-full border ${getStatusColor(
+                          className={`px-2.5 py-0.5 text-xs font-medium border ${getStatusColor(
                             adherent.subscription.status
                           )}`}
                         >
@@ -220,7 +220,7 @@ export function MemberTable({ data }: MemberTableProps) {
                       ) : (
                         <Badge
                           variant="outline"
-                          className="bg-gray-50 text-gray-500 border-gray-200 px-2.5 py-0.5 rounded-full"
+                          className="bg-gray-50 text-gray-500 border-gray-200 px-2.5 py-0.5"
                         >
                           <span className="flex items-center">
                             <span className="mr-1.5 h-2 w-2 rounded-full bg-gray-400"></span>
