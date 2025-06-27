@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MemberTable } from "@/components/member/table/MemberTable";
+import { MemberTable } from "@/components/member/table/AdherentTable";
 import Loading from "./loading";
 import { Adherent } from "@/types";
 
@@ -40,7 +40,7 @@ export default function MemberListPage() {
   }
 
   return (
-    <div className="w-full max-w-6xl px-4 mx-auto">
+    <div className="w-full max-w-6xl px-4 mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Liste des Adhérents</h1>
         <Button
@@ -50,17 +50,14 @@ export default function MemberListPage() {
           Ajouter un adhérent
         </Button>
       </div>
-      <MemberTable
-        members={adherents}
-        defaultColumnVisibility={{
-          firstname: true,
-          lastname: true,
-          tel: true,
-          subscriptionStatus: true,
-          subscriptionType: true,
-          subscriptionEndDate: true,
-        }}
-      />
+
+      {adherents.length > 0 ? (
+        <MemberTable data={adherents} />
+      ) : (
+        <div className="text-center py-10">
+          <p className="text-gray-500">Aucun adhérent trouvé</p>
+        </div>
+      )}
     </div>
   );
 }
