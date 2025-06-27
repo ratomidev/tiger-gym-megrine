@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,83 +12,34 @@ model User {
   email     String   @unique
   password  String
   name      String?
-  phone     String?
-  role      String?  @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-
-model Member {
-  id               String   @id @default(cuid())
-  membershipNumber String   
-  firstname        String
-  lastname         String
-  email            String?
-  tel              String?
-  sexe             String?
-  birthdate        DateTime?
-  photoUrl         String?  // URL to stored photo
-  
-  // Address information
-  address          Address?
-
-  // Membership information
-  inscriptionDate         DateTime @default(now())
-  subscriptionType        String   // monthly, quarterly, biannual, annual
-  subscriptionStartDate   DateTime
-  subscriptionEndDate     DateTime
-  subscriptionStatus      String   @default("actif") // actif, expiré, suspendu
-  
-  // Services as a relation to ServiceSubscription
-  services               ServiceSubscription?
-  
-  // Medical information
-  medicalRecord          MedicalRecord?
-  
-  // Notes
-  notes                  String?
-  
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+model Subscription {
+  id                   String   @id @default(cuid())
+  adherentId           String   @unique
+  startDate            DateTime
+  endDate              DateTime
+  plan                 String
+  price                Decimal  @db.Decimal(10, 3)
+  status               String   @default("actif")
+  hasCardioMusculation Boolean  @default(false)
+  hasCours             Boolean  @default(false)
+  adherent             Adherent @relation(fields: [adherentId], references: [id])
 }
 
-model Address {
-  id         String  @id @default(cuid())
-  street     String?
-  city       String?
-  postalCode String?
-  country    String  @default("Tunisie")
-  
-  // Relation to Member
-  memberId   String  @unique
-  member     Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
-}
-
-model ServiceSubscription {
-  id          String  @id @default(cuid())
-  musculation Boolean @default(false)
-  cardio      Boolean @default(false)
-  fitness     Boolean @default(false)
-  boxing      Boolean @default(false)
-  yoga        Boolean @default(false)
-  
-  // Relation to Member
-  memberId    String  @unique
-  member      Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
-}
-
-model MedicalRecord {
-  id                     String   @id @default(cuid())
-  medicalCertificateDate DateTime?
-  hasMedicalCertificate  Boolean  @default(false)
-  medicalCertificateUrl  String?  // URL to stored medical certificate
-  allergies              String?
-  healthIssues           String?
-  specialPermissions     String?
-  contraindications      String?
-  
-  // Relation to Member
-  memberId               String   @unique
-  member                 Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+model Adherent {
+  id           String        @id @default(cuid())
+  firstName    String
+  lastName     String
+  email        String        @unique
+  phone        String
+  birthDate    DateTime
+  Address      String
+  createdAt    DateTime      @default(now())
+  isValidated  Boolean       @default(false)
+  photoUrl     String?
+  sexe         String
+  subscription Subscription?
 }
