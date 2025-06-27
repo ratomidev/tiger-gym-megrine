@@ -123,149 +123,160 @@ export function MemberTable({ data }: MemberTableProps) {
       </div>
 
       <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Adhérent</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Abonnement</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead>Fin d&apos;abonnement</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredData.length > 0 ? (
-              filteredData.map((adherent) => (
-                <TableRow
-                  key={adherent.id}
-                  onClick={() => handleRowClick(adherent.id)}
-                  className="cursor-pointer hover:bg-gray-50"
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        {adherent.photoUrl ? (
-                          <AvatarImage
-                            src={adherent.photoUrl}
-                            alt={`${adherent.firstName} ${adherent.lastName}`}
-                          />
-                        ) : (
-                          <AvatarFallback>
-                            {getInitials(adherent.firstName, adherent.lastName)}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
+        <div className="overflow-hidden">
+          <Table>
+            <TableHeader className="bg-white sticky top-0 z-10">
+              <TableRow>
+                <TableHead>Adhérent</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Abonnement</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Fin d&apos;abonnement</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+          </Table>
+        </div>
+        <div className="overflow-auto max-h-[500px]">
+          <Table>
+            <TableBody>
+              {filteredData.length > 0 ? (
+                filteredData.map((adherent) => (
+                  <TableRow
+                    key={adherent.id}
+                    onClick={() => handleRowClick(adherent.id)}
+                    className="cursor-pointer hover:bg-gray-50"
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          {adherent.photoUrl ? (
+                            <AvatarImage
+                              src={adherent.photoUrl}
+                              alt={`${adherent.firstName} ${adherent.lastName}`}
+                            />
+                          ) : (
+                            <AvatarFallback>
+                              {getInitials(
+                                adherent.firstName,
+                                adherent.lastName
+                              )}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{`${adherent.firstName} ${adherent.lastName}`}</p>
+                          <p className="text-xs text-gray-500">
+                            {adherent.sexe === "M" ? "Homme" : "Femme"}
+                          </p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <div>
-                        <p className="font-medium">{`${adherent.firstName} ${adherent.lastName}`}</p>
+                        <p className="text-sm">{adherent.email}</p>
                         <p className="text-xs text-gray-500">
-                          {adherent.sexe === "M" ? "Homme" : "Femme"}
+                          {adherent.phone}
                         </p>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="text-sm">{adherent.email}</p>
-                      <p className="text-xs text-gray-500">{adherent.phone}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {adherent.subscription ? (
-                      <div>
-                        <p className="font-medium">
-                          {adherent.subscription.plan}
-                        </p>
-                        <p className="text-xs text-gray-500">{`${adherent.subscription.price} DT`}</p>
-                      </div>
-                    ) : (
-                      <Badge variant="outline" className="bg-gray-100">
-                        Sans abonnement
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {adherent.subscription ? (
-                      <Badge
-                        variant="outline"
-                        className={`px-2.5 py-0.5 text-xs font-medium rounded-full border ${getStatusColor(
-                          adherent.subscription.status
-                        )}`}
-                      >
-                        <span className="flex items-center">
-                          <span
-                            className={`mr-1.5 h-2 w-2 rounded-full ${
-                              adherent.subscription.status.toLowerCase() ===
-                              "actif"
-                                ? "bg-emerald-500"
-                                : adherent.subscription.status.toLowerCase() ===
-                                  "suspendu"
-                                ? "bg-amber-500"
-                                : "bg-red-500"
-                            }`}
-                          ></span>
-                          {adherent.subscription.status}
-                        </span>
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="bg-gray-50 text-gray-500 border-gray-200 px-2.5 py-0.5 rounded-full"
-                      >
-                        <span className="flex items-center">
-                          <span className="mr-1.5 h-2 w-2 rounded-full bg-gray-400"></span>
-                          N/A
-                        </span>
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {adherent.subscription
-                      ? formatDate(adherent.subscription.endDate.toString())
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Ouvrir menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <Link href={`/adherent/${adherent.id}`} passHref>
-                          <DropdownMenuItem>
-                            <Eye className="mr-2 h-4 w-4" />
-                            Voir détails
+                    </TableCell>
+                    <TableCell>
+                      {adherent.subscription ? (
+                        <div>
+                          <p className="font-medium">
+                            {adherent.subscription.plan}
+                          </p>
+                          <p className="text-xs text-gray-500">{`${adherent.subscription.price} DT`}</p>
+                        </div>
+                      ) : (
+                        <Badge variant="outline" className="bg-gray-100">
+                          Sans abonnement
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {adherent.subscription ? (
+                        <Badge
+                          variant="outline"
+                          className={`px-2.5 py-0.5 text-xs font-medium rounded-full border ${getStatusColor(
+                            adherent.subscription.status
+                          )}`}
+                        >
+                          <span className="flex items-center">
+                            <span
+                              className={`mr-1.5 h-2 w-2 rounded-full ${
+                                adherent.subscription.status.toLowerCase() ===
+                                "actif"
+                                  ? "bg-emerald-500"
+                                  : adherent.subscription.status.toLowerCase() ===
+                                    "suspendu"
+                                  ? "bg-amber-500"
+                                  : "bg-red-500"
+                              }`}
+                            ></span>
+                            {adherent.subscription.status}
+                          </span>
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="bg-gray-50 text-gray-500 border-gray-200 px-2.5 py-0.5 rounded-full"
+                        >
+                          <span className="flex items-center">
+                            <span className="mr-1.5 h-2 w-2 rounded-full bg-gray-400"></span>
+                            N/A
+                          </span>
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {adherent.subscription
+                        ? formatDate(adherent.subscription.endDate.toString())
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Ouvrir menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <Link href={`/adherent/${adherent.id}`} passHref>
+                            <DropdownMenuItem>
+                              <Eye className="mr-2 h-4 w-4" />
+                              Voir détails
+                            </DropdownMenuItem>
+                          </Link>
+                          <Link href={`/adherent/${adherent.id}/edit`} passHref>
+                            <DropdownMenuItem>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Modifier
+                            </DropdownMenuItem>
+                          </Link>
+                          <DropdownMenuItem className="text-red-600">
+                            <Trash className="mr-2 h-4 w-4" />
+                            Supprimer
                           </DropdownMenuItem>
-                        </Link>
-                        <Link href={`/adherent/${adherent.id}/edit`} passHref>
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Modifier
-                          </DropdownMenuItem>
-                        </Link>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash className="mr-2 h-4 w-4" />
-                          Supprimer
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="text-center py-6 text-gray-500"
+                  >
+                    Aucun adhérent trouvé pour cette recherche
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="text-center py-6 text-gray-500"
-                >
-                  Aucun adhérent trouvé pour cette recherche
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );
