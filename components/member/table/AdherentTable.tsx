@@ -25,12 +25,14 @@ import Link from "next/link";
 import { useState, useMemo } from "react";
 import { InputSearch } from "@/components/member/table/InputSearch";
 import { isSameDay } from "date-fns";
+import { useRouter } from "next/navigation";
 
 interface MemberTableProps {
   data: Adherent[];
 }
 
 export function MemberTable({ data }: MemberTableProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState<Date | null>(null);
@@ -72,8 +74,20 @@ export function MemberTable({ data }: MemberTableProps) {
     });
   }, [data, searchTerm, statusFilter, dateFilter]);
 
+  const handleRowClick = (id: string) => {
+    router.push(`/details-adherent/${id}`);
+  };
+
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), "dd MMM yyyy", { locale: fr });
+    } catch (error) {
+      return "Date invalide" + error;
+    }
   };
 
   const getStatusColor = (status: string | undefined) => {
@@ -87,14 +101,6 @@ export function MemberTable({ data }: MemberTableProps) {
         return "bg-red-50 text-red-600 border-red-200 hover:bg-red-100";
       default:
         return "bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200";
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), "dd MMM yyyy", { locale: fr });
-    } catch (error) {
-      return "Date invalide" + error;
     }
   };
 
@@ -131,7 +137,11 @@ export function MemberTable({ data }: MemberTableProps) {
           <TableBody>
             {filteredData.length > 0 ? (
               filteredData.map((adherent) => (
-                <TableRow key={adherent.id}>
+                <TableRow
+                  key={adherent.id}
+                  onClick={() => handleRowClick(adherent.id)}
+                  className="cursor-pointer hover:bg-gray-50"
+                >
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar>
