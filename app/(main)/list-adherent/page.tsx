@@ -44,7 +44,7 @@ export default function MemberListPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Liste des Adhérents</h1>
         <Button
-          onClick={() => (window.location.href = "/add-member")}
+          onClick={() => (window.location.href = "/add-adherent")}
           className="bg-black hover:bg-gray-800 text-white"
         >
           Ajouter un adhérent
