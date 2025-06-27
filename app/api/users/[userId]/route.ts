@@ -1,38 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// Define params type as a Promise
+type UserParamsType = Promise<{ userId: string }>;
+
+// DELETE endpoint to remove a user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: UserParamsType }
 ) {
   try {
-    const userId = params.userId;
+    // Await the params promise to get the actual value
+    const { userId } = await params;
 
-    // Check if user exists
-    const existingUser = await prisma.user.findUnique({
+    // Delete the user
+    const deletedUser = await prisma.user.delete({
       where: { id: userId },
     });
 
-    if (!existingUser) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    // Delete the user using Prisma
-    await prisma.user.delete({
-      where: { id: userId },
+    return NextResponse.json({
+      success: true,
+      message: "User successfully deleted",
+      user: {
+        id: deletedUser.id,
+        email: deletedUser.email,
+        name: deletedUser.name,
+      },
     });
-
-    return NextResponse.json(
-      { message: "User deleted successfully" },
-      { status: 200 }
-    );
   } catch (error) {
-    console.error("Failed to delete user:", error);
+    console.error("Error deleting user:", error);
     return NextResponse.json(
-      { error: "An error occurred while deleting the user" },
+      {
+        success: false,
+        error: "Failed to delete user: " + (error as Error).message,
+      },
       { status: 500 }
     );
   }
