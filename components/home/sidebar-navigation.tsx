@@ -6,8 +6,7 @@ import {
   User2,
   UserPlus,
   ChevronRight,
-  Dumbbell,
-  CalendarCog
+  CalendarCog,
 } from "lucide-react";
 
 import {
@@ -43,7 +42,7 @@ const items = [
   },
   {
     title: "Adherents",
-    url: "/list-member",
+    url: "/list-adherent",
     icon: UserPlus,
   },
   {
