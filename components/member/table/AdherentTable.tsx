@@ -123,22 +123,21 @@ export function MemberTable({ data }: MemberTableProps) {
       </div>
 
       <div className="rounded-md border">
-        <div className="overflow-hidden">
+        <div className="overflow-auto max-h-[500px]">
           <Table>
             <TableHeader className="bg-white sticky top-0 z-10">
               <TableRow>
-                <TableHead>Adhérent</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Abonnement</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead>Fin d&apos;abonnement</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="w-[250px]">Nom et Prénom</TableHead>
+                <TableHead className="w-[100px]">Tél</TableHead>
+                <TableHead className="w-[180px]">Mail</TableHead>
+                <TableHead className="w-[150px]">Abonnement</TableHead>
+                <TableHead className="w-[100px]">Status</TableHead>
+                <TableHead className="w-[130px]">
+                  Fin d&apos;abonnement
+                </TableHead>
+                <TableHead className="text-right w-[80px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
-          </Table>
-        </div>
-        <div className="overflow-auto max-h-[500px]">
-          <Table>
             <TableBody>
               {filteredData.length > 0 ? (
                 filteredData.map((adherent) => (
@@ -173,12 +172,10 @@ export function MemberTable({ data }: MemberTableProps) {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <p className="text-sm">{adherent.email}</p>
-                        <p className="text-xs text-gray-500">
-                          {adherent.phone}
-                        </p>
-                      </div>
+                      <p className="text-sm">{adherent.phone}</p>
+                    </TableCell>
+                    <TableCell>
+                      <p className="text-sm">{adherent.email}</p>
                     </TableCell>
                     <TableCell>
                       {adherent.subscription ? (
@@ -267,7 +264,7 @@ export function MemberTable({ data }: MemberTableProps) {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
+                    colSpan={7}
                     className="text-center py-6 text-gray-500"
                   >
                     Aucun adhérent trouvé pour cette recherche
