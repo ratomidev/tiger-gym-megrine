@@ -17,6 +17,14 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Edit,
   Trash,
   Mail,
@@ -24,6 +32,7 @@ import {
   Calendar,
   MapPin,
   CreditCard,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -34,6 +43,8 @@ export default function DetailsAdherent() {
   const [adherent, setAdherent] = useState<Adherent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchAdherent = async () => {
@@ -92,31 +103,41 @@ export default function DetailsAdherent() {
     }
   };
 
-  const handleDelete = async () => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cet adhérent?")) {
-      try {
-        const response = await fetch(`/api/adherents/${id}`, {
-          method: "DELETE",
-        });
+  const handleDeleteClick = () => {
+    setShowDeleteDialog(true);
+  };
 
-        const data = await response.json();
+  const handleDeleteConfirm = async () => {
+    try {
+      setIsDeleting(true);
+      const response = await fetch(`/api/adherents/${id}`, {
+        method: "DELETE",
+      });
 
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to delete adherent");
-        }
+      const data = await response.json();
 
-        if (data.success) {
-          toast.success("Adhérent supprimé avec succès");
-          setTimeout(() => {
-            router.push("/list-adherent");
-          }, 1500);
-        }
-      } catch (err) {
-        toast.error("Erreur lors de la suppression", {
-          description: (err as Error).message,
-        });
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to delete adherent");
       }
+
+      if (data.success) {
+        setShowDeleteDialog(false);
+        toast.success("Adhérent supprimé avec succès");
+        setTimeout(() => {
+          router.push("/list-adherent");
+        }, 1500);
+      }
+    } catch (err) {
+      toast.error("Erreur lors de la suppression", {
+        description: (err as Error).message,
+      });
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteDialog(false);
   };
 
   if (loading) {
@@ -169,11 +190,58 @@ export default function DetailsAdherent() {
         }}
       />
 
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              Confirmer la suppression
+            </DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer cet adhérent? Cette action est
+              irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-3">
+            <p className="text-sm font-medium">
+              Vous allez supprimer l&apos;adhérent suivant:
+            </p>
+            <p className="mt-1 text-sm bg-gray-50 p-2 rounded border border-gray-100">
+              {adherent?.firstName} {adherent?.lastName}
+            </p>
+          </div>
+          <DialogFooter className="sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={handleDeleteCancel}
+              disabled={isDeleting}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <span className="h-4 w-4 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                  Suppression...
+                </>
+              ) : (
+                "Supprimer"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Header with title and actions */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Détails de l&apos;Adhérent</h1>
         <div className="flex gap-3">
-          <Link href={`/edit-adherent/${adherent.id}`}>
+          <Link href={`/edit-adherent/${adherent?.id}`}>
             <Button variant="outline" size="sm" className="gap-2 h-9">
               <Edit className="h-4 w-4" />
               <span className="hidden sm:inline">Modifier</span>
@@ -182,7 +250,7 @@ export default function DetailsAdherent() {
           <Button
             variant="destructive"
             size="sm"
-            onClick={handleDelete}
+            onClick={handleDeleteClick}
             className="gap-2 h-9"
           >
             <Trash className="h-4 w-4" />
