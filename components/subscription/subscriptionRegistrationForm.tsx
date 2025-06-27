@@ -215,7 +215,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
         {/* Services */}
         <div className="space-y-4 pt-2">
           <Label>Services Inclus</Label>
-          <div className="space-y-3">
+          <div className="flex flex-row items-center space-x-6">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="hasCardioMusculation"
