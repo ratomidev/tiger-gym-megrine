@@ -4,6 +4,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MemberTable } from "@/components/member/table/AdherentTable";
+import { Toaster } from "sonner";
 import Loading from "./loading";
 import { Adherent } from "@/types";
 
@@ -35,12 +36,18 @@ export default function MemberListPage() {
     fetchMembers();
   }, []);
 
+  const handleDataUpdate = (updatedData: Adherent[]) => {
+    setAdherents(updatedData);
+  };
+
   if (loading) {
     return <Loading />;
   }
 
   return (
     <div className="w-full max-w-6xl px-4 mx-auto py-6">
+      <Toaster position="top-right" />
+
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Liste des Adhérents</h1>
         <Button
@@ -52,7 +59,7 @@ export default function MemberListPage() {
       </div>
 
       {adherents.length > 0 ? (
-        <MemberTable data={adherents} />
+        <MemberTable data={adherents} onDataUpdate={handleDataUpdate} />
       ) : (
         <div className="text-center py-10">
           <p className="text-gray-500">Aucun adhérent trouvé</p>

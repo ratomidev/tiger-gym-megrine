@@ -19,6 +19,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+import { DeleteConfirmationDialog } from "@/components/ui/DeleteConfirmationDialog";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Edit, Trash, Eye } from "lucide-react";
 import Link from "next/link";
@@ -26,16 +28,22 @@ import { useState, useMemo } from "react";
 import { InputSearch } from "@/components/member/table/InputSearch";
 import { isSameDay } from "date-fns";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface MemberTableProps {
   data: Adherent[];
+  onDataUpdate?: (updatedData: Adherent[]) => void;
 }
 
-export function MemberTable({ data }: MemberTableProps) {
+export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState<Date | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [adherentToDelete, setAdherentToDelete] = useState<Adherent | null>(
+    null
+  );
 
   const filteredData = useMemo(() => {
     return data.filter((adherent) => {
@@ -78,6 +86,54 @@ export function MemberTable({ data }: MemberTableProps) {
     router.push(`/details-adherent/${id}`);
   };
 
+  const handleDeleteClick = (adherent: Adherent, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setAdherentToDelete(adherent);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!adherentToDelete) return;
+
+    try {
+      const response = await fetch(`/api/adherents/${adherentToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.error || "Failed to delete adherent");
+      }
+
+      if (responseData.success) {
+        toast.success("Adhérent supprimé avec succès", {
+          description: `${adherentToDelete.firstName} ${adherentToDelete.lastName} a été supprimé définitivement.`,
+          duration: 3000,
+        });
+
+        // Update the local data immediately to reflect the change
+        const updatedData = data.filter(
+          (adherent) => adherent.id !== adherentToDelete.id
+        );
+        if (onDataUpdate) {
+          onDataUpdate(updatedData);
+        }
+
+        setAdherentToDelete(null);
+        setShowDeleteDialog(false);
+      } else {
+        throw new Error("Deletion failed - no success response");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Erreur lors de la suppression", {
+        description: (error as Error).message,
+        duration: 4000,
+      });
+    }
+  };
+
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
@@ -106,6 +162,20 @@ export function MemberTable({ data }: MemberTableProps) {
 
   return (
     <div className="space-y-4">
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Confirmer la suppression"
+        description="Êtes-vous sûr de vouloir supprimer cet adhérent? Cette action est irréversible."
+        itemName={
+          adherentToDelete
+            ? `${adherentToDelete.firstName} ${adherentToDelete.lastName}`
+            : undefined
+        }
+        onConfirm={handleDeleteConfirm}
+      />
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <InputSearch
           onSearch={setSearchTerm}
@@ -234,25 +304,38 @@ export function MemberTable({ data }: MemberTableProps) {
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             <span className="sr-only">Ouvrir menu</span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <Link href={`/adherent/${adherent.id}`} passHref>
+                        <DropdownMenuContent
+                          align="end"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Link
+                            href={`/details-adherent/${adherent.id}`}
+                            passHref
+                          >
                             <DropdownMenuItem>
                               <Eye className="mr-2 h-4 w-4" />
                               Voir détails
                             </DropdownMenuItem>
                           </Link>
-                          <Link href={`/adherent/${adherent.id}/edit`} passHref>
+                          <Link href={`/edit-adherent/${adherent.id}`} passHref>
                             <DropdownMenuItem>
                               <Edit className="mr-2 h-4 w-4" />
                               Modifier
                             </DropdownMenuItem>
                           </Link>
-                          <DropdownMenuItem className="text-red-600">
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onClick={(e) => handleDeleteClick(adherent, e)}
+                          >
                             <Trash className="mr-2 h-4 w-4" />
                             Supprimer
                           </DropdownMenuItem>
