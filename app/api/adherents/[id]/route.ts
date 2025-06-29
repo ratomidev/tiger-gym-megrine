@@ -54,27 +54,67 @@ export async function PUT(
     const id = params.id;
     const data = await request.json();
 
-    const updatedAdherent = await prisma.adherent.update({
-      where: {
-        id: id,
-      },
-      data: {
-        ...data,
-        subscription: data.subscription
-          ? {
-              update: {
-                where: { adherentId: id },
-                data: data.subscription,
-              },
-            }
-          : undefined,
-      },
-      include: {
-        subscription: true,
-      },
+    // Separate adherent data from subscription data
+    const {
+      subscriptionPlan,
+      subscriptionPrice,
+      subscriptionStatus,
+      subscriptionStartDate,
+      subscriptionEndDate,
+      hasCardioMusculation,
+      hasCours,
+      ...adherentData
+    } = data;
+
+    // Convert birthDate string to Date object if provided
+    if (adherentData.birthDate) {
+      adherentData.birthDate = new Date(adherentData.birthDate);
+    }
+
+    // Handle subscription update if subscription data is provided
+    if (
+      subscriptionPlan ||
+      subscriptionPrice ||
+      subscriptionStatus ||
+      subscriptionStartDate ||
+      subscriptionEndDate ||
+      hasCardioMusculation !== undefined ||
+      hasCours !== undefined
+    ) {
+      const subscriptionData: any = {};
+
+      if (subscriptionPlan) subscriptionData.plan = subscriptionPlan;
+      if (subscriptionPrice)
+        subscriptionData.price = parseFloat(subscriptionPrice);
+      if (subscriptionStatus) subscriptionData.status = subscriptionStatus;
+      if (subscriptionStartDate)
+        subscriptionData.startDate = new Date(subscriptionStartDate);
+      if (subscriptionEndDate)
+        subscriptionData.endDate = new Date(subscriptionEndDate);
+      if (hasCardioMusculation !== undefined)
+        subscriptionData.hasCardioMusculation = hasCardioMusculation;
+      if (hasCours !== undefined) subscriptionData.hasCours = hasCours;
+
+      // Upsert subscription (update if exists, create if doesn't exist)
+      await prisma.subscription.upsert({
+        where: {
+          adherentId: id,
+        },
+        update: subscriptionData,
+        create: {
+          ...subscriptionData,
+          adherentId: id,
+        },
+      });
+    }
+
+    // Fetch the updated adherent with subscription
+    const finalAdherent = await prisma.adherent.findUnique({
+      where: { id: id },
+      include: { subscription: true },
     });
 
-    return NextResponse.json({ success: true, adherent: updatedAdherent });
+    return NextResponse.json({ success: true, adherent: finalAdherent });
   } catch (error) {
     console.error("Error updating adherent:", error);
     return NextResponse.json(

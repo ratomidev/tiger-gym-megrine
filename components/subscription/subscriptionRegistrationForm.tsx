@@ -201,7 +201,6 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="actif">Actif</SelectItem>
-                <SelectItem value="inactif">Inactif</SelectItem>
                 <SelectItem value="suspendu">Suspendu</SelectItem>
                 <SelectItem value="expiré">Expiré</SelectItem>
               </SelectContent>
