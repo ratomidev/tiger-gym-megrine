@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import MemberRegistrationForm from "@/components/member/form/MemberRegistrationForm";
+import RegistrationSuccess from "@/components/member/RegistrationSuccess";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -18,6 +19,7 @@ export default function RegisterPage() {
     validateAndGetValues: () => Promise<AdherentFormValues | null>;
   }>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   /**
    * Handle form submission
@@ -65,12 +67,8 @@ export default function RegisterPage() {
       const result = await response.json();
       
       if (result.success) {
-        toast.success("Inscription réussie ! Votre demande a été envoyée.", {
-          description: "Notre équipe va traiter votre demande sous peu."
-        });
-        
-        // Reload the form by refreshing the page
-        window.location.reload();
+        toast.success("Inscription réussie ! Votre demande a été envoyée.");
+        setIsSuccess(true); // Show success component
       } else {
         throw new Error(result.error || "Une erreur s'est produite lors de l'inscription");
       }
@@ -82,6 +80,13 @@ export default function RegisterPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Reset the form and show registration form again
+  const handleReset = () => {
+    setIsSuccess(false);
+    // Force reload to reset all form fields
+    window.location.reload();
   };
 
   return (
@@ -101,36 +106,40 @@ export default function RegisterPage() {
           />
         </div>
         
-        {/* Registration Card */}
-        <Card className="w-full max-w-3xl shadow-lg border-gray-200">
-          <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl font-bold text-gray-800">Inscription Adhérent</CardTitle>
-            <CardDescription className="text-gray-600">
-              Remplissez le formulaire ci-dessous pour vous inscrire
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="pt-4">
-            <MemberRegistrationForm ref={adherentFormRef} />
-          </CardContent>
-          
-          <CardFooter className="flex justify-end space-x-4 pt-2 pb-6">
-            <Button 
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
-                  Envoi...
-                </>
-              ) : (
-                "S'inscrire"
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
+        {/* Conditionally render either the registration form or success message */}
+        {isSuccess ? (
+          <RegistrationSuccess onReset={handleReset} />
+        ) : (
+          <Card className="w-full max-w-3xl shadow-lg border-gray-200">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-2xl font-bold text-gray-800">Inscription Adhérent</CardTitle>
+              <CardDescription className="text-gray-600">
+                Remplissez le formulaire ci-dessous pour vous inscrire
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="pt-4">
+              <MemberRegistrationForm ref={adherentFormRef} />
+            </CardContent>
+            
+            <CardFooter className="flex justify-end space-x-4 pt-2 pb-6">
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+                    Envoi...
+                  </>
+                ) : (
+                  "S'inscrire"
+                )}
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
       </div>
     </div>
   );
