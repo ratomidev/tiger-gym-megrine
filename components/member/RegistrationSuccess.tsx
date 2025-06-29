@@ -1,13 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { Card, CardContent, CardDescription,  CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2 } from "lucide-react";
-import Link from "next/link";
 
 interface RegistrationSuccessProps {
   onReset?: () => void;
 }
 
-export default function RegistrationSuccess({ onReset }: RegistrationSuccessProps) {
+export default function RegistrationSuccess({ }: RegistrationSuccessProps) {
   return (
     <Card className="w-full max-w-3xl shadow-lg border-gray-200">
       <CardHeader className="text-center pb-2">
@@ -32,7 +31,7 @@ export default function RegistrationSuccess({ onReset }: RegistrationSuccessProp
             </p>
           </div>
           <p className="text-gray-600 text-sm">
-            Pour toute question, n'hésitez pas à nous contacter au <span className="font-semibold">+216 XX XXX XXX</span> ou par email à <span className="font-semibold">contact@tigergym.tn</span>
+            Pour toute question, n&apos;hésitez pas à nous contacter au <span className="font-semibold">+216 XX XXX XXX</span> ou par email à <span className="font-semibold">contact@tigergym.tn</span>
           </p>
         </div>
       </CardContent>
