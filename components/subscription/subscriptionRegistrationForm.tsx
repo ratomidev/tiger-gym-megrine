@@ -91,8 +91,15 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
     };
 
     useEffect(() => {
-      updateEndDate("1 mois", today);
-    }, []);
+      const initializeEndDate = () => {
+        const initialEndDate = calculateEndDate("1 mois", today);
+        const formattedEnd = format(initialEndDate, "yyyy-MM-dd");
+        setFormattedEndDate(formattedEnd);
+        setValue("endDate", initialEndDate);
+      };
+
+      initializeEndDate();
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useImperativeHandle(ref, () => ({
       validateAndGetValues: async () => {

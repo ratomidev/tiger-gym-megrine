@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { User } from "@/lib/login";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { User } from "@/lib/auth/types";
 
 interface EmailPasswordFormProps {
   onSuccess: (user: User) => void;

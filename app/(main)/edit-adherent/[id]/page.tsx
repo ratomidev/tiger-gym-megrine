@@ -537,7 +537,7 @@ export default function EditAdherentPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="actif">Actif</SelectItem>
-                      <SelectItem value="expire">Expiré</SelectItem>
+                      <SelectItem value="expiré">Expiré</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
