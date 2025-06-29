@@ -60,8 +60,7 @@ export function InputSearch({
 
   const statuses = [
     { label: "Actif", value: "actif" },
-    { label: "Suspendu", value: "suspendu" },
-    { label: "Expiré", value: "expired" },
+    { label: "Expiré", value: "expiré" },
     { label: "Sans abonnement", value: "none" },
   ];
 
@@ -71,9 +70,8 @@ export function InputSearch({
     switch (status) {
       case "actif":
         return "bg-emerald-50 text-emerald-600";
-      case "suspendu":
-        return "bg-amber-50 text-amber-600";
-      case "expired":
+
+      case "expiré":
         return "bg-red-50 text-red-600";
       case "none":
         return "bg-gray-100 text-gray-600";

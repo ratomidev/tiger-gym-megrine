@@ -190,10 +190,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
             <Select
               defaultValue="actif"
               onValueChange={(value) =>
-                setValue(
-                  "status",
-                  value as "actif" | "inactif" | "suspendu" | "expiré"
-                )
+                setValue("status", value as "actif" | "expiré")
               }
             >
               <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
@@ -201,7 +198,6 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="actif">Actif</SelectItem>
-                <SelectItem value="suspendu">Suspendu</SelectItem>
                 <SelectItem value="expiré">Expiré</SelectItem>
               </SelectContent>
             </Select>

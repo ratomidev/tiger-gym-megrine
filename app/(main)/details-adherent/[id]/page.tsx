@@ -502,7 +502,6 @@ export default function DetailsAdherent() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="actif">Actif</SelectItem>
-                  <SelectItem value="suspendu">Suspendu</SelectItem>
                   <SelectItem value="expire">Expiré</SelectItem>
                 </SelectContent>
               </Select>

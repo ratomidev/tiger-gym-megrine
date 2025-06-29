@@ -537,10 +537,6 @@ export default function EditAdherentPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="actif">Actif</SelectItem>
-                      <SelectItem value="suspendu">Suspendu</SelectItem>
-                      <SelectItem value="sans abonnement">
-                        Sans abonnement
-                      </SelectItem>
                       <SelectItem value="expire">Expiré</SelectItem>
                     </SelectContent>
                   </Select>
