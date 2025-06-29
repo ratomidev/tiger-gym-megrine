@@ -361,7 +361,7 @@ export default function DetailsAdherent() {
                 {/* Plan Information Section */}
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold mb-4 pb-2 border-b">
-                    Détails de l'abonnement
+                    Détails de l&apos;abonnement
                   </h3>
                   <div className="grid grid-cols-1 gap-6">
                     <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
@@ -393,7 +393,7 @@ export default function DetailsAdherent() {
                 {/* Time Period Section */}
                 <div className="mb-6">
                   <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">
-                    Période d'abonnement
+                    Période d&apos;abonnement
                   </h4>
                   <div className="bg-gray-50 p-3 rounded-lg">
                     <div className="grid grid-cols-2 gap-4">
@@ -409,7 +409,7 @@ export default function DetailsAdherent() {
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">
-                          Date d'expiration
+                          Date d&apos;expiration
                         </p>
                         <p className="font-medium">
                           {formatDate(adherent.subscription.endDate.toString())}
