@@ -4,22 +4,13 @@ import { prisma } from "@/lib/prisma";
 // GET endpoint to retrieve adherent by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
-
-    if (!id) {
-      return NextResponse.json(
-        { success: false, error: "Adherent ID is required" },
-        { status: 400 }
-      );
-    }
+    const { id } = await params;
 
     const adherent = await prisma.adherent.findUnique({
-      where: {
-        id: id,
-      },
+      where: { id },
       include: {
         subscription: true,
       },
@@ -34,7 +25,7 @@ export async function GET(
 
     return NextResponse.json({ success: true, adherent });
   } catch (error) {
-    console.error("Error fetching adherent by ID:", error);
+    console.error("Error fetching adherent:", error);
     return NextResponse.json(
       {
         success: false,
@@ -48,10 +39,10 @@ export async function GET(
 // PUT endpoint to update an adherent
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
     const data = await request.json();
 
     // Separate adherent data from subscription data
@@ -71,6 +62,12 @@ export async function PUT(
       adherentData.birthDate = new Date(adherentData.birthDate);
     }
 
+    // First, update the adherent's personal information
+    await prisma.adherent.update({
+      where: { id },
+      data: adherentData,
+    });
+
     // Handle subscription update if subscription data is provided
     if (
       subscriptionPlan ||
@@ -81,34 +78,64 @@ export async function PUT(
       hasCardioMusculation !== undefined ||
       hasCours !== undefined
     ) {
-      const subscriptionData: any = {};
+      const subscriptionUpdateData: {
+        plan?: string;
+        price?: number;
+        status?: string;
+        startDate?: Date;
+        endDate?: Date;
+        hasCardioMusculation?: boolean;
+        hasCours?: boolean;
+      } = {};
 
-      if (subscriptionPlan) subscriptionData.plan = subscriptionPlan;
+      const subscriptionCreateData: {
+        adherentId: string;
+        plan: string;
+        price: number;
+        status: string;
+        startDate: Date;
+        endDate: Date;
+        hasCardioMusculation: boolean;
+        hasCours: boolean;
+      } = {
+        adherentId: id,
+        plan: subscriptionPlan || "1 mois",
+        price: subscriptionPrice ? parseFloat(subscriptionPrice) : 0,
+        status: subscriptionStatus || "actif",
+        startDate: subscriptionStartDate
+          ? new Date(subscriptionStartDate)
+          : new Date(),
+        endDate: subscriptionEndDate
+          ? new Date(subscriptionEndDate)
+          : new Date(),
+        hasCardioMusculation: hasCardioMusculation || false,
+        hasCours: hasCours || false,
+      };
+
+      if (subscriptionPlan) subscriptionUpdateData.plan = subscriptionPlan;
       if (subscriptionPrice)
-        subscriptionData.price = parseFloat(subscriptionPrice);
-      if (subscriptionStatus) subscriptionData.status = subscriptionStatus;
+        subscriptionUpdateData.price = parseFloat(subscriptionPrice);
+      if (subscriptionStatus)
+        subscriptionUpdateData.status = subscriptionStatus;
       if (subscriptionStartDate)
-        subscriptionData.startDate = new Date(subscriptionStartDate);
+        subscriptionUpdateData.startDate = new Date(subscriptionStartDate);
       if (subscriptionEndDate)
-        subscriptionData.endDate = new Date(subscriptionEndDate);
+        subscriptionUpdateData.endDate = new Date(subscriptionEndDate);
       if (hasCardioMusculation !== undefined)
-        subscriptionData.hasCardioMusculation = hasCardioMusculation;
-      if (hasCours !== undefined) subscriptionData.hasCours = hasCours;
+        subscriptionUpdateData.hasCardioMusculation = hasCardioMusculation;
+      if (hasCours !== undefined) subscriptionUpdateData.hasCours = hasCours;
 
       // Upsert subscription (update if exists, create if doesn't exist)
       await prisma.subscription.upsert({
         where: {
           adherentId: id,
         },
-        update: subscriptionData,
-        create: {
-          ...subscriptionData,
-          adherentId: id,
-        },
+        update: subscriptionUpdateData,
+        create: subscriptionCreateData,
       });
     }
 
-    // Fetch the updated adherent with subscription
+    // Fetch the final updated adherent with subscription
     const finalAdherent = await prisma.adherent.findUnique({
       where: { id: id },
       include: { subscription: true },
@@ -130,29 +157,25 @@ export async function PUT(
 // DELETE endpoint to remove an adherent
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
-    // First delete the subscription to avoid foreign key constraint issues
+    // First, delete the subscription if it exists
     await prisma.subscription.deleteMany({
-      where: {
-        adherentId: id,
-      },
+      where: { adherentId: id },
     });
 
     // Then delete the adherent
     const deletedAdherent = await prisma.adherent.delete({
-      where: {
-        id: id,
-      },
+      where: { id },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Adherent successfully deleted",
-      adherent: deletedAdherent,
+      message: "Adherent deleted successfully",
+      deletedAdherent,
     });
   } catch (error) {
     console.error("Error deleting adherent:", error);

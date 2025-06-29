@@ -24,16 +24,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Edit,
   Trash,
@@ -43,7 +33,6 @@ import {
   MapPin,
   CreditCard,
   AlertTriangle,
-  Plus,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -56,20 +45,6 @@ export default function DetailsAdherent() {
   const [error, setError] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
-  const [isCreatingSubscription, setIsCreatingSubscription] = useState(false);
-  const [subscriptionForm, setSubscriptionForm] = useState({
-    duration: "",
-    price: "",
-    status: "actif",
-    startDate: "",
-    endDate: "",
-    hasCardioMusculation: false,
-    hasCours: false,
-  });
-  const [subscriptionErrors, setSubscriptionErrors] = useState<
-    Record<string, string>
-  >({});
 
   useEffect(() => {
     const fetchAdherent = async () => {
@@ -165,144 +140,6 @@ export default function DetailsAdherent() {
     setShowDeleteDialog(false);
   };
 
-  const handleAddSubscriptionClick = () => {
-    const today = new Date().toISOString().split("T")[0];
-    setSubscriptionForm((prev) => ({
-      ...prev,
-      startDate: today,
-    }));
-    setShowSubscriptionDialog(true);
-  };
-
-  const handleSubscriptionInputChange = (
-    field: string,
-    value: string | boolean
-  ) => {
-    setSubscriptionForm((prev) => {
-      const newForm = { ...prev, [field]: value };
-
-      // Auto-calculate end date based on start date and duration
-      if (
-        (field === "startDate" || field === "duration") &&
-        newForm.startDate &&
-        newForm.duration
-      ) {
-        const startDate = new Date(newForm.startDate);
-        const durationMonths = parseInt(newForm.duration);
-        if (!isNaN(durationMonths)) {
-          const endDate = new Date(startDate);
-          if (newForm.duration === "12") {
-            // For 1 year, add 1 year
-            endDate.setFullYear(endDate.getFullYear() + 1);
-          } else {
-            // For months, add the specified number of months
-            endDate.setMonth(endDate.getMonth() + durationMonths);
-          }
-          newForm.endDate = endDate.toISOString().split("T")[0];
-        }
-      }
-
-      return newForm;
-    });
-
-    // Clear error for this field
-    if (subscriptionErrors[field]) {
-      setSubscriptionErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-  };
-
-  const validateSubscriptionForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!subscriptionForm.duration) {
-      newErrors.duration = "Le type d'abonnement est requis";
-    }
-
-    if (!subscriptionForm.price.trim()) {
-      newErrors.price = "Le prix est requis";
-    } else if (isNaN(Number(subscriptionForm.price))) {
-      newErrors.price = "Le prix doit être un nombre valide";
-    }
-
-    if (!subscriptionForm.startDate) {
-      newErrors.startDate = "La date de début est requise";
-    }
-
-    setSubscriptionErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubscriptionSubmit = async () => {
-    if (!validateSubscriptionForm()) {
-      toast.error("Veuillez corriger les erreurs dans le formulaire");
-      return;
-    }
-
-    try {
-      setIsCreatingSubscription(true);
-      const response = await fetch(`/api/adherents/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subscriptionPlan: `${
-            subscriptionForm.duration === "12"
-              ? "1 an"
-              : subscriptionForm.duration + " mois"
-          }`,
-          subscriptionPrice: subscriptionForm.price,
-          subscriptionStatus: subscriptionForm.status,
-          subscriptionStartDate: subscriptionForm.startDate,
-          subscriptionEndDate: subscriptionForm.endDate,
-          hasCardioMusculation: subscriptionForm.hasCardioMusculation,
-          hasCours: subscriptionForm.hasCours,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create subscription");
-      }
-
-      if (data.success) {
-        setAdherent(data.adherent);
-        setShowSubscriptionDialog(false);
-        setSubscriptionForm({
-          duration: "",
-          price: "",
-          status: "actif",
-          startDate: "",
-          endDate: "",
-          hasCardioMusculation: false,
-          hasCours: false,
-        });
-        toast.success("Abonnement ajouté avec succès");
-      }
-    } catch (err) {
-      toast.error("Erreur lors de la création de l'abonnement", {
-        description: (err as Error).message,
-      });
-    } finally {
-      setIsCreatingSubscription(false);
-    }
-  };
-
-  const handleSubscriptionCancel = () => {
-    setShowSubscriptionDialog(false);
-    setSubscriptionForm({
-      duration: "",
-      price: "",
-      status: "actif",
-      startDate: "",
-      endDate: "",
-      hasCardioMusculation: false,
-      hasCours: false,
-    });
-    setSubscriptionErrors({});
-  };
-
   if (loading) {
     return (
       <div className="w-full max-w-6xl mx-auto py-6 px-4 flex items-center justify-center min-h-[60vh]">
@@ -381,186 +218,6 @@ export default function DetailsAdherent() {
                 </>
               ) : (
                 "Supprimer"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add Subscription Dialog */}
-      <Dialog
-        open={showSubscriptionDialog}
-        onOpenChange={setShowSubscriptionDialog}
-      >
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5 text-blue-500" />
-              Ajouter un abonnement
-            </DialogTitle>
-            <DialogDescription>
-              Remplissez les détails de l&apos;abonnement pour cet adhérent.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            {/* Type d'abonnement */}
-            <div className="space-y-2">
-              <Label htmlFor="duration">Type d&apos;abonnement *</Label>
-              <Select
-                value={subscriptionForm.duration}
-                onValueChange={(value) =>
-                  handleSubscriptionInputChange("duration", value)
-                }
-              >
-                <SelectTrigger
-                  className={
-                    subscriptionErrors.duration ? "border-red-500" : ""
-                  }
-                >
-                  <SelectValue placeholder="Sélectionner le type d'abonnement" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1 mois</SelectItem>
-                  <SelectItem value="3">3 mois</SelectItem>
-                  <SelectItem value="6">6 mois</SelectItem>
-                  <SelectItem value="12">1 an</SelectItem>
-                </SelectContent>
-              </Select>
-              {subscriptionErrors.duration && (
-                <p className="text-sm text-red-500">
-                  {subscriptionErrors.duration}
-                </p>
-              )}
-            </div>
-
-            {/* Prix */}
-            <div className="space-y-2">
-              <Label htmlFor="price">Prix (DT) *</Label>
-              <Input
-                id="price"
-                type="number"
-                value={subscriptionForm.price}
-                onChange={(e) =>
-                  handleSubscriptionInputChange("price", e.target.value)
-                }
-                placeholder="0"
-                className={subscriptionErrors.price ? "border-red-500" : ""}
-              />
-              {subscriptionErrors.price && (
-                <p className="text-sm text-red-500">
-                  {subscriptionErrors.price}
-                </p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {/* Date de début */}
-              <div className="space-y-2">
-                <Label htmlFor="startDate">Date de début *</Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={subscriptionForm.startDate}
-                  onChange={(e) =>
-                    handleSubscriptionInputChange("startDate", e.target.value)
-                  }
-                  className={
-                    subscriptionErrors.startDate ? "border-red-500" : ""
-                  }
-                />
-                {subscriptionErrors.startDate && (
-                  <p className="text-sm text-red-500">
-                    {subscriptionErrors.startDate}
-                  </p>
-                )}
-              </div>
-
-              {/* Date de fin (Calculée automatiquement) */}
-              <div className="space-y-2">
-                <Label htmlFor="endDate">Date de fin (Calculée)</Label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={subscriptionForm.endDate}
-                  readOnly
-                  className="bg-gray-50"
-                />
-              </div>
-            </div>
-
-            {/* Statut */}
-            <div className="space-y-2">
-              <Label htmlFor="status">Statut</Label>
-              <Select
-                value={subscriptionForm.status}
-                onValueChange={(value) =>
-                  handleSubscriptionInputChange("status", value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner le statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="actif">Actif</SelectItem>
-                  <SelectItem value="expire">Expiré</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Options */}
-            <div className="space-y-3">
-              <Label>Options incluses</Label>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="hasCardioMusculation"
-                    checked={subscriptionForm.hasCardioMusculation}
-                    onCheckedChange={(checked) =>
-                      handleSubscriptionInputChange(
-                        "hasCardioMusculation",
-                        checked as boolean
-                      )
-                    }
-                  />
-                  <Label htmlFor="hasCardioMusculation">
-                    Cardio et Musculation
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="hasCours"
-                    checked={subscriptionForm.hasCours}
-                    onCheckedChange={(checked) =>
-                      handleSubscriptionInputChange(
-                        "hasCours",
-                        checked as boolean
-                      )
-                    }
-                  />
-                  <Label htmlFor="hasCours">Cours collectifs</Label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <DialogFooter className="sm:justify-end">
-            <Button
-              variant="outline"
-              onClick={handleSubscriptionCancel}
-              disabled={isCreatingSubscription}
-            >
-              Annuler
-            </Button>
-            <Button
-              onClick={handleSubscriptionSubmit}
-              disabled={isCreatingSubscription}
-            >
-              {isCreatingSubscription ? (
-                <>
-                  <span className="h-4 w-4 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
-                  Création...
-                </>
-              ) : (
-                "Créer l'abonnement"
               )}
             </Button>
           </DialogFooter>
@@ -787,13 +444,12 @@ export default function DetailsAdherent() {
             ) : (
               <div className="py-8 px-6 bg-gray-50 rounded-md text-center h-full flex flex-col justify-center">
                 <p className="text-gray-500">Aucun abonnement actif</p>
-                <Button
-                  size="sm"
-                  onClick={handleAddSubscriptionClick}
-                  className="mt-4"
+                <Link
+                  href={`/add-subscription/${adherent.id}`}
+                  className="mt-4 inline-block"
                 >
-                  Ajouter un abonnement
-                </Button>
+                  <Button size="sm">Ajouter un abonnement</Button>
+                </Link>
               </div>
             )}
           </CardContent>
