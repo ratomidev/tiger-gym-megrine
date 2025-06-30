@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
     // Create session token
     const token = await createSessionToken(user);
     
-    // Set session cookie
-    setSessionCookie(token);
+    // Fix: Await the setSessionCookie function
+    await setSessionCookie(token);
     
     // Return user without password
     const { password: _, ...userWithoutPassword } = user;

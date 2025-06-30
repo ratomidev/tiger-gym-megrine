@@ -121,10 +121,27 @@ export async function verifySessionToken(token: string): Promise<User | null> {
 }
 
 /**
+ * Get the current user from the session
+ */
+export async function getCurrentUser(): Promise<User | null> {
+  // Fix: Await the cookies() function before using it
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("session");
+  
+  if (!sessionCookie?.value) {
+    return null;
+  }
+  
+  return verifySessionToken(sessionCookie.value);
+}
+
+/**
  * Set the session cookie
  */
-export function setSessionCookie(token: string) {
-  cookies().set({
+export async function setSessionCookie(token: string) {
+  // Fix: Await the cookies() function
+  const cookieStore = await cookies();
+  cookieStore.set({
     name: "session",
     value: token,
     httpOnly: true,
@@ -138,19 +155,8 @@ export function setSessionCookie(token: string) {
 /**
  * Clear the session cookie
  */
-export function clearSessionCookie() {
-  cookies().delete("session");
-}
-
-/**
- * Get the current user from the session
- */
-export async function getCurrentUser(): Promise<User | null> {
-  const sessionCookie = await cookies().get("session");
-  
-  if (!sessionCookie?.value) {
-    return null;
-  }
-  
-  return verifySessionToken(sessionCookie.value);
+export async function clearSessionCookie() {
+  // Fix: Await the cookies() function
+  const cookieStore = await cookies();
+  cookieStore.delete("session");
 }

@@ -36,7 +36,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
-  // Get the session cookie
+  // Get the session cookie from the request object
+  // Note: In middleware, cookies are accessible synchronously from the request
   const sessionCookie = request.cookies.get("session");
   
   // If no session cookie exists, redirect to login
