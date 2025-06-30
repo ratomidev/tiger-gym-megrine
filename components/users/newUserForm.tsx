@@ -16,23 +16,19 @@ import {
   SelectValue
 } from "@/components/ui/select";
 
-// Form validation schema
+// Form validation schema with simplified password requirements
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters long")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      "Password must contain at least one uppercase letter, one lowercase letter, and one number"
-    ),
+    .min(6, "Password must be at least 6 characters long"), // Simplified password validation
   name: z.string().optional(),
   phone: z
     .string()
     .optional()
     .refine(
       (val) => !val || /^\d{8}$/.test(val),
-      "Phone number should be 8 digits (e.g., 54806948)"
+      "Phone number should be 8 digits "
     ),
   role: z.enum(['OWNER', 'STAFF'])
 });
@@ -126,7 +122,7 @@ export function NewUserForm({ onSubmit, onCancel }: NewUserFormProps) {
           id="phone"
           type="text"
           {...form.register("phone")}
-          placeholder="54806948"
+          placeholder="XX XXX XXX"
           disabled={isSubmitting}
         />
         {form.formState.errors.phone && (

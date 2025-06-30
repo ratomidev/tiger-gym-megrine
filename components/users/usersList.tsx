@@ -26,8 +26,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Search } from "lucide-react";
-import { User } from "@/types/auth"; // Import updated User type
+import { Search, User as UserIcon } from "lucide-react";
+import { User } from "@/types/auth";
 import { NewUserForm, NewUserFormValues } from "./newUserForm";
 import { toast } from "sonner";
 import { ActionsMenu } from "./actionsMenu";
@@ -168,13 +168,15 @@ export default function UsersList() {
             <div className="relative w-full sm:w-[300px]">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by name, email, role or phone..."
+                placeholder="Search users..."
                 className="pl-8 w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <Button onClick={handleAddUserClick}>Add New User</Button>
+            <Button onClick={handleAddUserClick} className="w-full sm:w-auto">
+              Add New User
+            </Button>
           </div>
 
           {loading ? (
@@ -195,9 +197,9 @@ export default function UsersList() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
+                    <TableHead className="hidden md:table-cell">Email</TableHead>
                     <TableHead className="hidden md:table-cell">Phone</TableHead>
-                    <TableHead className="hidden md:table-cell">Role</TableHead>
+                    <TableHead>Role</TableHead>
                     <TableHead className="hidden md:table-cell">
                       Created
                     </TableHead>
@@ -217,15 +219,25 @@ export default function UsersList() {
                     filteredUsers.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell className="font-medium">
-                          {user.name || "N/A"}
+                          <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 md:hidden">
+                              <UserIcon className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <div>{user.name || "N/A"}</div>
+                              <div className="text-sm text-gray-500 md:hidden">
+                                {user.email}
+                              </div>
+                            </div>
+                          </div>
                         </TableCell>
-                        <TableCell className="max-w-[200px] truncate">
+                        <TableCell className="max-w-[200px] truncate hidden md:table-cell">
                           {user.email}
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
                           {user.phone || "N/A"}
                         </TableCell>
-                        <TableCell className="hidden md:table-cell">
+                        <TableCell>
                           <span
                             className={`px-2 py-1 rounded-full text-xs font-medium ${
                               user.role === "OWNER"
