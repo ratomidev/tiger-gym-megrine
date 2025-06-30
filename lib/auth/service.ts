@@ -93,11 +93,8 @@ export const SESSION_DURATION = 8 * 60 * 60; // 8 hours
  * Create a session token for a user
  */
 export async function createSessionToken(user: User): Promise<string> {
-  // Remove sensitive fields before encoding in JWT
-  const { password, ...userWithoutPassword } = user as any;
-  
   // Create a JWT that expires after SESSION_DURATION
-  const token = await new SignJWT({ user: userWithoutPassword })
+  const token = await new SignJWT({ user })
     .setProtectedHeader({ alg: "HS256" })
     .setJti(nanoid())
     .setIssuedAt()
@@ -114,7 +111,7 @@ export async function verifySessionToken(token: string): Promise<User | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     return payload.user as User;
-  } catch (error) {
+  } catch {
     // Token is invalid or expired
     return null;
   }

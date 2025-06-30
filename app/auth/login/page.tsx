@@ -81,7 +81,7 @@ export default function LoginPage() {
 
     // Delay navigation to allow toast to be seen
     setTimeout(() => {
-      router.push("/home");
+      router.push(decodeURIComponent(callbackUrl));
     }, 1000);
   };
 

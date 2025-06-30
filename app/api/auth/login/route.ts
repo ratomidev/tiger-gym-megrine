@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     await setSessionCookie(token);
     
     // Return user without password
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _password, ...userWithoutPassword } = user;
     
     return NextResponse.json({ 
       user: userWithoutPassword,

@@ -59,7 +59,7 @@ export function NewUserForm({ onSubmit, onCancel }: NewUserFormProps) {
     try {
       await onSubmit(values);
       form.reset();
-    } catch (error) {
+    } catch {
       // Error is handled by parent component
     } finally {
       setIsSubmitting(false);

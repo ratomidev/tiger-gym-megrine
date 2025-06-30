@@ -1,7 +1,7 @@
 // components/auth/SessionCheck.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
@@ -12,10 +12,9 @@ const SESSION_CHECK_INTERVAL = 5 * 60 * 1000;
 export function SessionCheck() {
   const router = useRouter();
   const { logout } = useAuth();
-  const [sessionTimeout, setSessionTimeout] = useState<NodeJS.Timeout | null>(null);
 
   // Check session validity
-  const checkSession = async () => {
+  const checkSession = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/check-session");
       
@@ -28,7 +27,7 @@ export function SessionCheck() {
     } catch (error) {
       console.error("Session check failed", error);
     }
-  };
+  }, [logout, router]);
   
   useEffect(() => {
     // Check session on component mount
@@ -36,14 +35,11 @@ export function SessionCheck() {
     
     // Set up interval to check session
     const interval = setInterval(checkSession, SESSION_CHECK_INTERVAL);
-    setSessionTimeout(interval);
     
     return () => {
-      if (sessionTimeout) {
-        clearInterval(sessionTimeout);
-      }
+      clearInterval(interval);
     };
-  }, []);
+  }, [checkSession]);
   
   return null; // This component doesn't render anything
 }

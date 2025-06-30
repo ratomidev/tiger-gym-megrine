@@ -31,8 +31,8 @@ async function getAllUsers() {
 /**
  * Exclude password from a user object for safe return
  */
-function excludePassword(user: any) {
-  const { password, ...userWithoutPassword } = user;
+function excludePassword(user: Record<string, unknown>) {
+  const { password: _password, ...userWithoutPassword } = user;
   return userWithoutPassword;
 }
 

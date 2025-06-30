@@ -1,8 +1,8 @@
 // app/api/auth/check-session/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/service";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const user = await getCurrentUser();
   
   if (!user) {
