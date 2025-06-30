@@ -1,13 +1,4 @@
-import {
-  Calendar,
-  ChevronUp,
-  Home,
-  Settings,
-  User2,
-  UserPlus,
-  ChevronRight,
-  CalendarCog,
-} from "lucide-react";
+import { ChevronUp, Home, User2, UserPlus } from "lucide-react";
 
 import {
   Sidebar,
@@ -19,7 +10,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -27,11 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@radix-ui/react-collapsible";
 
 // Menu items.
 const items = [
