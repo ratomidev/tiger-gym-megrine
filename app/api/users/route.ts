@@ -13,6 +13,8 @@ async function getAllUsers() {
       id: true,
       email: true,
       name: true,
+      phone: true, // Added phone field
+      role: true,  // Added role field
       createdAt: true,
       updatedAt: true,
       // Explicitly exclude password
@@ -50,7 +52,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, name, phone } = body;
+    const { email, password, name, phone, role } = body;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -81,6 +83,8 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         name: name || null,
+        phone: phone || null,
+        role: role || 'STAFF', // Default to STAFF if not provided
       },
     });
 

@@ -1,53 +1,62 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User } from "@/lib/auth/types";
+import { User } from "@/types/auth"; // Import updated User type
+import { Button } from "@/components/ui/button";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 interface DeleteDialogProps {
   user: User | null;
   isOpen: boolean;
   onClose: () => void;
-  onUserDeleted?: () => void;
+  onUserDeleted: () => void;
 }
 
-export function DeleteDialog({ 
-  user, 
-  isOpen, 
-  onClose, 
-  onUserDeleted 
+export function DeleteDialog({
+  user,
+  isOpen,
+  onClose,
+  onUserDeleted,
 }: DeleteDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Add cleanup effect
+  useEffect(() => {
+    if (!isOpen) {
+      const timer = setTimeout(() => {
+        document.body.style.pointerEvents = "";
+      }, 150);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   const handleDelete = async () => {
     if (!user) return;
-    
+
+    setIsDeleting(true);
     try {
-      setIsDeleting(true);
       const response = await fetch(`/api/users/${user.id}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete user");
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete user");
       }
 
       toast.success("User deleted successfully");
-
-      if (onUserDeleted) {
-        onUserDeleted();
-      }
+      onUserDeleted();
+      onClose();
     } catch (error) {
       console.error("Error deleting user:", error);
       toast.error(
@@ -55,65 +64,76 @@ export function DeleteDialog({
       );
     } finally {
       setIsDeleting(false);
-      onClose();
     }
   };
 
-  // Important: Reset document styles when dialog closes
-  useEffect(() => {
-    if (!isOpen) {
-      const timer = setTimeout(() => {
-        document.body.style.pointerEvents = '';
-      }, 150);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
-  // Return null when not open to fully unmount
-  if (!isOpen) return null;
+  // Return null when not open to fully unmount the component
+  if (!isOpen || !user) return null;
 
   return (
-    <AlertDialog 
-      open={isOpen} 
+    <Dialog
+      open={isOpen}
       onOpenChange={(open) => {
         if (!open && !isDeleting) {
           setTimeout(() => onClose(), 0);
         }
       }}
     >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-red-600">Delete User</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the user
-            account for <span className="font-medium">{user?.name || user?.email || "this user"}</span>.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="gap-4 flex flex-col sm:flex-row items-stretch sm:items-center">
-          <AlertDialogCancel 
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!isDeleting) onClose();
-            }}
+      <DialogContent
+        onPointerDownOutside={(e) => {
+          e.preventDefault();
+        }}
+        className="sm:max-w-[425px]"
+      >
+        <DialogHeader>
+          <DialogTitle>Delete User</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this user? This action cannot be
+            undone.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="py-4">
+          <div className="space-y-1">
+            <p className="text-sm font-medium">User details:</p>
+            <p className="text-sm">
+              <span className="font-semibold">Name:</span> {user.name || "N/A"}
+            </p>
+            <p className="text-sm">
+              <span className="font-semibold">Email:</span> {user.email}
+            </p>
+            <p className="text-sm">
+              <span className="font-semibold">Role:</span> {user.role}
+            </p>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
             disabled={isDeleting}
-            className="mb-2 sm:mb-0"
           >
             Cancel
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleDelete();
-            }}
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleDelete}
             disabled={isDeleting}
-            className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
           >
-            {isDeleting ? "Deleting..." : "Delete User"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              "Delete"
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

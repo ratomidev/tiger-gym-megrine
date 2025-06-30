@@ -2,6 +2,8 @@ export interface User {
   id: string;
   email: string;
   name: string | null;
+  phone: string | null;
+  role: 'OWNER' | 'STAFF';
   createdAt: Date | string;
   updatedAt: Date | string;
 }
