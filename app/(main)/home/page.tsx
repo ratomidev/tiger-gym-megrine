@@ -1,4 +1,3 @@
-"use client";
 import RevenueSection from "@/components/dashboard/RevenueSection";
 import AdherentOverviewSection from "@/components/dashboard/AdherentOverviewSection";
 
