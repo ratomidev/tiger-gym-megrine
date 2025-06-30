@@ -2,7 +2,18 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, set up your environment variables:
+
+```bash
+cp .env.example .env.local
+```
+
+Add your environment variables:
+
+- `DATABASE_URL`: Your database connection string
+- `BLOB_READ_WRITE_TOKEN`: Your Vercel Blob storage token
+
+Then, run the development server:
 
 ```bash
 npm run dev
@@ -19,6 +30,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Features
+
+### Photo Upload with Vercel Blob Storage
+
+- Member photos are uploaded to Vercel Blob Storage
+- Supports both file upload and camera capture
+- Automatic file validation (type and size)
+- Photos are stored securely with public URLs
 
 ## Learn More
 

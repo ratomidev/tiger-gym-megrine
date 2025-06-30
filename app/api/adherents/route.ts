@@ -1,75 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
 import { prisma } from "@/lib/prisma";
 import { AdherentFormValues } from "@/types/adherent";
 
-// Ensure uploads directory exists
-async function ensureDirectoryExists(dirPath: string) {
-  try {
-    await mkdir(dirPath, { recursive: true });
-  } catch (error) {
-    console.error("Error creating directory:", error);
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
+    const body = await request.json();
+    console.log("Received adherent data:", body);
 
-    // Process basic adherent data
+    // Process adherent data
     const adherentData: AdherentFormValues = {
-      firstName: formData.get("firstName") as string,
-      lastName: formData.get("lastName") as string,
-      email: formData.get("email") as string,
-      phone: formData.get("phone") as string,
-      birthDate: new Date(formData.get("birthDate") as string),
-      Address: formData.get("Address") as string,
-      sexe: formData.get("sexe") as "M" | "F",
+      firstName: body.firstName,
+      lastName: body.lastName,
+      email: body.email,
+      phone: body.phone,
+      birthDate: new Date(body.birthDate),
+      Address: body.Address,
+      sexe: body.sexe,
+      photoUrl: body.photoUrl || null,
     };
 
-    // Process photo file if provided
-    let photoUrl = null;
-    const photo = formData.get("photo") as File;
-    if (photo && photo.size > 0) {
-      const bytes = await photo.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      // Ensure directory exists
-      const uploadDir = join(process.cwd(), "public", "uploads", "photos");
-      await ensureDirectoryExists(uploadDir);
-
-      // Generate a unique filename
-      const fileName = `${Date.now()}-${photo.name.replace(/\s+/g, "-")}`;
-      const photoPath = join(uploadDir, fileName);
-
-      // Write the file
-      await writeFile(photoPath, buffer);
-
-      // Set the URL (relative to public)
-      photoUrl = `/uploads/photos/${fileName}`;
-    }
-
     // Check if subscription data is provided
-    const hasSubscription = formData.get("hasSubscription") === "true";
+    const hasSubscription = body.hasSubscription === true;
 
     // Create adherent with or without subscription
     if (hasSubscription) {
       const subscriptionData = {
-        plan: formData.get("plan") as string,
-        price: parseFloat(formData.get("price") as string),
-        startDate: new Date(formData.get("startDate") as string),
-        endDate: new Date(formData.get("endDate") as string),
-        status: (formData.get("status") as string) || "actif",
-        hasCardioMusculation: formData.get("hasCardioMusculation") === "true",
-        hasCours: formData.get("hasCours") === "true",
+        plan: body.plan,
+        price: parseFloat(body.price),
+        startDate: new Date(body.startDate),
+        endDate: new Date(body.endDate),
+        status: body.status || "actif",
+        hasCardioMusculation: body.hasCardioMusculation === true,
+        hasCours: body.hasCours === true,
       };
 
       // Create adherent with subscription
       const adherent = await prisma.adherent.create({
         data: {
           ...adherentData,
-          photoUrl,
           isValidated: true,
           subscription: {
             create: subscriptionData,
@@ -86,7 +54,6 @@ export async function POST(request: NextRequest) {
       const adherent = await prisma.adherent.create({
         data: {
           ...adherentData,
-          photoUrl,
           isValidated: false,
         },
       });

@@ -3,7 +3,14 @@ import { useRef, useState } from "react";
 import MemberRegistrationForm from "@/components/member/form/MemberRegistrationForm";
 import RegistrationSuccess from "@/components/member/RegistrationSuccess";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import Image from "next/image";
 import { AdherentFormValues } from "@/types";
 import { toast } from "sonner";
@@ -32,50 +39,47 @@ export default function RegisterPage() {
 
     try {
       // Get adherent data using the correct method
-      const adherentData = await adherentFormRef.current?.validateAndGetValues();
-      
+      const adherentData =
+        await adherentFormRef.current?.validateAndGetValues();
+
       if (!adherentData) {
         toast.error("Veuillez remplir toutes les informations requises");
         setIsSubmitting(false);
         return;
       }
-      
-      // Create FormData and add values (same approach as add-adherent)
-      const formData = new FormData();
-      
-      // Add adherent data
-      formData.append("firstName", adherentData.firstName);
-      formData.append("lastName", adherentData.lastName);
-      formData.append("email", adherentData.email);
-      formData.append("phone", adherentData.phone);
-      formData.append("birthDate", new Date(adherentData.birthDate).toISOString());
-      formData.append("Address", adherentData.Address);
-      formData.append("sexe", adherentData.sexe);
-      formData.append("hasSubscription", "false"); // No subscription in public registration
-      
-      // Add photo if present
-      if ("photoFile" in adherentData && adherentData.photoFile) {
-        formData.append("photo", adherentData.photoFile as File);
-      }
-      
+
+      // Create request payload
+      const payload = {
+        ...adherentData,
+        hasSubscription: false, // No subscription in public registration
+      };
+
       // Send to API
-      const response = await fetch('/api/adherents', {
-        method: 'POST',
-        body: formData,
+      const response = await fetch("/api/adherents", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
-      
+
       const result = await response.json();
-      
+
       if (result.success) {
         toast.success("Inscription réussie ! Votre demande a été envoyée.");
         setIsSuccess(true); // Show success component
       } else {
-        throw new Error(result.error || "Une erreur s'est produite lors de l'inscription");
+        throw new Error(
+          result.error || "Une erreur s'est produite lors de l'inscription"
+        );
       }
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Échec de l'inscription", {
-        description: error instanceof Error ? error.message : "Veuillez réessayer plus tard"
+        description:
+          error instanceof Error
+            ? error.message
+            : "Veuillez réessayer plus tard",
       });
     } finally {
       setIsSubmitting(false);
@@ -94,43 +98,45 @@ export default function RegisterPage() {
       <div className="flex flex-col items-center justify-center">
         {/* Logo/Branding Area */}
         <div className="mb-3 text-center">
-          <Image 
-            src="/images/logo.jpg" 
-            alt="Tiger Gym Megrine" 
+          <Image
+            src="/images/logo.jpg"
+            alt="Tiger Gym Megrine"
             width={120}
             height={120}
             className="mx-auto"
             onError={(e) => {
-              e.currentTarget.style.display = 'none';
+              e.currentTarget.style.display = "none";
             }}
           />
         </div>
-        
+
         {/* Conditionally render either the registration form or success message */}
         {isSuccess ? (
           <RegistrationSuccess onReset={handleReset} />
         ) : (
           <Card className="w-full max-w-3xl shadow-lg border-gray-200">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-2xl font-bold text-gray-800">Inscription Adhérent</CardTitle>
+              <CardTitle className="text-2xl font-bold text-gray-800">
+                Inscription Adhérent
+              </CardTitle>
               <CardDescription className="text-gray-600">
                 Remplissez le formulaire ci-dessous pour vous inscrire
               </CardDescription>
             </CardHeader>
-            
+
             <CardContent className="pt-4">
               <MemberRegistrationForm ref={adherentFormRef} />
             </CardContent>
-            
+
             <CardFooter className="flex justify-end space-x-4 pt-2 pb-6">
-              <Button 
+              <Button
                 className="bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Envoi...
                   </>
                 ) : (

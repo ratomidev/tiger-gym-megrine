@@ -10,9 +10,9 @@ import { useForm } from "react-hook-form";
 import { AdherentFormValues as BaseAdherentFormValues } from "@/types/adherent";
 import Image from "next/image";
 
-// Extend the base type to include photoFile
+// Extend the base type to include photoUrl
 interface AdherentFormValues extends BaseAdherentFormValues {
-  photoFile?: File | null;
+  photoUrl?: string;
 }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,7 +56,8 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
   });
 
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
@@ -74,7 +75,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
           (data) => {
             resolve({
               ...data,
-              photoFile,
+              photoUrl: photoUrl || undefined,
             });
           },
           () => {
@@ -85,7 +86,34 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
     },
   }));
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const uploadPhoto = async (file: File): Promise<string | null> => {
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("photo", file);
+
+      const response = await fetch("/api/upload/photo", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Upload failed");
+      }
+
+      const result = await response.json();
+      return result.url;
+    } catch (error) {
+      console.error("Photo upload error:", error);
+      toast.error("Erreur lors du téléchargement de la photo");
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type
@@ -100,15 +128,24 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
         return;
       }
 
-      setPhotoFile(file);
+      // Show preview immediately
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Upload to blob storage
+      const uploadedUrl = await uploadPhoto(file);
+      if (uploadedUrl) {
+        setPhotoUrl(uploadedUrl);
+        toast.success("Photo téléchargée avec succès!");
+      } else {
+        setPhotoPreview(null);
+      }
     } else {
       setPhotoPreview(null);
-      setPhotoFile(null);
+      setPhotoUrl(null);
     }
   };
 
@@ -165,7 +202,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
     }
   };
 
-  const capturePhoto = () => {
+  const capturePhoto = async () => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
@@ -181,16 +218,24 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
 
         // Convert canvas to blob
         canvas.toBlob(
-          (blob) => {
+          async (blob) => {
             if (blob) {
               const file = new File([blob], `photo-${Date.now()}.jpg`, {
                 type: "image/jpeg",
               });
 
-              setPhotoFile(file);
+              // Show preview immediately
               setPhotoPreview(canvas.toDataURL("image/jpeg"));
               stopCamera();
-              toast.success("Photo capturée avec succès!");
+
+              // Upload to blob storage
+              const uploadedUrl = await uploadPhoto(file);
+              if (uploadedUrl) {
+                setPhotoUrl(uploadedUrl);
+                toast.success("Photo capturée et téléchargée avec succès!");
+              } else {
+                setPhotoPreview(null);
+              }
             }
           },
           "image/jpeg",
@@ -202,7 +247,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
 
   const removePhoto = () => {
     setPhotoPreview(null);
-    setPhotoFile(null);
+    setPhotoUrl(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -436,9 +481,10 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
             variant="outline"
             onClick={() => fileInputRef.current?.click()}
             className="gap-2"
+            disabled={isUploading}
           >
             <Upload className="h-4 w-4" />
-            Choisir un fichier
+            {isUploading ? "Téléchargement..." : "Choisir un fichier"}
           </Button>
 
           <Button
@@ -446,7 +492,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
             variant="outline"
             onClick={startCamera}
             className="gap-2"
-            disabled={!navigator.mediaDevices}
+            disabled={!navigator.mediaDevices || isUploading}
           >
             <Camera className="h-4 w-4" />
             Prendre une photo

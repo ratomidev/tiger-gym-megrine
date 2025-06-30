@@ -64,47 +64,19 @@ export default function Page() {
     adherentData: AdherentFormValues,
     subscriptionData: SubscriptionFormValues
   ) => {
-    const formData = new FormData();
-
-    // Add adherent data
-    formData.append("firstName", adherentData.firstName);
-    formData.append("lastName", adherentData.lastName);
-    formData.append("email", adherentData.email);
-    formData.append("phone", adherentData.phone);
-    formData.append(
-      "birthDate",
-      new Date(adherentData.birthDate).toISOString()
-    );
-    formData.append("Address", adherentData.Address);
-    formData.append("sexe", adherentData.sexe);
-    formData.append("hasSubscription", "true"); // Always true now
-
-    // Add subscription data
-    formData.append("plan", subscriptionData.plan);
-    formData.append("price", subscriptionData.price.toString());
-    formData.append(
-      "startDate",
-      new Date(subscriptionData.startDate).toISOString()
-    );
-    formData.append(
-      "endDate",
-      new Date(subscriptionData.endDate).toISOString()
-    );
-    formData.append("status", subscriptionData.status);
-    formData.append(
-      "hasCardioMusculation",
-      subscriptionData.hasCardioMusculation.toString()
-    );
-    formData.append("hasCours", subscriptionData.hasCours.toString());
-
-    // Add photo if present
-    if ("photoFile" in adherentData && adherentData.photoFile) {
-      formData.append("photo", adherentData.photoFile as File);
-    }
+    // Prepare the request payload
+    const payload = {
+      ...adherentData,
+      hasSubscription: true,
+      ...subscriptionData,
+    };
 
     const response = await fetch("/api/adherents", {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     });
 
     const result = await response.json();
