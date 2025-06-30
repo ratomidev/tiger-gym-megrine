@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { User } from "@/types/auth"; // Import updated User type
+import { User } from "@/types/auth";
+import { SessionCheck } from "@/components/auth/SessionCheck";
 
 interface AuthContextType {
   user: User | null;
@@ -23,32 +24,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Initial load - fetch user from API
   useEffect(() => {
-    // Check for stored user data on initial load
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    const fetchUser = async () => {
       try {
-        setUser(JSON.parse(storedUser));
+        const response = await fetch("/api/auth/me");
+
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+        }
       } catch (error) {
-        console.error("Failed to parse stored user data", error);
-        localStorage.removeItem("user");
+        console.error("Failed to fetch user", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
-    setIsLoading(false);
+    };
+
+    fetchUser();
   }, []);
 
+  // Login function
   const login = (userData: User) => {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
+  // Logout function - calls API
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+      {/* Session check component to handle expired sessions */}
+      {user && <SessionCheck />}
       {children}
     </AuthContext.Provider>
   );

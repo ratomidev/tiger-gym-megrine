@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateUser } from "@/lib/auth/service";
+import { prisma } from "@/lib/prisma";
+import { compare } from "bcryptjs";
+import { createSessionToken, setSessionCookie } from "@/lib/auth/service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,10 +16,12 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Authenticate user with email and password
-    const user = await authenticateUser(email, password);
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
     
-    // If authentication failed
+    // Check if user exists
     if (!user) {
       return NextResponse.json(
         { error: "Invalid email or password" }, 
@@ -25,9 +29,26 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Return the authenticated user (password is already excluded by the service)
+    // Verify password
+    const isPasswordValid = await compare(password, user.password);
+    if (!isPasswordValid) {
+      return NextResponse.json(
+        { error: "Invalid email or password" }, 
+        { status: 401 }
+      );
+    }
+    
+    // Create session token
+    const token = await createSessionToken(user);
+    
+    // Set session cookie
+    setSessionCookie(token);
+    
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = user;
+    
     return NextResponse.json({ 
-      user,
+      user: userWithoutPassword,
       message: "Login successful"
     });
   } catch (error) {

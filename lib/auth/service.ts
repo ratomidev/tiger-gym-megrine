@@ -1,5 +1,9 @@
 import { hash, compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { User } from "@/types/auth";
+import { cookies } from "next/headers";
+import { SignJWT, jwtVerify } from "jose";
+import { nanoid } from "nanoid";
 
 /**
  * Password hashing settings
@@ -71,4 +75,82 @@ export async function createUser(email: string, password: string, name?: string)
       updatedAt: true
     }
   });
+}
+
+/**
+ * Secret key for signing JWTs - should be in .env
+ */
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "your-secret-key-min-32-chars-long-for-security"
+);
+
+/**
+ * Session duration - 8 hours in seconds
+ */
+export const SESSION_DURATION = 8 * 60 * 60; // 8 hours
+
+/**
+ * Create a session token for a user
+ */
+export async function createSessionToken(user: User): Promise<string> {
+  // Remove sensitive fields before encoding in JWT
+  const { password, ...userWithoutPassword } = user as any;
+  
+  // Create a JWT that expires after SESSION_DURATION
+  const token = await new SignJWT({ user: userWithoutPassword })
+    .setProtectedHeader({ alg: "HS256" })
+    .setJti(nanoid())
+    .setIssuedAt()
+    .setExpirationTime(Math.floor(Date.now() / 1000) + SESSION_DURATION)
+    .sign(JWT_SECRET);
+  
+  return token;
+}
+
+/**
+ * Verify and decode a session token
+ */
+export async function verifySessionToken(token: string): Promise<User | null> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    return payload.user as User;
+  } catch (error) {
+    // Token is invalid or expired
+    return null;
+  }
+}
+
+/**
+ * Set the session cookie
+ */
+export function setSessionCookie(token: string) {
+  cookies().set({
+    name: "session",
+    value: token,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: SESSION_DURATION,
+    path: "/",
+  });
+}
+
+/**
+ * Clear the session cookie
+ */
+export function clearSessionCookie() {
+  cookies().delete("session");
+}
+
+/**
+ * Get the current user from the session
+ */
+export async function getCurrentUser(): Promise<User | null> {
+  const sessionCookie = cookies().get("session");
+  
+  if (!sessionCookie?.value) {
+    return null;
+  }
+  
+  return verifySessionToken(sessionCookie.value);
 }
