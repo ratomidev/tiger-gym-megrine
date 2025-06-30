@@ -27,21 +27,26 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Search } from "lucide-react";
-import { User } from "@/lib/auth/types";
+import { User } from "@/types/auth"; // Updated import path
 import { NewUserForm, NewUserFormValues } from "./newUserForm";
 import { toast } from "sonner";
 import { ActionsMenu } from "./actionsMenu";
 import { EditDialog } from "./editDialog";
 import { DeleteDialog } from "./deleteDialog";
 
+// Extended user type to include phone from schema
+interface ExtendedUser extends User {
+  phone?: string | null;
+}
+
 export default function UsersList() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<ExtendedUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   // Dialog open state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<ExtendedUser | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -107,11 +112,12 @@ export default function UsersList() {
   const filteredUsers = users.filter(
     (user) =>
       user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.phone?.toLowerCase().includes(searchQuery.toLowerCase()) // Include phone in search
   );
 
   // Modify the handler functions to ensure clean state management
-  const handleEditUser = (user: User) => {
+  const handleEditUser = (user: ExtendedUser) => {
     // Clean up any existing dialogs first
     setIsDeleteDialogOpen(false);
     // Set the user and open dialog
@@ -119,7 +125,7 @@ export default function UsersList() {
     setIsEditDialogOpen(true);
   };
 
-  const handleDeleteUser = (user: User) => {
+  const handleDeleteUser = (user: ExtendedUser) => {
     // Clean up any existing dialogs first
     setIsEditDialogOpen(false);
     // Set the user and open dialog
@@ -167,7 +173,7 @@ export default function UsersList() {
             <div className="relative w-full sm:w-[300px]">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by name or email..."
+                placeholder="Search by name, email or phone..."
                 className="pl-8 w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -195,6 +201,7 @@ export default function UsersList() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead className="hidden md:table-cell">Phone</TableHead>
                     <TableHead className="hidden md:table-cell">
                       Created
                     </TableHead>
@@ -204,7 +211,7 @@ export default function UsersList() {
                 <TableBody>
                   {filteredUsers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center h-24">
+                      <TableCell colSpan={5} className="text-center h-24">
                         {searchQuery
                           ? "No users matching your search"
                           : "No users found"}
@@ -218,6 +225,9 @@ export default function UsersList() {
                         </TableCell>
                         <TableCell className="max-w-[200px] truncate">
                           {user.email}
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {user.phone || "N/A"}
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
                           {format(new Date(user.createdAt), "PPP")}
