@@ -20,7 +20,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { DeleteConfirmationDialog } from "@/components/ui/DeleteConfirmationDialog";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Edit, Trash, Eye } from "lucide-react";
 import Link from "next/link";
@@ -28,7 +27,7 @@ import { useState, useMemo, useEffect } from "react";
 import { InputSearch } from "@/components/member/table/InputSearch";
 import { isSameDay } from "date-fns";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import DeleteAdherentDialog from "./DeleteAdherentDialog";
 
 interface MemberTableProps {
   data: Adherent[];
@@ -40,15 +39,19 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState<Date | null>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [adherentToDelete, setAdherentToDelete] = useState<Adherent | null>(
-    null
-  );
+
   const [showEmailColumn, setShowEmailColumn] = useState(true);
   const [showAbonnementColumn, setShowAbonnementColumn] = useState(true);
   const [showPhoneColumn, setShowPhoneColumn] = useState(true);
   const [showActionsColumn, setShowActionsColumn] = useState(true);
   const [showEndDateColumn, setShowEndDateColumn] = useState(true);
+
+  // State for delete dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [adherentToDelete, setAdherentToDelete] = useState<Adherent | null>(
+    null
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -110,54 +113,6 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
     router.push(`/details-adherent/${id}`);
   };
 
-  const handleDeleteClick = (adherent: Adherent, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setAdherentToDelete(adherent);
-    setShowDeleteDialog(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!adherentToDelete) return;
-
-    try {
-      const response = await fetch(`/api/adherents/${adherentToDelete.id}`, {
-        method: "DELETE",
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.error || "Failed to delete adherent");
-      }
-
-      if (responseData.success) {
-        toast.success("Adhérent supprimé avec succès", {
-          description: `${adherentToDelete.firstName} ${adherentToDelete.lastName} et sa photo ont été supprimés définitivement.`,
-          duration: 3000,
-        });
-
-        // Update the local data immediately to reflect the change
-        const updatedData = data.filter(
-          (adherent) => adherent.id !== adherentToDelete.id
-        );
-        if (onDataUpdate) {
-          onDataUpdate(updatedData);
-        }
-
-        setAdherentToDelete(null);
-        setShowDeleteDialog(false);
-      } else {
-        throw new Error("Deletion failed - no success response");
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("Erreur lors de la suppression", {
-        description: (error as Error).message,
-        duration: 4000,
-      });
-    }
-  };
-
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
@@ -184,20 +139,52 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
     }
   };
 
+  // Delete handler
+  const handleDeleteClick = (adherent: Adherent) => {
+    setAdherentToDelete(adherent);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!adherentToDelete) return;
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/adherents/${adherentToDelete.id}`, {
+        method: "DELETE",
+      });
+      const dataRes = await response.json();
+      if (!response.ok || !dataRes.success) {
+        throw new Error(dataRes.error || "Erreur lors de la suppression");
+      }
+      setDeleteDialogOpen(false);
+      setAdherentToDelete(null);
+      // Remove from table if onDataUpdate is provided
+      if (onDataUpdate) {
+        onDataUpdate(data.filter((a) => a.id !== adherentToDelete.id));
+      }
+    } catch (err) {
+      // Optionally show a toast here
+      alert((err as Error).message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setAdherentToDelete(null);
+  };
+
   return (
     <div className="space-y-4">
       {/* Delete Confirmation Dialog */}
-      <DeleteConfirmationDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        title="Confirmer la suppression"
-        description="Êtes-vous sûr de vouloir supprimer cet adhérent? Cette action est irréversible."
-        itemName={
-          adherentToDelete
-            ? `${adherentToDelete.firstName} ${adherentToDelete.lastName}`
-            : undefined
-        }
+      <DeleteAdherentDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        adherent={adherentToDelete}
         onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        isDeleting={isDeleting}
       />
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -380,7 +367,10 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                             </Link>
                             <DropdownMenuItem
                               className="text-red-600"
-                              onClick={(e) => handleDeleteClick(adherent, e)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClick(adherent);
+                              }}
                             >
                               <Trash className="mr-2 h-4 w-4" />
                               Supprimer

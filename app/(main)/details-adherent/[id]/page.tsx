@@ -16,25 +16,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Edit,
-  Trash,
-  Mail,
-  Phone,
-  Calendar,
-  MapPin,
-  CreditCard,
-  AlertTriangle,
-} from "lucide-react";
 import Link from "next/link";
+
+// Import the new DeleteAdherentDialog component
+import DeleteAdherentDialog from "@/components/member/table/DeleteAdherentDialog";
+import { Calendar, CreditCard, Edit, Mail, MapPin, Phone, Trash } from "lucide-react";
 
 export default function DetailsAdherent() {
   const params = useParams();
@@ -180,51 +166,14 @@ export default function DetailsAdherent() {
       <Toaster position="top-right" className="rounded-md" />
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
-              Confirmer la suppression
-            </DialogTitle>
-            <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer cet adhérent? Cette action est
-              irréversible et supprimera également sa photo du stockage.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-3">
-            <p className="text-sm font-medium">
-              Vous allez supprimer l&apos;adhérent suivant:
-            </p>
-            <p className="mt-1 text-sm bg-gray-50 p-2 rounded border border-gray-100">
-              {adherent?.firstName} {adherent?.lastName}
-            </p>
-          </div>
-          <DialogFooter className="sm:justify-end">
-            <Button
-              variant="outline"
-              onClick={handleDeleteCancel}
-              disabled={isDeleting}
-            >
-              Annuler
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteConfirm}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <>
-                  <span className="h-4 w-4 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
-                  Suppression...
-                </>
-              ) : (
-                "Supprimer"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteAdherentDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        adherent={adherent}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        isDeleting={isDeleting}
+      />
 
       {/* Header with title and actions */}
       <div className="flex justify-between items-center mb-6">
