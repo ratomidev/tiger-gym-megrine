@@ -36,7 +36,7 @@ import {
 // Menu items.
 const items = [
   {
-    title: "Home",
+    title: "Dashboard",
     url: "/home",
     icon: Home,
   },
@@ -49,21 +49,6 @@ const items = [
     title: "Users",
     url: "/users",
     icon: User2,
-  },
-  {
-    title: "Subscriptions",
-    url: "#",
-    icon: CalendarCog,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Settings,
   },
 ];
 
@@ -87,42 +72,6 @@ export function SidebarNavigation() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-
-              {/* Fix Collapsible menu item structure */}
-              <SidebarMenuItem>
-                <div className="w-full">
-                  <Collapsible defaultOpen className="group/collapsible">
-                    <div className="flex w-full items-center">
-                      <CollapsibleTrigger className="w-full" asChild>
-                        <SidebarMenuButton asChild>
-                          <a href="#" className="w-full flex items-center">
-                            <span>Getting started</span>
-                            <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                          </a>
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                    </div>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        <SidebarMenuItem>
-                          <SidebarMenuButton asChild>
-                            <a href="#">
-                              <span>Installation</span>
-                            </a>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                          <SidebarMenuButton asChild>
-                            <a href="#">
-                              <span>Project structure</span>
-                            </a>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </Collapsible>
-                </div>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
