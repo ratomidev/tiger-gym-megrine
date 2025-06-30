@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Toaster, toast } from "sonner";
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
   const searchParams = useSearchParams();
@@ -95,7 +95,6 @@ export default function LoginPage() {
 
   return (
     <div className="container flex items-center justify-center min-h-screen">
-      <Toaster position="top-right" richColors />
       <div className="w-full max-w-md space-y-8">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Tiger Gym Dashboard</h1>
@@ -145,5 +144,14 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+      <Toaster position="top-center" />
+    </Suspense>
   );
 }

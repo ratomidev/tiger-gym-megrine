@@ -32,6 +32,7 @@ async function getAllUsers() {
  * Exclude password from a user object for safe return
  */
 function excludePassword(user: Record<string, unknown>) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password: _password, ...userWithoutPassword } = user;
   return userWithoutPassword;
 }

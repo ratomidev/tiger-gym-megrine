@@ -4,6 +4,7 @@ import { User } from "@/types/auth";
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import { nanoid } from "nanoid";
+import { Role } from "@prisma/client";
 
 /**
  * Password hashing settings
@@ -51,6 +52,7 @@ export async function authenticateUser(email: string, password: string) {
   if (!isPasswordValid) return null;
 
   // Return user without password
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password: _, ...userWithoutPassword } = user;
   return userWithoutPassword;
 }
@@ -58,7 +60,7 @@ export async function authenticateUser(email: string, password: string) {
 /**
  * Create a new user with a hashed password
  */
-export async function createUser(email: string, password: string, name?: string) {
+export async function createUser(email: string, password: string, name?: string, role: Role = Role.STAFF) {
   const hashedPassword = await hashPassword(password);
   
   return prisma.user.create({
@@ -66,6 +68,7 @@ export async function createUser(email: string, password: string, name?: string)
       email,
       password: hashedPassword,
       name: name || null,
+      role,
     },
     select: {
       id: true,
