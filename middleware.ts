@@ -3,73 +3,87 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifySessionToken } from "@/lib/auth/service";
 
-// Paths that don't require authentication
-const publicPaths = [
+// Define public paths that don't require authentication
+const PUBLIC_PATHS = [
   "/auth/login",
   "/auth/register",
-  "/auth/forgot-password",
   "/api/auth/login",
   "/api/auth/register",
+  // Add any other public routes here
 ];
 
-// Check if a path should be public
-const isPublicPath = (path: string) => {
-  return publicPaths.some(publicPath => 
-    path === publicPath || path.startsWith(`${publicPath}/`)
+// Static assets should also be public
+const isStaticAsset = (path: string) => {
+  return (
+    path.startsWith("/_next") || 
+    path.startsWith("/favicon.ico") ||
+    path.includes(".") // Files with extensions are typically static assets
   );
+};
+
+// Check if a path is public and doesn't require authentication
+const isPublicPath = (path: string) => {
+  return PUBLIC_PATHS.some(publicPath => 
+    path === publicPath || path.startsWith(`${publicPath}/`)
+  ) || isStaticAsset(path);
 };
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Allow access to public paths
+  // Skip middleware for public paths
   if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
   
-  // For API routes, check session and return 401 if invalid
-  if (pathname.startsWith("/api/")) {
-    const sessionCookie = request.cookies.get("session");
-    
-    if (!sessionCookie?.value) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    
-    const user = await verifySessionToken(sessionCookie.value);
-    
-    if (!user) {
-      return NextResponse.json({ error: "Session expired" }, { status: 401 });
-    }
-    
-    return NextResponse.next();
-  }
-  
-  // For regular routes, redirect to login if session is invalid
+  // Get the session cookie
   const sessionCookie = request.cookies.get("session");
   
+  // If no session cookie exists, redirect to login
   if (!sessionCookie?.value) {
-    const url = new URL("/auth/login", request.url);
-    url.searchParams.set("returnUrl", encodeURI(pathname));
-    return NextResponse.redirect(url);
+    const loginUrl = new URL("/auth/login", request.url);
+    // Store the original URL to redirect back after login
+    loginUrl.searchParams.set("callbackUrl", encodeURIComponent(request.url));
+    return NextResponse.redirect(loginUrl);
   }
   
-  const user = await verifySessionToken(sessionCookie.value);
-  
-  if (!user) {
-    // Clear invalid cookie
-    const response = NextResponse.redirect(
-      new URL("/auth/login?expired=true", request.url)
-    );
+  try {
+    // Verify the session token
+    const user = await verifySessionToken(sessionCookie.value);
+    
+    // If token verification fails (expired or invalid), redirect to login
+    if (!user) {
+      const loginUrl = new URL("/auth/login", request.url);
+      loginUrl.searchParams.set("expired", "true");
+      
+      // Create response that clears the invalid cookie and redirects
+      const response = NextResponse.redirect(loginUrl);
+      response.cookies.delete("session");
+      return response;
+    }
+    
+    // User is authenticated, allow request to proceed
+    return NextResponse.next();
+  } catch (error) {
+    console.error("Authentication error:", error);
+    // Handle any errors during verification
+    const loginUrl = new URL("/auth/login", request.url);
+    const response = NextResponse.redirect(loginUrl);
     response.cookies.delete("session");
     return response;
   }
-  
-  return NextResponse.next();
 }
 
+// Configure which routes this middleware applies to
 export const config = {
   matcher: [
-    // Add routes that should check for authentication
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    /*
+     * Match all request paths except:
+     * 1. /api/auth/* (authentication API routes)
+     * 2. /_next/* (Next.js internals)
+     * 3. /fonts/* (static font assets)
+     * 4. /favicon.ico, /logo.png, etc (static assets)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

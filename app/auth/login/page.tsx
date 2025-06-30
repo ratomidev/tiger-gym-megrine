@@ -3,10 +3,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Toaster, toast } from "sonner";
-import { User } from "@/lib/auth/types";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { Toaster, toast } from "sonner";
+import { User } from "@/types/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,9 +14,21 @@ import { Label } from "@/components/ui/label";
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
+  const searchParams = useSearchParams();
   const [isProcessing, setIsProcessing] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
+  // Get the callback URL if available
+  const callbackUrl = searchParams.get("callbackUrl") || "/home";
+  
+  // Check if session expired
+  const sessionExpired = searchParams.get("expired") === "true";
+  
+  // Show expired session message
+  if (sessionExpired) {
+    toast.error("Your session has expired. Please log in again.");
+  }
   
   /**
    * Handle form submission

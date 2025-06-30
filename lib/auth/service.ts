@@ -146,7 +146,7 @@ export function clearSessionCookie() {
  * Get the current user from the session
  */
 export async function getCurrentUser(): Promise<User | null> {
-  const sessionCookie = cookies().get("session");
+  const sessionCookie = await cookies().get("session");
   
   if (!sessionCookie?.value) {
     return null;

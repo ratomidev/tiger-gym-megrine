@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { User } from "@/types/auth";
-import { SessionCheck } from "@/components/auth/SessionCheck";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
   user: User | null;
@@ -23,8 +23,9 @@ export const useAuth = () => useContext(AuthContext);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  // Initial load - fetch user from API
+  // Check for session on initial load
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -32,10 +33,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (response.ok) {
           const data = await response.json();
-          setUser(data.user);
+          if (data.user) {
+            setUser(data.user);
+          }
         }
       } catch (error) {
-        console.error("Failed to fetch user", error);
+        console.error("Failed to fetch user session:", error);
       } finally {
         setIsLoading(false);
       }
@@ -44,26 +47,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchUser();
   }, []);
 
-  // Login function
   const login = (userData: User) => {
     setUser(userData);
   };
 
-  // Logout function - calls API
   const logout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        setUser(null);
+        router.push("/auth/login");
+      }
     } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      setUser(null);
+      console.error("Logout failed:", error);
     }
   };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, isLoading }}>
-      {/* Session check component to handle expired sessions */}
-      {user && <SessionCheck />}
       {children}
     </AuthContext.Provider>
   );
