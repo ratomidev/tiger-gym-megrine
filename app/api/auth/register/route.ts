@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateUser } from "@/lib/auth/service";
+import { createUser } from "@/lib/auth/service";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, password, name } = body;
     
     // Basic validation
     if (!email || !password) {
@@ -14,24 +15,27 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Authenticate user with email and password
-    const user = await authenticateUser(email, password);
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
     
-    // If authentication failed
-    if (!user) {
+    if (existingUser) {
       return NextResponse.json(
-        { error: "Invalid email or password" }, 
-        { status: 401 }
+        { error: "User with this email already exists" }, 
+        { status: 409 }
       );
     }
     
-    // Return the authenticated user (password is already excluded by the service)
+    // Create new user with hashed password
+    const user = await createUser(email, password, name);
+    
     return NextResponse.json({ 
       user,
-      message: "Login successful"
+      message: "User registered successfully"
     });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Registration error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred" }, 
       { status: 500 }
