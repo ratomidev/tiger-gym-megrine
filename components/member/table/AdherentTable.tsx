@@ -24,7 +24,7 @@ import { DeleteConfirmationDialog } from "@/components/ui/DeleteConfirmationDial
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Edit, Trash, Eye } from "lucide-react";
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { InputSearch } from "@/components/member/table/InputSearch";
 import { isSameDay } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -44,6 +44,30 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   const [adherentToDelete, setAdherentToDelete] = useState<Adherent | null>(
     null
   );
+  const [showEmailColumn, setShowEmailColumn] = useState(true);
+  const [showAbonnementColumn, setShowAbonnementColumn] = useState(true);
+  const [showPhoneColumn, setShowPhoneColumn] = useState(true);
+  const [showActionsColumn, setShowActionsColumn] = useState(true);
+  const [showEndDateColumn, setShowEndDateColumn] = useState(true);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setShowEmailColumn(window.innerWidth >= 825);
+      setShowAbonnementColumn(window.innerWidth >= 650);
+      setShowPhoneColumn(window.innerWidth >= 550);
+      setShowActionsColumn(window.innerWidth >= 480);
+      setShowEndDateColumn(window.innerWidth >= 410);
+    };
+
+    // Set initial state
+    handleResize();
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const filteredData = useMemo(() => {
     return data.filter((adherent) => {
@@ -198,14 +222,24 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
             <TableHeader className="bg-white sticky top-0 z-10">
               <TableRow>
                 <TableHead className="w-[250px]">Nom et Prénom</TableHead>
-                <TableHead className="w-[100px]">Tél</TableHead>
-                <TableHead className="w-[180px]">Mail</TableHead>
-                <TableHead className="w-[150px]">Abonnement</TableHead>
+                {showPhoneColumn && (
+                  <TableHead className="w-[100px]">Tél</TableHead>
+                )}
+                {showEmailColumn && (
+                  <TableHead className="w-[180px]">Mail</TableHead>
+                )}
+                {showAbonnementColumn && (
+                  <TableHead className="w-[150px]">Abonnement</TableHead>
+                )}
                 <TableHead className="w-[100px]">Status</TableHead>
-                <TableHead className="w-[130px]">
-                  Fin d&apos;abonnement
-                </TableHead>
-                <TableHead className="text-right w-[80px]">Actions</TableHead>
+                {showEndDateColumn && (
+                  <TableHead className="w-[130px]">
+                    Fin d&apos;abonnement
+                  </TableHead>
+                )}
+                {showActionsColumn && (
+                  <TableHead className="text-right w-[80px]">Actions</TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -241,26 +275,32 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <p className="text-sm">{adherent.phone}</p>
-                    </TableCell>
-                    <TableCell>
-                      <p className="text-sm">{adherent.email}</p>
-                    </TableCell>
-                    <TableCell>
-                      {adherent.subscription ? (
-                        <div>
-                          <p className="font-medium">
-                            {adherent.subscription.plan}
-                          </p>
-                          <p className="text-xs text-gray-500">{`${adherent.subscription.price} DT`}</p>
-                        </div>
-                      ) : (
-                        <Badge variant="outline" className="bg-gray-100">
-                          Sans abonnement
-                        </Badge>
-                      )}
-                    </TableCell>
+                    {showPhoneColumn && (
+                      <TableCell>
+                        <p className="text-sm">{adherent.phone}</p>
+                      </TableCell>
+                    )}
+                    {showEmailColumn && (
+                      <TableCell>
+                        <p className="text-sm">{adherent.email}</p>
+                      </TableCell>
+                    )}
+                    {showAbonnementColumn && (
+                      <TableCell>
+                        {adherent.subscription ? (
+                          <div>
+                            <p className="font-medium">
+                              {adherent.subscription.plan}
+                            </p>
+                            <p className="text-xs text-gray-500">{`${adherent.subscription.price} DT`}</p>
+                          </div>
+                        ) : (
+                          <Badge variant="outline" className="bg-gray-100">
+                            Sans abonnement
+                          </Badge>
+                        )}
+                      </TableCell>
+                    )}
                     <TableCell>
                       {adherent.subscription ? (
                         <Badge
@@ -296,58 +336,73 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                         </Badge>
                       )}
                     </TableCell>
-                    <TableCell>
-                      {adherent.subscription
-                        ? formatDate(adherent.subscription.endDate.toString())
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="h-8 w-8 p-0"
+                    {showEndDateColumn && (
+                      <TableCell>
+                        {adherent.subscription
+                          ? formatDate(adherent.subscription.endDate.toString())
+                          : "N/A"}
+                      </TableCell>
+                    )}
+                    {showActionsColumn && (
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="h-8 w-8 p-0"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <span className="sr-only">Ouvrir menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <span className="sr-only">Ouvrir menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Link
-                            href={`/details-adherent/${adherent.id}`}
-                            passHref
-                          >
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
-                              Voir détails
+                            <Link
+                              href={`/details-adherent/${adherent.id}`}
+                              passHref
+                            >
+                              <DropdownMenuItem>
+                                <Eye className="mr-2 h-4 w-4" />
+                                Voir détails
+                              </DropdownMenuItem>
+                            </Link>
+                            <Link
+                              href={`/edit-adherent/${adherent.id}`}
+                              passHref
+                            >
+                              <DropdownMenuItem>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Modifier
+                              </DropdownMenuItem>
+                            </Link>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={(e) => handleDeleteClick(adherent, e)}
+                            >
+                              <Trash className="mr-2 h-4 w-4" />
+                              Supprimer
                             </DropdownMenuItem>
-                          </Link>
-                          <Link href={`/edit-adherent/${adherent.id}`} passHref>
-                            <DropdownMenuItem>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Modifier
-                            </DropdownMenuItem>
-                          </Link>
-                          <DropdownMenuItem
-                            className="text-red-600"
-                            onClick={(e) => handleDeleteClick(adherent, e)}
-                          >
-                            <Trash className="mr-2 h-4 w-4" />
-                            Supprimer
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={
+                      [
+                        showEmailColumn,
+                        showAbonnementColumn,
+                        showPhoneColumn,
+                        showActionsColumn,
+                        showEndDateColumn,
+                      ].filter(Boolean).length + 2
+                    }
                     className="text-center py-6 text-gray-500"
                   >
                     Aucun adhérent trouvé pour cette recherche
