@@ -122,7 +122,9 @@ export default function DetailsAdherent() {
 
       if (data.success) {
         setShowDeleteDialog(false);
-        toast.success("Adhérent supprimé avec succès");
+        toast.success("Adhérent supprimé avec succès", {
+          description: "L'adhérent et sa photo ont été supprimés du système",
+        });
         setTimeout(() => {
           router.push("/list-adherent");
         }, 1500);
@@ -187,7 +189,7 @@ export default function DetailsAdherent() {
             </DialogTitle>
             <DialogDescription>
               Êtes-vous sûr de vouloir supprimer cet adhérent? Cette action est
-              irréversible.
+              irréversible et supprimera également sa photo du stockage.
             </DialogDescription>
           </DialogHeader>
           <div className="py-3">

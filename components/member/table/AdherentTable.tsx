@@ -132,7 +132,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
 
       if (responseData.success) {
         toast.success("Adhérent supprimé avec succès", {
-          description: `${adherentToDelete.firstName} ${adherentToDelete.lastName} a été supprimé définitivement.`,
+          description: `${adherentToDelete.firstName} ${adherentToDelete.lastName} et sa photo ont été supprimés définitivement.`,
           duration: 3000,
         });
 

@@ -39,6 +39,8 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 - Supports both file upload and camera capture
 - Automatic file validation (type and size)
 - Photos are stored securely with public URLs
+- **Automatic cleanup**: Photos are deleted from blob storage when adherents are deleted
+- **Orphan cleanup**: API endpoint available to clean up unused photos (`POST /api/upload/photo/cleanup`)
 
 ## Learn More
 

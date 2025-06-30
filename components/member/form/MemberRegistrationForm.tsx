@@ -245,7 +245,23 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
     }
   };
 
-  const removePhoto = () => {
+  const removePhoto = async () => {
+    // Delete photo from blob storage if it exists
+    if (photoUrl) {
+      try {
+        await fetch(
+          `/api/upload/photo/delete?url=${encodeURIComponent(photoUrl)}`,
+          {
+            method: "DELETE",
+          }
+        );
+        console.log("Photo deleted from blob storage");
+      } catch (error) {
+        console.error("Error deleting photo from blob storage:", error);
+        // Continue with local cleanup even if blob deletion fails
+      }
+    }
+
     setPhotoPreview(null);
     setPhotoUrl(null);
     if (fileInputRef.current) {

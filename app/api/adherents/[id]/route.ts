@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { del } from "@vercel/blob";
 
 // GET endpoint to retrieve adherent by ID
 export async function GET(
@@ -56,6 +57,30 @@ export async function PUT(
       hasCours,
       ...adherentData
     } = data;
+
+    // If photoUrl is being updated, delete the old photo
+    if (adherentData.photoUrl !== undefined) {
+      const existingAdherent = await prisma.adherent.findUnique({
+        where: { id },
+        select: { photoUrl: true },
+      });
+
+      if (
+        existingAdherent?.photoUrl &&
+        existingAdherent.photoUrl !== adherentData.photoUrl
+      ) {
+        try {
+          await del(existingAdherent.photoUrl);
+          console.log(`Old photo deleted: ${existingAdherent.photoUrl}`);
+        } catch (photoError) {
+          console.error(
+            "Error deleting old photo from blob storage:",
+            photoError
+          );
+          // Continue with update even if photo deletion fails
+        }
+      }
+    }
 
     // Convert birthDate string to Date object if provided
     if (adherentData.birthDate) {
@@ -162,7 +187,33 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    // First, delete the subscription if it exists
+    // First, get the adherent to check if they have a photo
+    const adherent = await prisma.adherent.findUnique({
+      where: { id },
+      select: { photoUrl: true },
+    });
+
+    if (!adherent) {
+      return NextResponse.json(
+        { success: false, error: "Adherent not found" },
+        { status: 404 }
+      );
+    }
+
+    // Delete photo from Vercel Blob if it exists
+    if (adherent.photoUrl) {
+      try {
+        await del(adherent.photoUrl);
+        console.log(`✅ Photo deleted from blob storage: ${adherent.photoUrl}`);
+      } catch (photoError) {
+        console.error("❌ Error deleting photo from blob storage:", photoError);
+        // Continue with adherent deletion even if photo deletion fails
+      }
+    } else {
+      console.log("ℹ️ No photo to delete for this adherent");
+    }
+
+    // Delete the subscription if it exists
     await prisma.subscription.deleteMany({
       where: { adherentId: id },
     });
@@ -174,7 +225,7 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: "Adherent deleted successfully",
+      message: "Adherent and associated photo deleted successfully",
       deletedAdherent,
     });
   } catch (error) {
