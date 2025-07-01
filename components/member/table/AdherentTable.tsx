@@ -141,6 +141,13 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
 
   // Delete handler
   const handleDeleteClick = (adherent: Adherent) => {
+    // First ensure any lingering dialog elements are cleaned up
+    document.querySelectorAll('[role="dialog"]').forEach((el) => el.remove());
+    document.querySelectorAll('[data-radix-focus-guard]').forEach((el) => el.remove());
+    document.body.style.pointerEvents = "";
+    document.body.style.overflow = "";
+
+    // Then set the adherent and open the dialog
     setAdherentToDelete(adherent);
     setDeleteDialogOpen(true);
   };
@@ -156,14 +163,25 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
       if (!response.ok || !dataRes.success) {
         throw new Error(dataRes.error || "Erreur lors de la suppression");
       }
-      setDeleteDialogOpen(false);
-      setAdherentToDelete(null);
-      // Remove from table if onDataUpdate is provided
+
+      // Update the UI
       if (onDataUpdate) {
         onDataUpdate(data.filter((a) => a.id !== adherentToDelete.id));
       }
+
+      // Close dialog and reset state
+      setDeleteDialogOpen(false);
+
+      // Clean up with a delay to ensure animations complete
+      setTimeout(() => {
+        setAdherentToDelete(null);
+        // Forcefully clean up any lingering dialog elements
+        document.querySelectorAll('[role="dialog"]').forEach((el) => el.remove());
+        document.querySelectorAll('[data-radix-focus-guard]').forEach((el) => el.remove());
+        document.body.style.pointerEvents = "";
+        document.body.style.overflow = "";
+      }, 300);
     } catch (err) {
-      // Optionally show a toast here
       alert((err as Error).message);
     } finally {
       setIsDeleting(false);
@@ -171,8 +189,25 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   };
 
   const handleDeleteCancel = () => {
+    // Close the dialog
     setDeleteDialogOpen(false);
-    setAdherentToDelete(null);
+
+    // Clean up with multiple delayed attempts to catch all artifacts
+    const cleanup = () => {
+      document.body.style.pointerEvents = "";
+      document.body.style.overflow = "";
+      document.querySelectorAll('[role="dialog"]').forEach((el) => el.remove());
+      document.querySelectorAll('[data-radix-focus-guard]').forEach((el) => el.remove());
+      document.querySelectorAll('[data-radix-popper-content-wrapper]').forEach((el) => el.remove());
+    };
+
+    // Execute cleanup multiple times with increasing delays
+    cleanup();
+    setTimeout(cleanup, 100);
+    setTimeout(() => {
+      cleanup();
+      setAdherentToDelete(null);
+    }, 300);
   };
 
   return (

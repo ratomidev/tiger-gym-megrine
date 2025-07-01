@@ -1,13 +1,15 @@
+import React, { useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 import { Adherent } from "@/types";
 
 interface DeleteAdherentDialogProps {
@@ -27,51 +29,122 @@ export default function DeleteAdherentDialog({
   onCancel,
   isDeleting,
 }: DeleteAdherentDialogProps) {
+  // More aggressive cleanup when dialog closes
+  useEffect(() => {
+    // Only run cleanup when dialog closes
+    if (!open) {
+      // Function to thoroughly clean up all dialog artifacts
+      const cleanupDialogArtifacts = () => {
+        // Reset body styles
+        document.body.style.pointerEvents = "";
+        document.body.style.overflow = "";
+
+        // Remove any lingering focus trap elements
+        const focusTraps = document.querySelectorAll('[data-radix-focus-guard]');
+        focusTraps.forEach(el => el.remove());
+
+        // Remove any dialog backdrops
+        const backdrops = document.querySelectorAll('[data-radix-popper-content-wrapper]');
+        backdrops.forEach(el => el.remove());
+
+        // Remove closed dialogs
+        const dialogs = document.querySelectorAll('[role="dialog"]');
+        dialogs.forEach(el => {
+          if (!el.hasAttribute('data-state') || el.getAttribute('data-state') === 'closed') {
+            el.remove();
+          }
+        });
+
+        // Make sure no elements have pointer-events: none
+        document.querySelectorAll('*').forEach(el => {
+          if (window.getComputedStyle(el).pointerEvents === 'none') {
+            (el as HTMLElement).style.pointerEvents = 'auto';
+          }
+        });
+      };
+
+      // Run cleanup immediately
+      cleanupDialogArtifacts();
+
+      // Run again after a delay to catch any elements that might appear during animation
+      setTimeout(cleanupDialogArtifacts, 100);
+      setTimeout(cleanupDialogArtifacts, 500);
+    }
+  }, [open]);
+
+  // Handle escape key press
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open && !isDeleting) {
+        onOpenChange(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [open, isDeleting, onOpenChange]);
+
+  // If dialog is not open and no adherent, don't render anything
+  if (!open && !adherent) return null;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
-            Confirmer la suppression
-          </DialogTitle>
-          <DialogDescription>
-            Êtes-vous sûr de vouloir supprimer cet adhérent? Cette action est
-            irréversible et supprimera également sa photo du stockage.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="py-3">
-          <p className="text-sm font-medium">
-            Vous allez supprimer l&apos;adhérent suivant:
-          </p>
-          <p className="mt-1 text-sm bg-gray-50 p-2 rounded border border-gray-100">
-            {adherent?.firstName} {adherent?.lastName}
-          </p>
-        </div>
-        <DialogFooter className="sm:justify-end">
-          <Button
-            variant="outline"
-            onClick={onCancel}
+    <AlertDialog
+      open={open}
+      onOpenChange={(newOpen) => {
+        if (isDeleting && !newOpen) return; // Prevent closing while deleting
+        onOpenChange(newOpen);
+      }}
+    >
+      <AlertDialogContent
+        // Force pointer events to be auto
+        style={{ pointerEvents: 'auto' }}
+        className="z-50"
+      >
+        <AlertDialogHeader>
+          <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+          <AlertDialogDescription>
+            Êtes-vous sûr de vouloir supprimer l&apos;adhérent{" "}
+            <span className="font-semibold">
+              {adherent ? `${adherent.firstName} ${adherent.lastName}` : ""}
+            </span>
+            ? Cette action ne peut pas être annulée.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel
+            onClick={(e) => {
+              e.stopPropagation();
+              onCancel();
+            }}
             disabled={isDeleting}
+            className="focus:ring-0"
           >
             Annuler
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={onConfirm}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.stopPropagation();
+              onConfirm();
+            }}
             disabled={isDeleting}
+            className="bg-red-600 hover:bg-red-700 focus:ring-red-600 focus:ring-0"
           >
             {isDeleting ? (
               <>
-                <span className="h-4 w-4 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Suppression...
               </>
             ) : (
               "Supprimer"
             )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
