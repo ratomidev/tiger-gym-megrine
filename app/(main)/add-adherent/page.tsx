@@ -52,7 +52,7 @@ export default function Page() {
       await submitAdherentWithSubscription(adherentData, subscriptionData);
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error("Une erreur s'est produite lors de l'enregistrement", {
+      toast.error("Une erreur s'est produite lors de l'enregistrement.", {
         description: (error as Error).message,
       });
     } finally {
