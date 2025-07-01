@@ -1,4 +1,8 @@
-import { ChevronUp, Home, User2, UserPlus } from "lucide-react";
+"use client";
+
+import { ChevronUp, Home, LogOut, User2, UserPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 import {
   Sidebar,
@@ -38,6 +42,18 @@ const items = [
 ];
 
 export function SidebarNavigation() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  // Handle logout click
+  const handleLogout = async () => {
+    await logout();
+    router.push("/auth/login");
+  };
+
+  // Display name or fallback
+  const displayName = user?.name || user?.email?.split("@")[0] || "Guest";
+
   return (
     <Sidebar>
       <SidebarHeader className="flex items-center justify-between font-bold">
@@ -68,7 +84,7 @@ export function SidebarNavigation() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Username
+                  <User2 /> {displayName}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -79,10 +95,8 @@ export function SidebarNavigation() {
                 <DropdownMenuItem>
                   <span>Account</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Billing</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
                   <span>Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>

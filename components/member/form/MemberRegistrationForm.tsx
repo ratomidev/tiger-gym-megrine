@@ -152,6 +152,13 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
   const startCamera = async () => {
     try {
       setCameraError(null);
+      
+      // Check if we're in the browser and navigator is available
+      if (typeof window === 'undefined' || !navigator.mediaDevices) {
+        setCameraError("Caméra non disponible dans cet environnement");
+        return;
+      }
+      
       const constraints = {
         video: {
           facingMode: facingMode,
@@ -508,7 +515,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
             variant="outline"
             onClick={startCamera}
             className="gap-2"
-            disabled={!navigator.mediaDevices || isUploading}
+            disabled={typeof window === 'undefined' || !navigator?.mediaDevices}
           >
             <Camera className="h-4 w-4" />
             Prendre une photo

@@ -1,55 +1,74 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { User } from "@/lib/auth/types";
+import { User } from "@/types/auth";
+import { useRouter } from "next/navigation";
 
-type AuthContextType = {
+interface AuthContextType {
   user: User | null;
-  isLoading: boolean;
   login: (user: User) => void;
   logout: () => void;
-};
+  isLoading: boolean;
+}
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  login: () => {},
+  logout: () => {},
+  isLoading: true,
+});
+
+export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
+  // Check for session on initial load
   useEffect(() => {
-    // Load user from localStorage on mount
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    const fetchUser = async () => {
       try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        localStorage.removeItem("user");
+        const response = await fetch("/api/auth/me");
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.user) {
+            setUser(data.user);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch user session:", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
-    setIsLoading(false);
+    };
+
+    fetchUser();
   }, []);
 
   const login = (userData: User) => {
-    localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData);
   };
 
-  const logout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
+  const logout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        setUser(null);
+        router.push("/auth/login");
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
 }

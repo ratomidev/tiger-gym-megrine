@@ -1,8 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['images.unsplash.com', 'i.pravatar.cc'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'example.com', // Replace with your actual domain
+        pathname: '/**',
+      },
+      // Add other domains as needed
+    ],
   },
-}
+  // Your other configurations...
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

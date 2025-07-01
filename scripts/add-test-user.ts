@@ -1,7 +1,7 @@
-const { PrismaClient } = require('../lib/generated/prisma');
+const { PrismaClient } = require('@prisma/client');
 const { hash } = require('bcryptjs');
 
-// Create a new Prisma client instance
+// Create a new Prisma client instance for this script
 const prisma = new PrismaClient();
 
 async function addTestUser() {
@@ -12,9 +12,9 @@ async function addTestUser() {
     // Add the user to the database
     const user = await prisma.user.create({
       data: {
-        email: 'test@example.com',
+        email: 'test2@example.com',
         name: 'Test User',
-        password: hashedPassword,
+        password: 'test123',
       },
     });
     

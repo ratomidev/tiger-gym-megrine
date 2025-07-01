@@ -13,9 +13,14 @@ model User {
   password  String
   name      String?
   phone     String?
-  role      Role
+  role      Role 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  OWNER 
+  STAFF
 }
 
 model Subscription {

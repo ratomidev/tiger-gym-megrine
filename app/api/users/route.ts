@@ -1,7 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAllUsers, excludePassword } from "@/lib/db/user";
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
+
+/**
+ * Get all users from the database with sensitive fields excluded
+ * Returns users with all necessary fields for the UsersList component
+ */
+async function getAllUsers() {
+  // Direct database query using Prisma
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      phone: true, // Added phone field
+      role: true,  // Added role field
+      createdAt: true,
+      updatedAt: true,
+      // Explicitly exclude password
+      password: false,
+    },
+    orderBy: {
+      createdAt: 'desc' // Most recent users first
+    }
+  });
+
+  return users;
+}
+
+/**
+ * Exclude password from a user object for safe return
+ */
+function excludePassword(user: Record<string, unknown>) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { password: _password, ...userWithoutPassword } = user;
+  return userWithoutPassword;
+}
 
 export async function GET() {
   try {
@@ -19,7 +53,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, name, phone } = body;
+    const { email, password, name, phone, role } = body;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -41,7 +75,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password
+    // Hash password using service
     const hashedPassword = await hash(password, 10);
 
     // Create user
@@ -50,7 +84,8 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         name: name || null,
-        // phone: phone || null,
+        phone: phone || null,
+        role: role || 'STAFF', // Default to STAFF if not provided
       },
     });
 

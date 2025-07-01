@@ -1,12 +1,100 @@
 // app/(auth)/login/page.tsx
 
-import { Toaster } from "sonner";
-import { LoginForm } from "../../../components/auth/LoginForm";
+"use client";
 
-export default function LoginPage() {
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { Toaster, toast } from "sonner";
+import { User } from "@/types/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+function LoginForm() {
+  const router = useRouter();
+  const { login } = useAuth();
+  const searchParams = useSearchParams();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  
+  // Get the callback URL if available
+  const callbackUrl = searchParams.get("callbackUrl") || "/home";
+  
+  // Check if session expired
+  const sessionExpired = searchParams.get("expired") === "true";
+  
+  // Show expired session message
+  if (sessionExpired) {
+    toast.error("Your session has expired. Please log in again.");
+  }
+  
+  /**
+   * Handle form submission
+   * - Validates inputs
+   * - Calls login API
+   * - Handles success/error responses
+   */
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!email || !password) {
+      toast.error("Email and password are required");
+      return;
+    }
+    
+    setIsProcessing(true);
+    
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+      
+      // Success - handle user login
+      handleAuthSuccess(data.user);
+    } catch (error) {
+      handleAuthError(error instanceof Error ? error.message : "Login failed");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  /**
+   * Handle successful authentication
+   * - Updates auth context
+   * - Shows success toast
+   * - Redirects to home page
+   */
+  const handleAuthSuccess = (user: User) => {
+    login(user);
+    toast.success("Welcome back! " + (user.name || user.email));
+
+    // Delay navigation to allow toast to be seen
+    setTimeout(() => {
+      router.push(decodeURIComponent(callbackUrl));
+    }, 1000);
+  };
+
+  /**
+   * Handle authentication errors
+   * - Shows error toast with message
+   */
+  const handleAuthError = (message: string) => {
+    toast.error(`Login failed: ${message}`);
+  };
+
   return (
     <div className="container flex items-center justify-center min-h-screen">
-      <Toaster position="top-right" richColors />
       <div className="w-full max-w-md space-y-8">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Tiger Gym Dashboard</h1>
@@ -14,8 +102,56 @@ export default function LoginPage() {
             Enter your credentials to sign in
           </p>
         </div>
-        <LoginForm />
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              placeholder="your.email@example.com"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              disabled={isProcessing}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              disabled={isProcessing}
+            />
+          </div>
+          
+          <Button 
+            type="submit" 
+            className="w-full" 
+            disabled={isProcessing}
+          >
+            {isProcessing ? "Signing in..." : "Sign in"}
+          </Button>
+        </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+      <Toaster position="top-center" />
+    </Suspense>
   );
 }
