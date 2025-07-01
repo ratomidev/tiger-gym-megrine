@@ -2,6 +2,7 @@ import { startOfMonth, endOfMonth, addMonths, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { IconArrowUpRight, IconArrowDownRight, IconCash } from "@tabler/icons-react";
 import { prisma } from "@/lib/prisma";
+import { Decimal } from "@prisma/client/runtime/library";
 import {
   Card,
   CardContent,
@@ -11,6 +12,11 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+
+// Type for Prisma query result
+type SubscriptionWithPrice = {
+  price: Decimal;
+};
 
 // Fonction utilitaire pour formater les valeurs monétaires
 function formatCurrency(amount: number): string {
@@ -41,7 +47,8 @@ export default async function RevenueSection() {
   // ---------------------------------------------------------------
   // 1. Revenu total ce mois-ci
   // ---------------------------------------------------------------
-  const currentMonthSubscriptions = await prisma.subscription.findMany({
+  // Obtenir le revenu du mois en cours
+  const currentMonthSubscriptions: SubscriptionWithPrice[] = await prisma.subscription.findMany({
     where: {
       startDate: {
         gte: firstDayOfMonth,
@@ -54,12 +61,12 @@ export default async function RevenueSection() {
   });
   
   const totalRevenueThisMonth = currentMonthSubscriptions.reduce(
-    (sum, subscription) => sum + Number(subscription.price),
+    (sum: number, subscription) => sum + Number(subscription.price),
     0
   );
   
   // Obtenir le revenu du mois précédent pour comparaison
-  const prevMonthSubscriptions = await prisma.subscription.findMany({
+  const prevMonthSubscriptions: SubscriptionWithPrice[] = await prisma.subscription.findMany({
     where: {
       startDate: {
         gte: firstDayOfPrevMonth,
@@ -72,7 +79,7 @@ export default async function RevenueSection() {
   });
   
   const totalRevenuePrevMonth = prevMonthSubscriptions.reduce(
-    (sum, subscription) => sum + Number(subscription.price),
+    (sum: number, subscription) => sum + Number(subscription.price),
     0
   );
   
@@ -84,7 +91,7 @@ export default async function RevenueSection() {
   // ---------------------------------------------------------------
   // 2. Revenu prévisionnel pour le mois prochain
   // ---------------------------------------------------------------
-  const projectedSubscriptions = await prisma.subscription.findMany({
+  const projectedSubscriptions: SubscriptionWithPrice[] = await prisma.subscription.findMany({
     where: {
       startDate: {
         gte: firstDayOfNextMonth,
@@ -97,7 +104,7 @@ export default async function RevenueSection() {
   });
   
   const projectedRevenueNextMonth = projectedSubscriptions.reduce(
-    (sum, subscription) => sum + Number(subscription.price),
+    (sum: number, subscription) => sum + Number(subscription.price),
     0
   );
   
