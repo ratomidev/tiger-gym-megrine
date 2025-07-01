@@ -34,7 +34,7 @@ const formSchema = z.object({
     .optional()
     .refine(
       (val) => !val || /^\d{8}$/.test(val),
-      "Phone number should be 8 digits (e.g., 54806948)"
+      "Le numéro de téléphone doit contenir 8 chiffres (ex: 54806948)"
     ),
   role: z.enum(["OWNER", "STAFF"]),
 });
@@ -48,7 +48,12 @@ interface EditDialogProps {
   onUserUpdated?: () => void;
 }
 
-export function EditDialog({ user, isOpen, onClose, onUserUpdated }: EditDialogProps) {
+export function EditDialog({
+  user,
+  isOpen,
+  onClose,
+  onUserUpdated,
+}: EditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<EditUserFormValues>({
@@ -100,10 +105,12 @@ export function EditDialog({ user, isOpen, onClose, onUserUpdated }: EditDialogP
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to update user");
+        throw new Error(
+          data.error || "Échec de la mise à jour de l'utilisateur"
+        );
       }
 
-      toast.success("User updated successfully");
+      toast.success("Utilisateur mis à jour avec succès");
       if (onUserUpdated) {
         onUserUpdated();
       }
@@ -112,7 +119,9 @@ export function EditDialog({ user, isOpen, onClose, onUserUpdated }: EditDialogP
     } catch (error) {
       console.error("Error updating user:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to update user"
+        error instanceof Error
+          ? error.message
+          : "Échec de la mise à jour de l'utilisateur"
       );
     } finally {
       setIsSubmitting(false);
@@ -140,13 +149,17 @@ export function EditDialog({ user, isOpen, onClose, onUserUpdated }: EditDialogP
         className="sm:max-w-[500px]"
       >
         <DialogHeader>
-          <DialogTitle>Edit User</DialogTitle>
+          <DialogTitle>Modifier l&apos;Utilisateur</DialogTitle>
           <DialogDescription>
-            Update user information. Email cannot be changed.
+            Mettre à jour les informations de l&apos;utilisateur. L&apos;email ne peut pas
+            être modifié.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4">
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-4 py-4"
+        >
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -156,16 +169,18 @@ export function EditDialog({ user, isOpen, onClose, onUserUpdated }: EditDialogP
               disabled
               className="bg-gray-100"
             />
-            <p className="text-sm text-gray-500">Email cannot be changed</p>
+            <p className="text-sm text-gray-500">
+              L&apos;email ne peut pas être modifié
+            </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="name">Name (Optional)</Label>
+            <Label htmlFor="name">Nom (Optionnel)</Label>
             <Input
               id="name"
               type="text"
               {...form.register("name")}
-              placeholder="John Doe"
+              placeholder="Jean Dupont"
               disabled={isSubmitting}
             />
             {form.formState.errors.name && (
@@ -176,7 +191,7 @@ export function EditDialog({ user, isOpen, onClose, onUserUpdated }: EditDialogP
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone (Optional)</Label>
+            <Label htmlFor="phone">Téléphone (Optionnel)</Label>
             <Input
               id="phone"
               type="text"
@@ -192,7 +207,7 @@ export function EditDialog({ user, isOpen, onClose, onUserUpdated }: EditDialogP
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
+            <Label htmlFor="role">Rôle</Label>
             <Select
               defaultValue={user.role}
               onValueChange={(value) =>
@@ -201,11 +216,11 @@ export function EditDialog({ user, isOpen, onClose, onUserUpdated }: EditDialogP
               disabled={isSubmitting}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a role" />
+                <SelectValue placeholder="Sélectionner un rôle" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="OWNER">Owner</SelectItem>
-                <SelectItem value="STAFF">Staff</SelectItem>
+                <SelectItem value="OWNER">Propriétaire</SelectItem>
+                <SelectItem value="STAFF">Personnel</SelectItem>
               </SelectContent>
             </Select>
             {form.formState.errors.role && (
@@ -225,16 +240,16 @@ export function EditDialog({ user, isOpen, onClose, onUserUpdated }: EditDialogP
               }}
               disabled={isSubmitting}
             >
-              Cancel
+              Annuler
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
+                  Mise à jour...
                 </>
               ) : (
-                "Update User"
+                "Mettre à Jour l'Utilisateur"
               )}
             </Button>
           </DialogFooter>

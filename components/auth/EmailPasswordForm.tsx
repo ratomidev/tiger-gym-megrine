@@ -12,7 +12,10 @@ interface EmailPasswordFormProps {
   onError: (message: string) => void;
 }
 
-export function EmailPasswordForm({ onSuccess, onError }: EmailPasswordFormProps) {
+export function EmailPasswordForm({
+  onSuccess,
+  onError,
+}: EmailPasswordFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -27,19 +30,19 @@ export function EmailPasswordForm({ onSuccess, onError }: EmailPasswordFormProps
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
-        onError(data.error || "Failed to sign in");
+        onError(data.error || "Échec de la connexion");
         return;
       }
-      
+
       if (data.user) {
         onSuccess(data.user);
       }
     } catch (error) {
-      onError("An unexpected error occurred");
+      onError("Une erreur inattendue s'est produite");
       console.error("Login error:", error);
     } finally {
       setIsLoading(false);
@@ -53,7 +56,7 @@ export function EmailPasswordForm({ onSuccess, onError }: EmailPasswordFormProps
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
-            placeholder="name@example.com"
+            placeholder="nom@exemple.com"
             type="email"
             autoCapitalize="none"
             autoComplete="email"
@@ -65,7 +68,7 @@ export function EmailPasswordForm({ onSuccess, onError }: EmailPasswordFormProps
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Mot de passe</Label>
           <Input
             id="password"
             type="password"
@@ -78,7 +81,7 @@ export function EmailPasswordForm({ onSuccess, onError }: EmailPasswordFormProps
           />
         </div>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Signing in..." : "Sign In"}
+          {isLoading ? "Connexion en cours..." : "Se connecter"}
         </Button>
       </div>
     </form>

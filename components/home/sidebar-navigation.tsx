@@ -35,7 +35,7 @@ const items = [
     icon: UserPlus,
   },
   {
-    title: "Users",
+    title: "Utilisateurs",
     url: "/users",
     icon: User2,
   },

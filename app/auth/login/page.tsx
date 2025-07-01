@@ -18,18 +18,18 @@ function LoginForm() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
   // Get the callback URL if available
   const callbackUrl = searchParams.get("callbackUrl") || "/home";
-  
+
   // Check if session expired
   const sessionExpired = searchParams.get("expired") === "true";
-  
+
   // Show expired session message
   if (sessionExpired) {
-    toast.error("Your session has expired. Please log in again.");
+    toast.error("Votre session a expiré. Veuillez vous reconnecter.");
   }
-  
+
   /**
    * Handle form submission
    * - Validates inputs
@@ -38,32 +38,34 @@ function LoginForm() {
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (!email || !password) {
-      toast.error("Email and password are required");
+      toast.error("L'email et le mot de passe sont requis");
       return;
     }
-    
+
     setIsProcessing(true);
-    
+
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+        throw new Error(data.error || "Échec de la connexion");
       }
-      
+
       // Success - handle user login
       handleAuthSuccess(data.user);
     } catch (error) {
-      handleAuthError(error instanceof Error ? error.message : "Login failed");
+      handleAuthError(
+        error instanceof Error ? error.message : "Échec de la connexion"
+      );
     } finally {
       setIsProcessing(false);
     }
@@ -77,7 +79,7 @@ function LoginForm() {
    */
   const handleAuthSuccess = (user: User) => {
     login(user);
-    toast.success("Welcome back! " + (user.name || user.email));
+    toast.success("Bon retour ! " + (user.name || user.email));
 
     // Delay navigation to allow toast to be seen
     setTimeout(() => {
@@ -90,7 +92,7 @@ function LoginForm() {
    * - Shows error toast with message
    */
   const handleAuthError = (message: string) => {
-    toast.error(`Login failed: ${message}`);
+    toast.error(`Échec de la connexion : ${message}`);
   };
 
   return (
@@ -99,7 +101,7 @@ function LoginForm() {
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Tiger Gym Dashboard</h1>
           <p className="text-gray-500 dark:text-gray-400">
-            Enter your credentials to sign in
+            Entrez vos identifiants pour vous connecter
           </p>
         </div>
 
@@ -108,7 +110,7 @@ function LoginForm() {
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
-              placeholder="your.email@example.com"
+              placeholder="votre.email@exemple.com"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -117,10 +119,10 @@ function LoginForm() {
               disabled={isProcessing}
             />
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Mot de passe</Label>
             </div>
             <Input
               id="password"
@@ -133,13 +135,9 @@ function LoginForm() {
               disabled={isProcessing}
             />
           </div>
-          
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={isProcessing}
-          >
-            {isProcessing ? "Signing in..." : "Sign in"}
+
+          <Button type="submit" className="w-full" disabled={isProcessing}>
+            {isProcessing ? "Connexion en cours..." : "Se connecter"}
           </Button>
         </form>
       </div>
@@ -149,7 +147,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Chargement...</div>}>
       <LoginForm />
       <Toaster position="top-center" />
     </Suspense>

@@ -55,14 +55,16 @@ export default function UsersList() {
       const response = await fetch("/api/users");
 
       if (!response.ok) {
-        throw new Error("Failed to fetch users");
+        throw new Error("Échec du chargement des utilisateurs");
       }
 
       const data = await response.json();
       setUsers(data.users);
     } catch (err) {
       console.error("Error fetching users:", err);
-      setError("Failed to load users. Please try again later.");
+      setError(
+        "Échec du chargement des utilisateurs. Veuillez réessayer plus tard."
+      );
     } finally {
       setLoading(false);
     }
@@ -86,17 +88,19 @@ export default function UsersList() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to create user");
+        throw new Error(data.error || "Échec de la création de l'utilisateur");
       }
 
-      toast.success("User created successfully");
+      toast.success("Utilisateur créé avec succès");
       setIsDialogOpen(false);
       // Refresh user list
       fetchUsers();
     } catch (error) {
       console.error("Error creating user:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to create user"
+        error instanceof Error
+          ? error.message
+          : "Échec de la création de l'utilisateur"
       );
       throw error; // Re-throw for the form to handle
     }
@@ -158,9 +162,9 @@ export default function UsersList() {
     <div className="w-full p-4 flex justify-center">
       <Card className="shadow-sm w-full max-w-5xl mx-auto">
         <CardHeader>
-          <CardTitle>Users Management</CardTitle>
+          <CardTitle>Gestion des Utilisateurs</CardTitle>
           <CardDescription>
-            View and manage all users in the system
+            Voir et gérer tous les utilisateurs du système
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -168,14 +172,14 @@ export default function UsersList() {
             <div className="relative w-full sm:w-[300px]">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search users..."
+                placeholder="Rechercher des utilisateurs..."
                 className="pl-8 w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <Button onClick={handleAddUserClick} className="w-full sm:w-auto">
-              Add New User
+              Ajouter un nouvel utilisateur
             </Button>
           </div>
 
@@ -196,12 +200,16 @@ export default function UsersList() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead className="hidden md:table-cell">Email</TableHead>
-                    <TableHead className="hidden md:table-cell">Phone</TableHead>
-                    <TableHead>Role</TableHead>
+                    <TableHead>Nom</TableHead>
                     <TableHead className="hidden md:table-cell">
-                      Created
+                      Email
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Téléphone
+                    </TableHead>
+                    <TableHead>Rôle</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Créé le
                     </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -211,8 +219,8 @@ export default function UsersList() {
                     <TableRow>
                       <TableCell colSpan={6} className="text-center h-24">
                         {searchQuery
-                          ? "No users matching your search"
-                          : "No users found"}
+                          ? "Aucun utilisateur correspondant à votre recherche"
+                          : "Aucun utilisateur trouvé"}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -224,7 +232,7 @@ export default function UsersList() {
                               <UserIcon className="h-4 w-4" />
                             </div>
                             <div>
-                              <div>{user.name || "N/A"}</div>
+                              <div>{user.name || "N/D"}</div>
                               <div className="text-sm text-gray-500 md:hidden">
                                 {user.email}
                               </div>
@@ -235,7 +243,7 @@ export default function UsersList() {
                           {user.email}
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
-                          {user.phone || "N/A"}
+                          {user.phone || "N/D"}
                         </TableCell>
                         <TableCell>
                           <span
@@ -245,7 +253,7 @@ export default function UsersList() {
                                 : "bg-blue-100 text-blue-800"
                             }`}
                           >
-                            {user.role}
+                            {user.role === "OWNER" ? "PROPRIÉTAIRE" : user.role}
                           </span>
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
@@ -272,7 +280,7 @@ export default function UsersList() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
+            <DialogTitle>Ajouter un nouvel utilisateur</DialogTitle>
           </DialogHeader>
           <NewUserForm
             onSubmit={handleCreateUser}
