@@ -2,6 +2,11 @@ import { list, del } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// Type for the specific Prisma query result
+type AdherentWithPhotoUrl = {
+  photoUrl: string | null;
+};
+
 /**
  * Clean up orphaned photos in blob storage
  * This endpoint finds photos in blob storage that are not referenced by any adherent
@@ -12,7 +17,7 @@ export async function POST() {
     const { blobs } = await list({ prefix: "photos/" });
 
     // Get all photoUrls from the database
-    const adherents = await prisma.adherent.findMany({
+    const adherents: AdherentWithPhotoUrl[] = await prisma.adherent.findMany({
       select: { photoUrl: true },
       where: { photoUrl: { not: null } },
     });
