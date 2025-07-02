@@ -22,7 +22,10 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * Verify if a plain text password matches a hash
  */
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+export async function verifyPassword(
+  password: string,
+  hashedPassword: string
+): Promise<boolean> {
   return compare(password, hashedPassword);
 }
 
@@ -40,8 +43,8 @@ export async function authenticateUser(email: string, password: string) {
       password: true,
       name: true,
       createdAt: true,
-      updatedAt: true
-    }
+      updatedAt: true,
+    },
   });
 
   // No user found with that email
@@ -60,9 +63,14 @@ export async function authenticateUser(email: string, password: string) {
 /**
  * Create a new user with a hashed password
  */
-export async function createUser(email: string, password: string, name?: string, role: Role = Role.STAFF) {
+export async function createUser(
+  email: string,
+  password: string,
+  name?: string,
+  role: Role = Role.STAFF
+) {
   const hashedPassword = await hashPassword(password);
-  
+
   return prisma.user.create({
     data: {
       email,
@@ -74,9 +82,11 @@ export async function createUser(email: string, password: string, name?: string,
       id: true,
       email: true,
       name: true,
+      phone: true,
+      role: true,
       createdAt: true,
-      updatedAt: true
-    }
+      updatedAt: true,
+    },
   });
 }
 
@@ -103,7 +113,7 @@ export async function createSessionToken(user: User): Promise<string> {
     .setIssuedAt()
     .setExpirationTime(Math.floor(Date.now() / 1000) + SESSION_DURATION)
     .sign(JWT_SECRET);
-  
+
   return token;
 }
 
@@ -127,11 +137,11 @@ export async function getCurrentUser(): Promise<User | null> {
   // Fix: Await the cookies() function before using it
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("session");
-  
+
   if (!sessionCookie?.value) {
     return null;
   }
-  
+
   return verifySessionToken(sessionCookie.value);
 }
 
