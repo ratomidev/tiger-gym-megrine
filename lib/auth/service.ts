@@ -1,4 +1,3 @@
-import { hash, compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { User } from "@/types/auth";
 import { cookies } from "next/headers";
@@ -10,23 +9,25 @@ import { Role } from "@prisma/client";
  * Password hashing settings
  * 12 rounds is recommended for bcrypt in 2023
  */
-const SALT_ROUNDS = 12;
+
 
 /**
- * Hash a password using bcrypt
+ * Web Crypto API compatible password hashing (works in Edge Runtime)
  */
 export async function hashPassword(password: string): Promise<string> {
-  return hash(password, SALT_ROUNDS);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/**
- * Verify if a plain text password matches a hash
- */
 export async function verifyPassword(
   password: string,
   hashedPassword: string
 ): Promise<boolean> {
-  return compare(password, hashedPassword);
+  const hashedInput = await hashPassword(password);
+  return hashedInput === hashedPassword;
 }
 
 /**
