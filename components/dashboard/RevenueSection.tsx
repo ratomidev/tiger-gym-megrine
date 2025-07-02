@@ -22,6 +22,17 @@ type SubscriptionWithPrice = {
   price: Decimal;
 };
 
+// Type for Prisma groupBy result
+type SubscriptionGroupByPlan = {
+  plan: string;
+  _sum: {
+    price: Decimal | null;
+  };
+  _count: {
+    id: number;
+  };
+};
+
 // Fonction utilitaire pour formater les valeurs monétaires
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("fr-TN", {
@@ -167,7 +178,7 @@ export default async function RevenueSection() {
 
   // Trier les plans par revenu (du plus élevé au plus bas)
   const planBreakdown = subscriptionsByPlan
-    .map((plan) => ({
+    .map((plan: SubscriptionGroupByPlan) => ({
       name: plan.plan,
       revenue: Number(plan._sum.price) || 0,
       count: plan._count.id,
