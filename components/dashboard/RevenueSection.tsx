@@ -1,12 +1,13 @@
-import { startOfMonth, endOfMonth, addMonths, format } from "date-fns";
+"use client";
+
+import { useState, useEffect } from "react";
+import { addMonths, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
   IconArrowUpRight,
   IconArrowDownRight,
   IconCash,
 } from "@tabler/icons-react";
-import { prisma } from "@/lib/prisma";
-import { Decimal } from "@prisma/client/runtime/library";
 import {
   Card,
   CardContent,
@@ -16,21 +17,29 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Type for Prisma query result
-type SubscriptionWithPrice = {
-  price: Decimal;
+// Types
+type SubscriptionData = {
+  price: number;
 };
 
-// Type for Prisma groupBy result
-type SubscriptionGroupByPlan = {
-  plan: string;
-  _sum: {
-    price: Decimal | null;
-  };
-  _count: {
-    id: number;
-  };
+type PlanBreakdown = {
+  name: string;
+  revenue: number;
+  count: number;
+  percentage: number;
+};
+
+type RevenueData = {
+  currentMonthSubscriptions: SubscriptionData[];
+  prevMonthSubscriptions: SubscriptionData[];
+  projectedSubscriptions: SubscriptionData[];
+  subscriptionsByPlan: {
+    name: string;
+    revenue: number;
+    count: number;
+  }[];
 };
 
 // Fonction utilitaire pour formater les valeurs monétaires
@@ -43,64 +52,102 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-export default async function RevenueSection() {
-  // Obtenir les informations de date actuelles
+export default function RevenueSection() {
+  const [data, setData] = useState<RevenueData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRevenueData = async () => {
+      try {
+        const response = await fetch("/api/revenue");
+        if (!response.ok) {
+          throw new Error("Failed to fetch revenue data");
+        }
+        const revenueData = await response.json();
+        setData(revenueData);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRevenueData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-8">
+        <Skeleton className="h-9 w-64" />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="space-y-0 pb-2">
+                <Skeleton className="h-4 w-32" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-24 mb-2" />
+                <Skeleton className="h-4 w-40" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-64" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-2 w-full" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-8">
+        <h2 className="text-3xl font-bold tracking-tight">
+          Analyse des Revenus
+        </h2>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-red-500">Erreur: {error}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
   const now = new Date();
 
-  // Calculer les limites du mois en cours
-  const firstDayOfMonth = startOfMonth(now);
-  const lastDayOfMonth = endOfMonth(now);
-
-  // Calculer les limites du mois prochain
-  const firstDayOfNextMonth = startOfMonth(addMonths(now, 1));
-  const lastDayOfNextMonth = endOfMonth(addMonths(now, 1));
-
-  // Calculer les limites du mois précédent (pour comparaison)
-  const firstDayOfPrevMonth = startOfMonth(addMonths(now, -1));
-  const lastDayOfPrevMonth = endOfMonth(addMonths(now, -1));
-
-  // ---------------------------------------------------------------
-  // 1. Revenu total ce mois-ci
-  // ---------------------------------------------------------------
-  // Obtenir le revenu du mois en cours
-  const currentMonthSubscriptions: SubscriptionWithPrice[] =
-    await prisma.subscription.findMany({
-      where: {
-        startDate: {
-          gte: firstDayOfMonth,
-          lte: lastDayOfMonth,
-        },
-      },
-      select: {
-        price: true,
-      },
-    });
-
-  const totalRevenueThisMonth = currentMonthSubscriptions.reduce(
-    (sum: number, subscription) => sum + Number(subscription.price),
+  // Calculate revenue metrics
+  const totalRevenueThisMonth = data.currentMonthSubscriptions.reduce(
+    (sum, subscription) => sum + subscription.price,
     0
   );
 
-  // Obtenir le revenu du mois précédent pour comparaison
-  const prevMonthSubscriptions: SubscriptionWithPrice[] =
-    await prisma.subscription.findMany({
-      where: {
-        startDate: {
-          gte: firstDayOfPrevMonth,
-          lte: lastDayOfPrevMonth,
-        },
-      },
-      select: {
-        price: true,
-      },
-    });
-
-  const totalRevenuePrevMonth = prevMonthSubscriptions.reduce(
-    (sum: number, subscription) => sum + Number(subscription.price),
+  const totalRevenuePrevMonth = data.prevMonthSubscriptions.reduce(
+    (sum, subscription) => sum + subscription.price,
     0
   );
 
-  // Calculer le pourcentage de changement d'un mois à l'autre
+  const projectedRevenueNextMonth = data.projectedSubscriptions.reduce(
+    (sum, subscription) => sum + subscription.price,
+    0
+  );
+
   const revenueChangePercent =
     totalRevenuePrevMonth > 0
       ? ((totalRevenueThisMonth - totalRevenuePrevMonth) /
@@ -108,28 +155,6 @@ export default async function RevenueSection() {
         100
       : 100;
 
-  // ---------------------------------------------------------------
-  // 2. Revenu prévisionnel pour le mois prochain
-  // ---------------------------------------------------------------
-  const projectedSubscriptions: SubscriptionWithPrice[] =
-    await prisma.subscription.findMany({
-      where: {
-        startDate: {
-          gte: firstDayOfNextMonth,
-          lte: lastDayOfNextMonth,
-        },
-      },
-      select: {
-        price: true,
-      },
-    });
-
-  const projectedRevenueNextMonth = projectedSubscriptions.reduce(
-    (sum: number, subscription) => sum + Number(subscription.price),
-    0
-  );
-
-  // Calculer le pourcentage de changement prévisionnel
   const projectedChangePercent =
     totalRevenueThisMonth > 0
       ? ((projectedRevenueNextMonth - totalRevenueThisMonth) /
@@ -137,54 +162,29 @@ export default async function RevenueSection() {
         100
       : 100;
 
-  // ---------------------------------------------------------------
-  // 3. Prix moyen d'abonnement
-  // ---------------------------------------------------------------
   const averagePrice =
-    currentMonthSubscriptions.length > 0
-      ? totalRevenueThisMonth / currentMonthSubscriptions.length
+    data.currentMonthSubscriptions.length > 0
+      ? totalRevenueThisMonth / data.currentMonthSubscriptions.length
       : 0;
 
-  // Obtenir la moyenne du mois précédent pour comparaison
   const prevAveragePrice =
-    prevMonthSubscriptions.length > 0
-      ? totalRevenuePrevMonth / prevMonthSubscriptions.length
+    data.prevMonthSubscriptions.length > 0
+      ? totalRevenuePrevMonth / data.prevMonthSubscriptions.length
       : 0;
 
-  // Calculer le pourcentage de changement du prix moyen
   const averagePriceChangePercent =
     prevAveragePrice > 0
       ? ((averagePrice - prevAveragePrice) / prevAveragePrice) * 100
       : 0;
 
-  // ---------------------------------------------------------------
-  // 4. Répartition des revenus par type d'abonnement
-  // ---------------------------------------------------------------
-  const subscriptionsByPlan = await prisma.subscription.groupBy({
-    by: ["plan"],
-    where: {
-      startDate: {
-        gte: firstDayOfMonth,
-        lte: lastDayOfMonth,
-      },
-    },
-    _sum: {
-      price: true,
-    },
-    _count: {
-      id: true,
-    },
-  });
-
-  // Trier les plans par revenu (du plus élevé au plus bas)
-  const planBreakdown = subscriptionsByPlan
-    .map((plan: SubscriptionGroupByPlan) => ({
-      name: plan.plan,
-      revenue: Number(plan._sum.price) || 0,
-      count: plan._count.id,
+  const planBreakdown: PlanBreakdown[] = data.subscriptionsByPlan
+    .map((plan) => ({
+      name: plan.name,
+      revenue: plan.revenue,
+      count: plan.count,
       percentage:
         totalRevenueThisMonth > 0
-          ? (Number(plan._sum.price) / totalRevenueThisMonth) * 100
+          ? (plan.revenue / totalRevenueThisMonth) * 100
           : 0,
     }))
     .sort((a, b) => b.revenue - a.revenue);
@@ -299,11 +299,11 @@ export default async function RevenueSection() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {currentMonthSubscriptions.length}
+              {data.currentMonthSubscriptions.length}
             </div>
             <div className="flex items-center pt-1">
-              {currentMonthSubscriptions.length -
-                prevMonthSubscriptions.length >=
+              {data.currentMonthSubscriptions.length -
+                data.prevMonthSubscriptions.length >=
               0 ? (
                 <IconArrowUpRight className="mr-1 h-4 w-4 text-green-500" />
               ) : (
@@ -311,16 +311,16 @@ export default async function RevenueSection() {
               )}
               <Badge
                 variant={
-                  currentMonthSubscriptions.length -
-                    prevMonthSubscriptions.length >=
+                  data.currentMonthSubscriptions.length -
+                    data.prevMonthSubscriptions.length >=
                   0
                     ? "outline"
                     : "destructive"
                 }
               >
                 {Math.abs(
-                  currentMonthSubscriptions.length -
-                    prevMonthSubscriptions.length
+                  data.currentMonthSubscriptions.length -
+                    data.prevMonthSubscriptions.length
                 )}
               </Badge>
               <span className="text-xs text-muted-foreground ml-2">

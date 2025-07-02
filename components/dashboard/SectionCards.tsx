@@ -1,5 +1,8 @@
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
-import { Badge } from "@/components/ui/badge"
+"use client";
+
+import { useState, useEffect } from "react";
+import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardAction,
@@ -7,120 +10,113 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { prisma } from "@/lib/prisma"
-import { formatCurrency } from "@/lib/utils"
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatCurrency } from "@/lib/utils";
 
-// This is now a server component (no 'use client' directive)
-export default async function SectionCards() {
-  // Get the current month's date range
-  const now = new Date()
-  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-  const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+type DashboardData = {
+  currentMonthSubscriptions: { price: number }[];
+  previousMonthSubscriptions: { price: number }[];
+  newCustomers: number;
+  previousMonthNewCustomers: number;
+  activeSubscriptions: number;
+  previousMonthActiveSubscriptions: number;
+};
 
-  // Get the previous month's date range for comparison
-  const firstDayOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-  const lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
+export default function SectionCards() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Get total revenue for current month
-  const currentMonthSubscriptions = await prisma.subscription.findMany({
-    where: {
-      startDate: {
-        gte: firstDayOfMonth,
-        lte: lastDayOfMonth,
-      },
-    },
-    select: {
-      price: true,
-    },
-  })
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await fetch("/api/dashboard-cards");
+        if (!response.ok) {
+          throw new Error("Failed to fetch dashboard data");
+        }
+        const dashboardData = await response.json();
+        setData(dashboardData);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const totalRevenue = currentMonthSubscriptions.reduce(
-    (sum, subscription) => sum + Number(subscription.price),
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i} className="@container/card">
+            <CardHeader>
+              <CardDescription>
+                <Skeleton className="h-4 w-24" />
+              </CardDescription>
+              <CardTitle>
+                <Skeleton className="h-8 w-32" />
+              </CardTitle>
+              <CardAction>
+                <Skeleton className="h-6 w-16" />
+              </CardAction>
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-4 w-32" />
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="px-4 lg:px-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-red-500">Error</CardTitle>
+            <CardDescription>{error}</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const now = new Date();
+
+  // Calculate metrics
+  const totalRevenue = data.currentMonthSubscriptions.reduce(
+    (sum, subscription) => sum + subscription.price,
     0
-  )
+  );
 
-  // Get total revenue for previous month for comparison
-  const previousMonthSubscriptions = await prisma.subscription.findMany({
-    where: {
-      startDate: {
-        gte: firstDayOfLastMonth,
-        lte: lastDayOfLastMonth,
-      },
-    },
-    select: {
-      price: true,
-    },
-  })
-
-  const previousMonthRevenue = previousMonthSubscriptions.reduce(
-    (sum, subscription) => sum + Number(subscription.price),
+  const previousMonthRevenue = data.previousMonthSubscriptions.reduce(
+    (sum, subscription) => sum + subscription.price,
     0
-  )
+  );
 
-  // Calculate revenue growth percentage
   const revenueGrowth =
     previousMonthRevenue > 0
       ? ((totalRevenue - previousMonthRevenue) / previousMonthRevenue) * 100
-      : 100
+      : 100;
 
-  // Get new customers (adherents) this month
-  const newCustomers = await prisma.adherent.count({
-    where: {
-      createdAt: {
-        gte: firstDayOfMonth,
-        lte: lastDayOfMonth,
-      },
-    },
-  })
-
-  // Get new customers from previous month
-  const previousMonthNewCustomers = await prisma.adherent.count({
-    where: {
-      createdAt: {
-        gte: firstDayOfLastMonth,
-        lte: lastDayOfLastMonth,
-      },
-    },
-  })
-
-  // Calculate customer growth percentage
   const customerGrowth =
-    previousMonthNewCustomers > 0
-      ? ((newCustomers - previousMonthNewCustomers) / previousMonthNewCustomers) * 100
-      : 100
+    data.previousMonthNewCustomers > 0
+      ? ((data.newCustomers - data.previousMonthNewCustomers) / data.previousMonthNewCustomers) * 100
+      : 100;
 
-  // Get active subscriptions count
-  const activeSubscriptions = await prisma.subscription.count({
-    where: {
-      status: "actif",
-      endDate: {
-        gte: now,
-      },
-    },
-  })
-
-  // Get active subscriptions from last month
-  const previousMonthActiveSubscriptions = await prisma.subscription.count({
-    where: {
-      status: "actif",
-      endDate: {
-        gte: lastDayOfLastMonth,
-      },
-      startDate: {
-        lte: lastDayOfLastMonth,
-      },
-    },
-  })
-
-  // Calculate active accounts growth
   const activeAccountsGrowth =
-    previousMonthActiveSubscriptions > 0
-      ? ((activeSubscriptions - previousMonthActiveSubscriptions) / previousMonthActiveSubscriptions) * 100
-      : 100
+    data.previousMonthActiveSubscriptions > 0
+      ? ((data.activeSubscriptions - data.previousMonthActiveSubscriptions) / data.previousMonthActiveSubscriptions) * 100
+      : 100;
 
-  // Calculate overall growth rate based on revenue and customers
-  const growthRate = (revenueGrowth + customerGrowth) / 2
+  const growthRate = (revenueGrowth + customerGrowth) / 2;
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
@@ -152,11 +148,12 @@ export default async function SectionCards() {
           </div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>New Members</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {newCustomers}
+            {data.newCustomers}
           </CardTitle>
           <CardAction>
             <Badge variant={customerGrowth >= 0 ? "outline" : "destructive"}>
@@ -182,11 +179,12 @@ export default async function SectionCards() {
           </div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Active Memberships</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {activeSubscriptions}
+            {data.activeSubscriptions}
           </CardTitle>
           <CardAction>
             <Badge variant={activeAccountsGrowth >= 0 ? "outline" : "destructive"}>
@@ -213,6 +211,7 @@ export default async function SectionCards() {
           </div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Growth Rate</CardDescription>
@@ -243,5 +242,5 @@ export default async function SectionCards() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
