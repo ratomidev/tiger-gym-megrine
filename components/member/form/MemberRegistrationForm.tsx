@@ -58,7 +58,9 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [showCamera, setShowCamera] = useState(false);
+  const [, setShowCamera] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -152,13 +154,13 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
   const startCamera = async () => {
     try {
       setCameraError(null);
-      
+
       // Check if we're in the browser and navigator is available
-      if (typeof window === 'undefined' || !navigator.mediaDevices) {
+      if (typeof window === "undefined" || !navigator.mediaDevices) {
         setCameraError("Caméra non disponible dans cet environnement");
         return;
       }
-      
+
       const constraints = {
         video: {
           facingMode: facingMode,
@@ -223,33 +225,43 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
         // Draw video frame to canvas
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Convert canvas to blob
-        canvas.toBlob(
-          async (blob) => {
-            if (blob) {
-              const file = new File([blob], `photo-${Date.now()}.jpg`, {
-                type: "image/jpeg",
-              });
-
-              // Show preview immediately
-              setPhotoPreview(canvas.toDataURL("image/jpeg"));
-              stopCamera();
-
-              // Upload to blob storage
-              const uploadedUrl = await uploadPhoto(file);
-              if (uploadedUrl) {
-                setPhotoUrl(uploadedUrl);
-                toast.success("Photo capturée et téléchargée avec succès!");
-              } else {
-                setPhotoPreview(null);
-              }
-            }
-          },
-          "image/jpeg",
-          0.8
-        );
+        // Store captured photo without uploading yet
+        const capturedDataUrl = canvas.toDataURL("image/jpeg", 0.8);
+        setCapturedPhoto(capturedDataUrl);
+        stopCamera();
       }
     }
+  };
+
+  const retakePhoto = () => {
+    setCapturedPhoto(null);
+    startCamera();
+  };
+
+  const finishPhoto = async () => {
+    if (capturedPhoto) {
+      // Convert dataURL to blob and upload
+      const response = await fetch(capturedPhoto);
+      const blob = await response.blob();
+      const file = new File([blob], `photo-${Date.now()}.jpg`, {
+        type: "image/jpeg",
+      });
+
+      // Show preview immediately
+      setPhotoPreview(capturedPhoto);
+
+      // Upload to blob storage
+      const uploadedUrl = await uploadPhoto(file);
+      if (uploadedUrl) {
+        setPhotoUrl(uploadedUrl);
+        toast.success("Photo capturée et téléchargée avec succès!");
+      } else {
+        setPhotoPreview(null);
+      }
+    }
+
+    setCapturedPhoto(null);
+    setShowPhotoModal(false);
   };
 
   const removePhoto = async () => {
@@ -276,65 +288,184 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
     }
   };
 
+  const openPhotoModal = () => {
+    setShowPhotoModal(true);
+    // Auto-start camera when modal opens
+    setTimeout(() => {
+      startCamera();
+    }, 100);
+  };
+
+  const closePhotoModal = () => {
+    setShowPhotoModal(false);
+    setCapturedPhoto(null);
+    stopCamera();
+  };
+
   return (
     <div className="space-y-6">
-      {/* Camera Modal */}
-      <Dialog open={showCamera} onOpenChange={setShowCamera}>
-        <DialogContent className="sm:max-w-md">
+      {/* Photo Modal */}
+      <Dialog open={showPhotoModal} onOpenChange={setShowPhotoModal}>
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Camera className="h-5 w-5" />
-              Prendre une photo
+            <DialogTitle className="flex items-center justify-center gap-2 text-xl">
+              <Camera className="h-6 w-6 text-blue-600" />
+              Ajouter une photo
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-6">
             {cameraError ? (
-              <div className="text-center py-8">
-                <p className="text-red-600 mb-4">{cameraError}</p>
-                <Button onClick={() => setShowCamera(false)} variant="outline">
-                  Fermer
-                </Button>
+              <div className="text-center py-12">
+                <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                  <Camera className="h-8 w-8 text-red-600" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Caméra indisponible
+                </h3>
+                <p className="text-red-600 mb-6 text-sm">{cameraError}</p>
+                <div className="flex gap-3 justify-center">
+                  <Button
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                    }}
+                    className="gap-2 bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Choisir dans la galerie
+                  </Button>
+                  <Button onClick={closePhotoModal} variant="outline">
+                    Fermer
+                  </Button>
+                </div>
               </div>
+            ) : capturedPhoto ? (
+              <>
+                {/* Captured Photo Preview */}
+                <div className="text-center">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Photo capturée
+                  </h3>
+                  <div className="relative bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl overflow-hidden shadow-lg mx-auto max-w-sm">
+                    <Image
+                      src={capturedPhoto}
+                      alt="Photo capturée"
+                      width={400}
+                      height={300}
+                      className="w-full h-80 object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons for Captured Photo */}
+                <div className="flex justify-center gap-4 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={retakePhoto}
+                    className="gap-2 min-w-[120px]"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Reprendre
+                  </Button>
+
+                  <Button
+                    type="button"
+                    onClick={finishPhoto}
+                    className="gap-2 bg-green-600 hover:bg-green-700 min-w-[120px]"
+                    disabled={isUploading}
+                  >
+                    {isUploading ? "Sauvegarde..." : "Terminer"}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={closePhotoModal}
+                    className="gap-2 min-w-[120px]"
+                  >
+                    <X className="h-4 w-4" />
+                    Annuler
+                  </Button>
+                </div>
+              </>
             ) : (
               <>
-                <div className="relative bg-black rounded-lg overflow-hidden">
+                {/* Camera Preview */}
+                <div className="relative bg-gradient-to-b from-gray-900 to-black rounded-xl overflow-hidden shadow-2xl">
                   <video
                     ref={videoRef}
-                    className="w-full h-64 object-cover"
+                    className="w-full h-80 object-cover"
                     autoPlay
                     playsInline
                     muted
                   />
                   <canvas ref={canvasRef} className="hidden" />
+
+                  {/* Camera overlay indicator */}
+                  <div className="absolute top-4 left-4">
+                    <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2">
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                      <span className="text-white text-xs font-medium">
+                        En direct
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Switch camera button overlay */}
+                  <div className="absolute top-4 right-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={switchCamera}
+                      className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70 h-10 w-10 p-0"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex justify-center gap-3">
+
+                {/* Action Buttons */}
+                <div className="flex justify-center gap-4 pt-2">
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
-                    onClick={switchCamera}
-                    className="gap-2"
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                    }}
+                    className="gap-2 min-w-[120px]"
                   >
-                    <RotateCcw className="h-4 w-4" />
-                    Changer
+                    <Upload className="h-4 w-4" />
+                    Galerie
                   </Button>
+
                   <Button
                     type="button"
                     onClick={capturePhoto}
-                    className="gap-2 bg-blue-600 hover:bg-blue-700"
+                    className="gap-2 bg-blue-600 hover:bg-blue-700 min-w-[120px] relative"
                   >
-                    <Camera className="h-4 w-4" />
+                    <div className="absolute inset-0 bg-white/20 rounded-md opacity-0 hover:opacity-100 transition-opacity"></div>
+                    <Camera className="h-5 w-5" />
                     Capturer
                   </Button>
+
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={stopCamera}
-                    className="gap-2"
+                    onClick={closePhotoModal}
+                    className="gap-2 min-w-[120px]"
                   >
                     <X className="h-4 w-4" />
                     Annuler
                   </Button>
+                </div>
+
+                {/* Instructions */}
+                <div className="text-center">
+                  <p className="text-sm text-gray-500">
+                    Positionnez votre visage dans le cadre et cliquez sur
+                    &quot;Capturer&quot;
+                  </p>
                 </div>
               </>
             )}
@@ -490,32 +621,24 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
         )}
 
         {/* Photo Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <div className="flex justify-center">
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            onChange={handlePhotoChange}
+            onChange={(e) => {
+              handlePhotoChange(e);
+              setShowPhotoModal(false);
+            }}
             className="hidden"
           />
 
           <Button
             type="button"
             variant="outline"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={openPhotoModal}
             className="gap-2"
             disabled={isUploading}
-          >
-            <Upload className="h-4 w-4" />
-            {isUploading ? "Téléchargement..." : "Choisir un fichier"}
-          </Button>
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={startCamera}
-            className="gap-2"
-            disabled={typeof window === 'undefined' || !navigator?.mediaDevices}
           >
             <Camera className="h-4 w-4" />
             Prendre une photo
