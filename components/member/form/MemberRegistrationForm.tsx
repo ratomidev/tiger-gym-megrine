@@ -306,16 +306,16 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
     <div className="space-y-6">
       {/* Photo Modal */}
       <Dialog open={showPhotoModal} onOpenChange={setShowPhotoModal}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-lg md:max-w-2xl w-full h-full sm:h-auto max-h-screen sm:max-h-[90vh] p-0 sm:p-6 flex flex-col">
+          <DialogHeader className="px-4 pt-4 sm:px-0 sm:pt-0 flex-shrink-0">
             <DialogTitle className="flex items-center justify-center gap-2 text-xl">
               <Camera className="h-6 w-6 text-blue-600" />
               Ajouter une photo
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-6">
+          <div className="flex-1 flex flex-col px-4 pb-4 sm:px-0 sm:pb-0 space-y-4 sm:space-y-6 overflow-hidden">
             {cameraError ? (
-              <div className="text-center py-12">
+              <div className="text-center py-8 sm:py-12 flex-1 flex flex-col justify-center">
                 <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
                   <Camera className="h-8 w-8 text-red-600" />
                 </div>
@@ -339,30 +339,30 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
                 </div>
               </div>
             ) : capturedPhoto ? (
-              <>
+              <div className="flex-1 flex flex-col">
                 {/* Captured Photo Preview */}
-                <div className="text-center">
+                <div className="text-center flex-1 flex flex-col justify-center">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Photo capturée
                   </h3>
-                  <div className="relative bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl overflow-hidden shadow-lg mx-auto max-w-sm">
+                  <div className="relative bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl overflow-hidden shadow-lg mx-auto w-full max-w-sm sm:max-w-md">
                     <Image
                       src={capturedPhoto}
                       alt="Photo capturée"
                       width={400}
                       height={300}
-                      className="w-full h-80 object-cover"
+                      className="w-full h-64 sm:h-80 object-cover"
                     />
                   </div>
                 </div>
 
                 {/* Action Buttons for Captured Photo */}
-                <div className="flex justify-center gap-4 pt-2">
+                <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 pt-4 sm:pt-2 flex-shrink-0">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={retakePhoto}
-                    className="gap-2 min-w-[120px]"
+                    className="gap-2 w-full sm:w-auto sm:min-w-[120px]"
                   >
                     <RotateCcw className="h-4 w-4" />
                     Reprendre
@@ -371,7 +371,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
                   <Button
                     type="button"
                     onClick={finishPhoto}
-                    className="gap-2 bg-green-600 hover:bg-green-700 min-w-[120px]"
+                    className="gap-2 bg-green-600 hover:bg-green-700 w-full sm:w-auto sm:min-w-[120px]"
                     disabled={isUploading}
                   >
                     {isUploading ? "Sauvegarde..." : "Terminer"}
@@ -381,20 +381,20 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
                     type="button"
                     variant="outline"
                     onClick={closePhotoModal}
-                    className="gap-2 min-w-[120px]"
+                    className="gap-2 w-full sm:w-auto sm:min-w-[120px]"
                   >
                     <X className="h-4 w-4" />
                     Annuler
                   </Button>
                 </div>
-              </>
+              </div>
             ) : (
-              <>
+              <div className="flex-1 flex flex-col">
                 {/* Camera Preview */}
-                <div className="relative bg-gradient-to-b from-gray-900 to-black rounded-xl overflow-hidden shadow-2xl">
+                <div className="relative bg-gradient-to-b from-gray-900 to-black rounded-xl sm:rounded-xl overflow-hidden shadow-2xl flex-1 sm:flex-none">
                   <video
                     ref={videoRef}
-                    className="w-full h-80 object-cover"
+                    className="w-full h-full sm:h-80 object-cover"
                     autoPlay
                     playsInline
                     muted
@@ -402,8 +402,8 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
                   <canvas ref={canvasRef} className="hidden" />
 
                   {/* Camera overlay indicator */}
-                  <div className="absolute top-4 left-4">
-                    <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2">
+                  <div className="absolute top-2 sm:top-4 left-2 sm:left-4">
+                    <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-lg px-2 sm:px-3 py-1 sm:py-2">
                       <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                       <span className="text-white text-xs font-medium">
                         En direct
@@ -412,21 +412,33 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
                   </div>
 
                   {/* Switch camera button overlay */}
-                  <div className="absolute top-4 right-4">
+                  <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={switchCamera}
-                      className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70 h-10 w-10 p-0"
+                      className="bg-black/50 backdrop-blur-sm border-white/20 text-white hover:bg-black/70 h-8 w-8 sm:h-10 sm:w-10 p-0"
                     >
-                      <RotateCcw className="h-4 w-4" />
+                      <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                  </div>
+
+                  {/* Mobile capture button overlay */}
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 sm:hidden">
+                    <Button
+                      type="button"
+                      onClick={capturePhoto}
+                      size="lg"
+                      className="h-16 w-16 rounded-full bg-white/90 hover:bg-white text-gray-900 hover:text-gray-900 p-0 shadow-lg"
+                    >
+                      <Camera className="h-8 w-8" />
                     </Button>
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex justify-center gap-4 pt-2">
+                {/* Desktop Action Buttons */}
+                <div className="hidden sm:flex justify-center gap-4 pt-2 flex-shrink-0">
                   <Button
                     type="button"
                     variant="outline"
@@ -460,14 +472,39 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
                   </Button>
                 </div>
 
+                {/* Mobile Action Buttons */}
+                <div className="flex sm:hidden justify-center gap-3 pt-4 flex-shrink-0">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                    }}
+                    className="gap-2 flex-1"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Galerie
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={closePhotoModal}
+                    className="gap-2 flex-1"
+                  >
+                    <X className="h-4 w-4" />
+                    Annuler
+                  </Button>
+                </div>
+
                 {/* Instructions */}
-                <div className="text-center">
-                  <p className="text-sm text-gray-500">
+                <div className="text-center pt-2 sm:pt-4 flex-shrink-0">
+                  <p className="text-xs sm:text-sm text-gray-500">
                     Positionnez votre visage dans le cadre et cliquez sur
                     &quot;Capturer&quot;
                   </p>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </DialogContent>
