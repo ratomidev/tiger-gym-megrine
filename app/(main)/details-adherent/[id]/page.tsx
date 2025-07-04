@@ -128,6 +128,24 @@ export default function DetailsAdherent() {
     setShowDeleteDialog(false);
   };
 
+  // Add this function to calculate remaining days
+  const calculateDaysRemaining = (endDateString: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset hours to get accurate day difference
+    const endDate = new Date(endDateString);
+    const diffTime = endDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // Update the getDaysRemainingStyle function to include dark theme variants
+  const getDaysRemainingStyle = (days: number) => {
+    if (days < 0) return "text-red-600 dark:text-red-400 font-medium";
+    if (days < 7) return "text-red-500 dark:text-red-400 font-medium";
+    if (days < 30) return "text-amber-500 dark:text-amber-400 font-medium";
+    return "text-emerald-600 dark:text-emerald-400 font-medium";
+  };
+
   if (loading) {
     return (
       <div className="w-full max-w-6xl mx-auto py-6 px-4 flex items-center justify-center min-h-[60vh]">
@@ -200,9 +218,9 @@ export default function DetailsAdherent() {
       <div className="grid md:grid-cols-2 gap-8">
         {/* Personal Info Card */}
         <Card className="h-full flex flex-col">
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-2 border-gray-100">
+          <CardHeader className="pb-1 pt-4">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-14 w-14 border-2 border-gray-100">
                 {adherent.photoUrl ? (
                   <AvatarImage
                     src={adherent.photoUrl}
@@ -215,10 +233,10 @@ export default function DetailsAdherent() {
                 )}
               </Avatar>
               <div>
-                <CardTitle className="text-2xl">
+                <CardTitle className="text-xl">
                   {adherent.firstName} {adherent.lastName}
                 </CardTitle>
-                <CardDescription className="flex items-center gap-1 mt-1">
+                <CardDescription className="flex items-center gap-1 mt-0.5">
                   <span className="inline-flex items-center">
                     {adherent.sexe === "M" ? "Homme" : "Femme"}
                   </span>
@@ -231,12 +249,12 @@ export default function DetailsAdherent() {
             </div>
           </CardHeader>
 
-          <CardContent className="flex-1">
-            <h3 className="text-lg font-semibold mb-6 pb-2 border-b">
+          <CardContent className="flex-1 pt-2">
+            <h3 className="text-base font-semibold mb-3 pb-1 border-b">
               Informations personnelles
             </h3>
-            <div className="grid grid-cols-1 gap-6">
-              <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
+            <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-[24px_1fr] gap-2 items-start">
                 <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="font-medium">Email</p>
@@ -244,7 +262,7 @@ export default function DetailsAdherent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
+              <div className="grid grid-cols-[24px_1fr] gap-2 items-start">
                 <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="font-medium">Téléphone</p>
@@ -252,7 +270,7 @@ export default function DetailsAdherent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
+              <div className="grid grid-cols-[24px_1fr] gap-2 items-start">
                 <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="font-medium">Adresse</p>
@@ -260,7 +278,7 @@ export default function DetailsAdherent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
+              <div className="grid grid-cols-[24px_1fr] gap-2 items-start">
                 <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="font-medium">Date de naissance</p>
@@ -275,7 +293,7 @@ export default function DetailsAdherent() {
 
         {/* Subscription Card */}
         <Card className="h-full flex flex-col">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-1 pt-4">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl">Abonnement</CardTitle>
               {adherent.subscription && (
@@ -303,16 +321,16 @@ export default function DetailsAdherent() {
             </div>
           </CardHeader>
 
-          <CardContent className="flex-1">
+          <CardContent className="flex-1 pt-2">
             {adherent.subscription ? (
               <div className="h-full flex flex-col">
                 {/* Plan Information Section */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-4 pb-2 border-b">
+                <div className="mb-4">
+                  <h3 className="text-base font-semibold mb-3 pb-1 border-b">
                     Détails de l&apos;abonnement
                   </h3>
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="grid grid-cols-[24px_1fr] gap-2 items-start">
                       <CreditCard className="h-5 w-5 text-gray-500 mt-0.5" />
                       <div>
                         <p className="font-medium">Plan</p>
@@ -322,7 +340,7 @@ export default function DetailsAdherent() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-[24px_1fr] gap-3 items-start">
+                    <div className="grid grid-cols-[24px_1fr] gap-2 items-start">
                       <div className="h-5 w-5 flex items-center justify-center bg-gray-100 rounded-full">
                         <span className="text-xs font-bold text-gray-600">
                           DT
@@ -346,37 +364,77 @@ export default function DetailsAdherent() {
                 </div>
 
                 {/* Time Period Section */}
-                <div className="mb-6">
-                  <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
                     Période d&apos;abonnement
                   </h4>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                           Date de début
                         </p>
-                        <p className="font-medium">
+                        <p className="font-medium text-gray-700 dark:text-gray-200">
                           {formatDate(
                             adherent.subscription.startDate.toString()
                           )}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                           Date d&apos;expiration
                         </p>
-                        <p className="font-medium">
+                        <p className="font-medium text-gray-700 dark:text-gray-200">
                           {formatDate(adherent.subscription.endDate.toString())}
                         </p>
                       </div>
                     </div>
+
+                    {/* Remaining days indicator with dark theme support */}
+                    {adherent.subscription.status.toLowerCase() === "actif" && (
+                      <div className="mt-2 pt-1.5 border-t border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-center">
+                          {(() => {
+                            const daysRemaining = calculateDaysRemaining(
+                              adherent.subscription.endDate.toString()
+                            );
+                            const style = getDaysRemainingStyle(daysRemaining);
+
+                            if (daysRemaining < 0) {
+                              return (
+                                <p className={style}>
+                                  Expiré depuis {Math.abs(daysRemaining)} jours
+                                </p>
+                              );
+                            } else if (daysRemaining === 0) {
+                              return (
+                                <p className="text-red-600 dark:text-red-400 font-medium">
+                                  Expire aujourd'hui
+                                </p>
+                              );
+                            } else if (daysRemaining === 1) {
+                              return (
+                                <p className="text-red-500 dark:text-red-400 font-medium">
+                                  Expire demain
+                                </p>
+                              );
+                            } else {
+                              return (
+                                <p className={style}>
+                                  {daysRemaining} jours restants
+                                </p>
+                              );
+                            }
+                          })()}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Options Section */}
-                <div className="pt-3 border-t mt-auto">
-                  <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">
+                <div className="pt-2 border-t mt-auto">
+                  <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-2">
                     Options incluses
                   </h4>
                   <div className="flex flex-wrap gap-2">
@@ -400,7 +458,7 @@ export default function DetailsAdherent() {
                 </div>
               </div>
             ) : (
-              <div className="py-8 px-6 bg-gray-50 rounded-md text-center h-full flex flex-col justify-center">
+              <div className="py-6 px-4 bg-gray-50 rounded-md text-center h-full flex flex-col justify-center">
                 <p className="text-gray-500">Aucun abonnement actif</p>
                 <Link
                   href={`/add-subscription/${adherent.id}`}
