@@ -49,7 +49,10 @@ interface AdherentRegistrationFormProps {
   onUploadStateChange?: (isUploading: boolean) => void;
 }
 
-const AdherentRegistrationForm = forwardRef<AdherentFormRef, AdherentRegistrationFormProps>((props, ref) => {
+const AdherentRegistrationForm = forwardRef<
+  AdherentFormRef,
+  AdherentRegistrationFormProps
+>((props, ref) => {
   const { onUploadStateChange } = props;
   const {
     register,
@@ -110,7 +113,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef, AdherentRegistratio
     try {
       setIsUploading(true);
       onUploadStateChange?.(true);
-      
+
       const formData = new FormData();
       formData.append("photo", file);
 

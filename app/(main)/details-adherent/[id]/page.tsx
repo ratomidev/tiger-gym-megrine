@@ -20,7 +20,16 @@ import Link from "next/link";
 
 // Import the new DeleteAdherentDialog component
 import DeleteAdherentDialog from "@/components/member/table/DeleteAdherentDialog";
-import { Calendar, CreditCard, Edit, Mail, MapPin, Phone, Trash } from "lucide-react";
+import AddSubscriptionModal from "@/components/subscription/AddSubscriptionModal";
+import {
+  Calendar,
+  CreditCard,
+  Edit,
+  Mail,
+  MapPin,
+  Phone,
+  Trash,
+} from "lucide-react";
 
 export default function DetailsAdherent() {
   const params = useParams();
@@ -31,6 +40,8 @@ export default function DetailsAdherent() {
   const [error, setError] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showAddSubscriptionModal, setShowAddSubscriptionModal] =
+    useState(false);
 
   useEffect(() => {
     const fetchAdherent = async () => {
@@ -128,6 +139,24 @@ export default function DetailsAdherent() {
     setShowDeleteDialog(false);
   };
 
+  const handleAddSubscriptionSuccess = () => {
+    // Refresh the adherent data
+    if (id) {
+      const fetchAdherent = async () => {
+        try {
+          const response = await fetch(`/api/adherents/${id}`);
+          const data = await response.json();
+          if (data.success && data.adherent) {
+            setAdherent(data.adherent);
+          }
+        } catch (err) {
+          console.error("Error refreshing adherent data:", err);
+        }
+      };
+      fetchAdherent();
+    }
+  };
+
   // Add this function to calculate remaining days
   const calculateDaysRemaining = (endDateString: string) => {
     const today = new Date();
@@ -182,6 +211,17 @@ export default function DetailsAdherent() {
   return (
     <div className="w-full max-w-6xl mx-auto py-6 px-4">
       <Toaster position="top-right" className="rounded-md" />
+
+      {/* Add Subscription Modal */}
+      {adherent && (
+        <AddSubscriptionModal
+          open={showAddSubscriptionModal}
+          onOpenChange={setShowAddSubscriptionModal}
+          adherentId={adherent.id}
+          adherentName={`${adherent.firstName} ${adherent.lastName}`}
+          onSuccess={handleAddSubscriptionSuccess}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <DeleteAdherentDialog
@@ -354,7 +394,8 @@ export default function DetailsAdherent() {
                           </p>
                           {adherent.subscription.remaining > 0 && (
                             <span className="text-amber-600 text-sm font-medium">
-                              (Reste: {adherent.subscription.remaining} DT à payer)
+                              (Reste: {adherent.subscription.remaining} DT à
+                              payer)
                             </span>
                           )}
                         </div>
@@ -460,12 +501,13 @@ export default function DetailsAdherent() {
             ) : (
               <div className="py-6 px-4 bg-gray-50 rounded-md text-center h-full flex flex-col justify-center">
                 <p className="text-gray-500">Aucun abonnement actif</p>
-                <Link
-                  href={`/add-subscription/${adherent.id}`}
-                  className="mt-4 inline-block"
+                <Button
+                  size="sm"
+                  onClick={() => setShowAddSubscriptionModal(true)}
+                  className="mt-4"
                 >
-                  <Button size="sm">Ajouter un abonnement</Button>
-                </Link>
+                  Ajouter un abonnement
+                </Button>
               </div>
             )}
           </CardContent>
