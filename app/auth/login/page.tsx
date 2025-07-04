@@ -79,7 +79,7 @@ function LoginForm() {
    */
   const handleAuthSuccess = (user: User) => {
     login(user);
-    toast.success("Bon retour ! " + (user.name || user.email));
+    toast.success(`Connexion réussie, Bienvenue ${user.name || user.email} !`);
 
     // Delay navigation to allow toast to be seen
     setTimeout(() => {
@@ -96,7 +96,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="container flex items-center justify-center min-h-screen">
+    <div className="container flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Tiger Gym Dashboard</h1>
@@ -105,7 +105,7 @@ function LoginForm() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 px-2">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -117,6 +117,7 @@ function LoginForm() {
               required
               autoComplete="email"
               disabled={isProcessing}
+              className="h-11 text-base"
             />
           </div>
 
@@ -133,11 +134,23 @@ function LoginForm() {
               required
               autoComplete="current-password"
               disabled={isProcessing}
+              className="h-11 text-base"
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={isProcessing}>
-            {isProcessing ? "Connexion en cours..." : "Se connecter"}
+          <Button
+            type="submit"
+            className="w-full h-11 text-base font-medium"
+            disabled={isProcessing}
+          >
+            {isProcessing ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Connexion en cours...</span>
+              </div>
+            ) : (
+              "Se connecter"
+            )}
           </Button>
         </form>
       </div>
@@ -149,7 +162,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={<div>Chargement...</div>}>
       <LoginForm />
-      <Toaster position="top-center" />
+      <Toaster position="top-right" />
     </Suspense>
   );
 }

@@ -130,7 +130,7 @@ export default function RegisterPage() {
 
             <CardFooter className="flex justify-end space-x-4 pt-2 pb-6">
               <Button
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-black hover:bg-black text-white"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
               >

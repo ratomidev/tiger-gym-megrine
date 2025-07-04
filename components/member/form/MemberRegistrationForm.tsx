@@ -45,7 +45,15 @@ export interface AdherentFormRef {
   validateAndGetValues: () => Promise<AdherentFormValues | null>;
 }
 
-const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
+interface AdherentRegistrationFormProps {
+  onUploadStateChange?: (isUploading: boolean) => void;
+}
+
+const AdherentRegistrationForm = forwardRef<
+  AdherentFormRef,
+  AdherentRegistrationFormProps
+>((props, ref) => {
+  const { onUploadStateChange } = props;
   const {
     register,
     handleSubmit,
@@ -104,6 +112,8 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
   const uploadPhoto = async (file: File): Promise<string | null> => {
     try {
       setIsUploading(true);
+      onUploadStateChange?.(true);
+
       const formData = new FormData();
       formData.append("photo", file);
 
@@ -125,6 +135,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
       return null;
     } finally {
       setIsUploading(false);
+      onUploadStateChange?.(false);
     }
   };
 
