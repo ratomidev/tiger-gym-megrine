@@ -59,13 +59,6 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
     const watchedPrice = watch("price");
     const watchedRemaining = watch("remaining");
 
-    // Calculate remaining amount
-    const calculateRemaining = (newRemaining: number) => {
-      if (newRemaining > watchedPrice) {
-        setValue("remaining", watchedPrice);
-      }
-    };
-
     const calculateEndDate = (plan: string, start: Date) => {
       switch (plan) {
         case "1 mois":
