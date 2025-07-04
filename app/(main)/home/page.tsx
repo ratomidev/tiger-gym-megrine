@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import RevenueSection from "@/components/dashboard/RevenueSection";
 import AdherentOverviewSection from "@/components/dashboard/AdherentOverviewSection";
 
