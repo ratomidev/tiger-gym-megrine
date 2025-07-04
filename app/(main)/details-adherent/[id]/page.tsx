@@ -330,9 +330,16 @@ export default function DetailsAdherent() {
                       </div>
                       <div>
                         <p className="font-medium">Prix</p>
-                        <p className="text-gray-600">
-                          {adherent.subscription.price} DT
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-gray-600">
+                            {adherent.subscription.price} DT
+                          </p>
+                          {adherent.subscription.remaining > 0 && (
+                            <span className="text-amber-600 text-sm font-medium">
+                              (Reste: {adherent.subscription.remaining} DT à payer)
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
