@@ -8,22 +8,12 @@ import React, {
 } from "react";
 import { useForm } from "react-hook-form";
 import { format, addMonths, addYears } from "date-fns";
-import { fr } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
 
 import { SubscriptionFormValues } from "@/types/subscription";
-import { cn } from "@/lib/utils";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -43,8 +33,12 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
     const today = new Date();
     const nextMonth = addMonths(today, 1);
 
-    const [, setFormattedStartDate] = useState(format(today, "yyyy-MM-dd"));
-    const [, setFormattedEndDate] = useState(format(nextMonth, "yyyy-MM-dd"));
+    const [formattedStartDate, setFormattedStartDate] = useState(
+      format(today, "yyyy-MM-dd")
+    );
+    const [formattedEndDate, setFormattedEndDate] = useState(
+      format(nextMonth, "yyyy-MM-dd")
+    );
 
     const {
       register,
@@ -92,20 +86,21 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
     // === Handlers ===
     const handlePlanChange = (value: string) => {
       setValue("plan", value);
-      updateEndDate(value, new Date(watch("startDate")));
+      updateEndDate(value, new Date(formattedStartDate));
     };
 
-    const handleStartDateChange = (date?: Date) => {
-      if (!date) return;
-      setFormattedStartDate(format(date, "yyyy-MM-dd"));
+    const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const dateStr = e.target.value;
+      setFormattedStartDate(dateStr);
+      const date = new Date(dateStr);
       setValue("startDate", date);
       updateEndDate(watch("plan"), date);
     };
 
-    const handleEndDateChange = (date?: Date) => {
-      if (!date) return;
-      setFormattedEndDate(format(date, "yyyy-MM-dd"));
-      setValue("endDate", date);
+    const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const dateStr = e.target.value;
+      setFormattedEndDate(dateStr);
+      setValue("endDate", new Date(dateStr));
     };
 
     // === Effect: Initialize end date on mount ===
@@ -176,31 +171,13 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
           {/* Start Date */}
           <div className="space-y-2">
             <Label htmlFor="startDate">Date de Début</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal border-gray-200 focus:border-gray-400 transition-colors",
-                    !watch("startDate") && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {watch("startDate")
-                    ? format(watch("startDate"), "PPP", { locale: fr })
-                    : "Sélectionner une date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={watch("startDate")}
-                  onSelect={handleStartDateChange}
-                  initialFocus
-                  locale={fr}
-                />
-              </PopoverContent>
-            </Popover>
+            <Input
+              id="startDate"
+              type="date"
+              value={formattedStartDate}
+              onChange={handleStartDateChange}
+              className="border-gray-200 focus:border-gray-400 transition-colors"
+            />
             {errors.startDate && (
               <p className="text-red-500 text-sm">{errors.startDate.message}</p>
             )}
@@ -209,37 +186,14 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
           {/* End Date */}
           <div className="space-y-2">
             <Label htmlFor="endDate">Date de Fin</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  disabled={watch("plan") !== "personnalisé"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal border-gray-200 focus:border-gray-400 transition-colors",
-                    !watch("endDate") && "text-muted-foreground",
-                    watch("plan") !== "personnalisé" &&
-                      "bg-gray-50 cursor-not-allowed"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {watch("endDate")
-                    ? format(watch("endDate"), "PPP", { locale: fr })
-                    : "Sélectionner une date"}
-                </Button>
-              </PopoverTrigger>
-              {watch("plan") === "personnalisé" && (
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={watch("endDate")}
-                    onSelect={handleEndDateChange}
-                    initialFocus
-                    locale={fr}
-                    disabled={(date) => date < watch("startDate")}
-                  />
-                </PopoverContent>
-              )}
-            </Popover>
+            <Input
+              id="endDate"
+              type="date"
+              value={formattedEndDate}
+              onChange={handleEndDateChange}
+              disabled={watch("plan") !== "personnalisé"}
+              className="border-gray-200 focus:border-gray-400 transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
+            />
             {errors.endDate && (
               <p className="text-red-500 text-sm">{errors.endDate.message}</p>
             )}

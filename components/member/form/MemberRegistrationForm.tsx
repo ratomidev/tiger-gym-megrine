@@ -10,6 +10,8 @@ import { useForm } from "react-hook-form";
 import { AdherentFormValues as BaseAdherentFormValues } from "@/types/adherent";
 import Image from "next/image";
 
+import { fr } from "date-fns/locale";
+
 // Extend the base type to include photoUrl
 interface AdherentFormValues extends BaseAdherentFormValues {
   photoUrl?: string;
@@ -17,6 +19,12 @@ interface AdherentFormValues extends BaseAdherentFormValues {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -30,7 +38,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Camera, Upload, RotateCcw, X } from "lucide-react";
+import { Camera, Upload, RotateCcw, X, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export interface AdherentFormRef {
@@ -42,6 +50,7 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<AdherentFormValues>({
     defaultValues: {
@@ -64,10 +73,14 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Watch the birthDate value
+  const birthDate = watch("birthDate");
 
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({
@@ -581,14 +594,50 @@ const AdherentRegistrationForm = forwardRef<AdherentFormRef>((props, ref) => {
         {/* Birth Date */}
         <div className="space-y-2">
           <Label htmlFor="birthDate">Date de Naissance</Label>
-          <Input
-            id="birthDate"
-            type="date"
-            {...register("birthDate", {
-              required: "La date de naissance est requise",
-            })}
-            className="border-gray-200 focus:border-gray-400 transition-colors"
-          />
+          <div className="flex gap-2">
+            <Input
+              id="birthDate"
+              type="date"
+              {...register("birthDate", {
+                required: "La date de naissance est requise",
+              })}
+              className="border-gray-200 focus:border-gray-400 transition-colors flex-1"
+            />
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="border-gray-200 focus:border-gray-400 transition-colors"
+                >
+                  <CalendarIcon className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={birthDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      setValue("birthDate", date);
+                      setCalendarOpen(false);
+                    }
+                  }}
+                  disabled={(date) =>
+                    date > new Date() || date < new Date("1900-01-01")
+                  }
+                  initialFocus
+                  locale={fr}
+                  defaultMonth={birthDate || new Date(1990, 0)}
+                  captionLayout="dropdown"
+                  fromYear={1900}
+                  toYear={new Date().getFullYear()}
+                  className="rounded-md border shadow-sm"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
           {errors.birthDate && (
             <p className="text-red-500 text-sm">{errors.birthDate.message}</p>
           )}
