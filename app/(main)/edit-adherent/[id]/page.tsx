@@ -28,7 +28,7 @@ interface FormData {
   birthDate: string;
   sexe: string;
   // Subscription fields
-  subscriptionDuration: string;
+  subscriptionPlan: string;
   subscriptionPrice: string;
   subscriptionStatus: string;
   subscriptionStartDate: string;
@@ -50,7 +50,7 @@ export default function EditAdherentPage() {
     Address: "",
     birthDate: "",
     sexe: "",
-    subscriptionDuration: "",
+    subscriptionPlan: "",
     subscriptionPrice: "",
     subscriptionStatus: "",
     subscriptionStartDate: "",
@@ -77,21 +77,6 @@ export default function EditAdherentPage() {
         if (data.success && data.adherent) {
           const adherent = data.adherent;
 
-          // Convert plan back to duration
-          let duration = "";
-          if (adherent.subscription?.plan) {
-            const plan = adherent.subscription.plan.toLowerCase();
-            if (plan.includes("1 an") || plan.includes("12 mois")) {
-              duration = "12";
-            } else if (plan.includes("6 mois")) {
-              duration = "6";
-            } else if (plan.includes("3 mois")) {
-              duration = "3";
-            } else if (plan.includes("1 mois")) {
-              duration = "1";
-            }
-          }
-
           setFormData({
             firstName: adherent.firstName || "",
             lastName: adherent.lastName || "",
@@ -102,7 +87,7 @@ export default function EditAdherentPage() {
               ? format(new Date(adherent.birthDate), "yyyy-MM-dd")
               : "",
             sexe: adherent.sexe || "",
-            subscriptionDuration: duration,
+            subscriptionPlan: adherent.subscription?.plan || "",
             subscriptionPrice: adherent.subscription?.price?.toString() || "",
             subscriptionStatus: adherent.subscription?.status || "",
             subscriptionStartDate: adherent.subscription?.startDate
@@ -133,6 +118,32 @@ export default function EditAdherentPage() {
     }
   }, [id]);
 
+  const calculateEndDate = (plan: string, startDate: string) => {
+    if (!startDate || !plan) return "";
+
+    const start = new Date(startDate);
+    const endDate = new Date(start);
+
+    switch (plan) {
+      case "1 mois":
+        endDate.setMonth(endDate.getMonth() + 1);
+        break;
+      case "3 mois":
+        endDate.setMonth(endDate.getMonth() + 3);
+        break;
+      case "6 mois":
+        endDate.setMonth(endDate.getMonth() + 6);
+        break;
+      case "1 an":
+        endDate.setFullYear(endDate.getFullYear() + 1);
+        break;
+      default:
+        return startDate;
+    }
+
+    return endDate.toISOString().split("T")[0];
+  };
+
   const handleInputChange = (
     field: keyof FormData,
     value: string | boolean
@@ -140,26 +151,17 @@ export default function EditAdherentPage() {
     setFormData((prev) => {
       const newForm = { ...prev, [field]: value };
 
-      // Auto-calculate end date based on start date and duration
+      // Auto-calculate end date based on start date and plan
       if (
-        (field === "subscriptionStartDate" ||
-          field === "subscriptionDuration") &&
+        (field === "subscriptionStartDate" || field === "subscriptionPlan") &&
         newForm.subscriptionStartDate &&
-        newForm.subscriptionDuration
+        newForm.subscriptionPlan &&
+        newForm.subscriptionPlan !== "personnalisé"
       ) {
-        const startDate = new Date(newForm.subscriptionStartDate);
-        const durationMonths = parseInt(newForm.subscriptionDuration);
-        if (!isNaN(durationMonths)) {
-          const endDate = new Date(startDate);
-          if (newForm.subscriptionDuration === "12") {
-            // For 1 year, add 1 year
-            endDate.setFullYear(endDate.getFullYear() + 1);
-          } else {
-            // For months, add the specified number of months
-            endDate.setMonth(endDate.getMonth() + durationMonths);
-          }
-          newForm.subscriptionEndDate = endDate.toISOString().split("T")[0];
-        }
+        newForm.subscriptionEndDate = calculateEndDate(
+          newForm.subscriptionPlan,
+          newForm.subscriptionStartDate
+        );
       }
 
       return newForm;
@@ -206,7 +208,7 @@ export default function EditAdherentPage() {
     }
 
     // Subscription validation (optional fields)
-    if (formData.subscriptionDuration && !formData.subscriptionPrice) {
+    if (formData.subscriptionPlan && !formData.subscriptionPrice) {
       newErrors.subscriptionPrice =
         "Le prix est requis si un plan est sélectionné";
     }
@@ -251,13 +253,7 @@ export default function EditAdherentPage() {
         Address: formData.Address,
         birthDate: formData.birthDate,
         sexe: formData.sexe,
-        subscriptionPlan: formData.subscriptionDuration
-          ? `${
-              formData.subscriptionDuration === "12"
-                ? "1 an"
-                : formData.subscriptionDuration + " mois"
-            }`
-          : "",
+        subscriptionPlan: formData.subscriptionPlan,
         subscriptionPrice: formData.subscriptionPrice,
         subscriptionStatus: formData.subscriptionStatus,
         subscriptionStartDate: formData.subscriptionStartDate,
@@ -475,30 +471,31 @@ export default function EditAdherentPage() {
         {/* Subscription Information Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Informations d&apos;abonnement</CardTitle>
+            <CardTitle>Détails de l&apos;Abonnement</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Subscription Duration */}
+                {/* Subscription Plan */}
                 <div className="space-y-2">
-                  <Label htmlFor="subscriptionDuration">
+                  <Label htmlFor="subscriptionPlan">
                     Type d&apos;abonnement
                   </Label>
                   <Select
-                    value={formData.subscriptionDuration}
+                    value={formData.subscriptionPlan}
                     onValueChange={(value) =>
-                      handleInputChange("subscriptionDuration", value)
+                      handleInputChange("subscriptionPlan", value)
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
                       <SelectValue placeholder="Sélectionner le type d'abonnement" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">1 mois</SelectItem>
-                      <SelectItem value="3">3 mois</SelectItem>
-                      <SelectItem value="6">6 mois</SelectItem>
-                      <SelectItem value="12">1 an</SelectItem>
+                      <SelectItem value="personnalisé">Personnalisé</SelectItem>
+                      <SelectItem value="1 mois">1 mois</SelectItem>
+                      <SelectItem value="3 mois">3 mois</SelectItem>
+                      <SelectItem value="6 mois">6 mois</SelectItem>
+                      <SelectItem value="1 an">1 an</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -509,37 +506,21 @@ export default function EditAdherentPage() {
                   <Input
                     id="subscriptionPrice"
                     type="number"
+                    step="0.01"
                     value={formData.subscriptionPrice}
                     onChange={(e) =>
                       handleInputChange("subscriptionPrice", e.target.value)
                     }
                     placeholder="0"
-                    className={errors.subscriptionPrice ? "border-red-500" : ""}
+                    className={`border-gray-200 focus:border-gray-400 transition-colors ${
+                      errors.subscriptionPrice ? "border-red-500" : ""
+                    }`}
                   />
                   {errors.subscriptionPrice && (
                     <p className="text-sm text-red-500">
                       {errors.subscriptionPrice}
                     </p>
                   )}
-                </div>
-
-                {/* Subscription Status */}
-                <div className="space-y-2">
-                  <Label htmlFor="subscriptionStatus">Statut</Label>
-                  <Select
-                    value={formData.subscriptionStatus}
-                    onValueChange={(value) =>
-                      handleInputChange("subscriptionStatus", value)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le statut" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="actif">Actif</SelectItem>
-                      <SelectItem value="expiré">Expiré</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
 
                 {/* Start Date */}
@@ -552,22 +533,57 @@ export default function EditAdherentPage() {
                     onChange={(e) =>
                       handleInputChange("subscriptionStartDate", e.target.value)
                     }
+                    className="border-gray-200 focus:border-gray-400 transition-colors"
                   />
                 </div>
 
                 {/* End Date */}
                 <div className="space-y-2">
                   <Label htmlFor="subscriptionEndDate">
-                    Date de fin (Calculée automatiquement)
+                    Date de fin
+                    {formData.subscriptionPlan !== "personnalisé" &&
+                      " (Calculée automatiquement)"}
                   </Label>
                   <Input
                     id="subscriptionEndDate"
                     type="date"
                     value={formData.subscriptionEndDate}
-                    readOnly
-                    className="bg-gray-50"
+                    onChange={(e) =>
+                      handleInputChange("subscriptionEndDate", e.target.value)
+                    }
+                    disabled={formData.subscriptionPlan !== "personnalisé"}
+                    className={`border-gray-200 focus:border-gray-400 transition-colors ${
+                      formData.subscriptionPlan !== "personnalisé"
+                        ? "bg-gray-50 disabled:cursor-not-allowed"
+                        : ""
+                    }`}
                   />
+                  {formData.subscriptionPlan !== "personnalisé" && (
+                    <p className="text-xs text-gray-500">
+                      Calculée automatiquement selon le type d&apos;abonnement
+                      et la date de début.
+                    </p>
+                  )}
                 </div>
+              </div>
+
+              {/* Subscription Status */}
+              <div className="space-y-2">
+                <Label htmlFor="subscriptionStatus">Statut</Label>
+                <Select
+                  value={formData.subscriptionStatus}
+                  onValueChange={(value) =>
+                    handleInputChange("subscriptionStatus", value)
+                  }
+                >
+                  <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
+                    <SelectValue placeholder="Sélectionner le statut" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="actif">Actif</SelectItem>
+                    <SelectItem value="expiré">Expiré</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Options */}
@@ -584,8 +600,12 @@ export default function EditAdherentPage() {
                           checked as boolean
                         )
                       }
+                      className="border-gray-300"
                     />
-                    <Label htmlFor="hasCardioMusculation">
+                    <Label
+                      htmlFor="hasCardioMusculation"
+                      className="text-sm font-medium leading-none"
+                    >
                       Cardio & Musculation
                     </Label>
                   </div>
@@ -596,8 +616,14 @@ export default function EditAdherentPage() {
                       onCheckedChange={(checked) =>
                         handleInputChange("hasCours", checked as boolean)
                       }
+                      className="border-gray-300"
                     />
-                    <Label htmlFor="hasCours">Cours collectifs</Label>
+                    <Label
+                      htmlFor="hasCours"
+                      className="text-sm font-medium leading-none"
+                    >
+                      Cours collectifs
+                    </Label>
                   </div>
                 </div>
               </div>
