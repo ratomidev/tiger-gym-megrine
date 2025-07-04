@@ -164,48 +164,53 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
             )}
           </div>
 
-          {/* Price */}
+          {/* Prix and Montant Restant combined in one column */}
           <div className="space-y-2">
-            <Label htmlFor="price">Prix</Label>
-            <Input
-              id="price"
-              type="number"
-              step="0.01"
-              {...register("price", {
-                required: "Le prix est requis",
-                min: { value: 0, message: "Le prix doit être positif" },
-              })}
-              placeholder="0.00"
-              className="border-gray-200 focus:border-gray-400 transition-colors"
-            />
-            {errors.price && (
-              <p className="text-red-500 text-sm">{errors.price.message}</p>
-            )}
-          </div>
+            <div className="flex gap-4">
+              {/* Prix */}
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="price">Prix</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  {...register("price", {
+                    required: "Le prix est requis",
+                    min: { value: 0, message: "Le prix doit être positif" },
+                  })}
+                  placeholder="0.00"
+                  className="border-gray-200 focus:border-gray-400 transition-colors"
+                />
+                {errors.price && (
+                  <p className="text-red-500 text-sm">{errors.price.message}</p>
+                )}
+              </div>
 
-          {/* New field: Remaining Amount */}
-          <div className="space-y-2">
-            <Label htmlFor="remaining">Montant Restant</Label>
-            <Input
-              id="remaining"
-              type="number"
-              step="0.01"
-              {...register("remaining", {
-                min: { value: 0, message: "Le montant restant ne peut pas être négatif" },
-                validate: value => {
-                  // Convert to number and handle undefined/null
-                  const numValue = value === undefined || value === null ? 0 : Number(value);
-                  return numValue <= watchedPrice || 
-                    "Le montant restant ne peut pas dépasser le prix total";
-                }
-              })}
-              placeholder="0.00"
-              className="border-gray-200 focus:border-gray-400 transition-colors"
-              max={watchedPrice}
-            />
-            {errors.remaining && (
-              <p className="text-red-500 text-sm">{errors.remaining.message}</p>
-            )}
+              {/* Montant Restant */}
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="remaining">Montant Restant</Label>
+                <Input
+                  id="remaining"
+                  type="number"
+                  step="0.01"
+                  {...register("remaining", {
+                    min: { value: 0, message: "Le montant restant ne peut pas être négatif" },
+                    validate: value => {
+                      // Convert to number and handle undefined/null
+                      const numValue = value === undefined || value === null ? 0 : Number(value);
+                      return numValue <= watchedPrice || 
+                        "Le montant restant ne peut pas dépasser le prix total";
+                    }
+                  })}
+                  placeholder="0.00"
+                  className="border-gray-200 focus:border-gray-400 transition-colors"
+                  max={watchedPrice}
+                />
+                {errors.remaining && (
+                  <p className="text-red-500 text-sm">{errors.remaining.message}</p>
+                )}
+              </div>
+            </div>
             <p className="text-xs text-gray-500">
               Montant restant à payer (0 = payé intégralement). Ne peut pas dépasser {watchedPrice} DT.
             </p>
