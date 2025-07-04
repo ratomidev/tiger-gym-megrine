@@ -30,6 +30,7 @@ interface FormData {
   // Subscription fields
   subscriptionPlan: string;
   subscriptionPrice: string;
+  subscriptionRemaining: string; // Add this new field
   subscriptionStatus: string;
   subscriptionStartDate: string;
   subscriptionEndDate: string;
@@ -52,6 +53,7 @@ export default function EditAdherentPage() {
     sexe: "",
     subscriptionPlan: "",
     subscriptionPrice: "",
+    subscriptionRemaining: "0", // Initialize with "0"
     subscriptionStatus: "",
     subscriptionStartDate: "",
     subscriptionEndDate: "",
@@ -89,6 +91,7 @@ export default function EditAdherentPage() {
             sexe: adherent.sexe || "",
             subscriptionPlan: adherent.subscription?.plan || "",
             subscriptionPrice: adherent.subscription?.price?.toString() || "",
+            subscriptionRemaining: adherent.subscription?.remaining?.toString() || "0",
             subscriptionStatus: adherent.subscription?.status || "",
             subscriptionStartDate: adherent.subscription?.startDate
               ? format(new Date(adherent.subscription.startDate), "yyyy-MM-dd")
@@ -229,6 +232,15 @@ export default function EditAdherentPage() {
       }
     }
 
+    if (
+      formData.subscriptionPrice &&
+      formData.subscriptionRemaining &&
+      Number(formData.subscriptionRemaining) > Number(formData.subscriptionPrice)
+    ) {
+      newErrors.subscriptionRemaining =
+        "Le montant restant ne peut pas dépasser le prix";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -255,6 +267,7 @@ export default function EditAdherentPage() {
         sexe: formData.sexe,
         subscriptionPlan: formData.subscriptionPlan,
         subscriptionPrice: formData.subscriptionPrice,
+        subscriptionRemaining: formData.subscriptionRemaining,
         subscriptionStatus: formData.subscriptionStatus,
         subscriptionStartDate: formData.subscriptionStartDate,
         subscriptionEndDate: formData.subscriptionEndDate,
@@ -290,6 +303,20 @@ export default function EditAdherentPage() {
       setSaving(false);
     }
   };
+
+  // 4. Add a new useEffect to validate the remaining amount
+  useEffect(() => {
+    // Ensure remaining amount doesn't exceed price when price changes
+    const price = Number(formData.subscriptionPrice);
+    const remaining = Number(formData.subscriptionRemaining);
+
+    if (!isNaN(price) && !isNaN(remaining) && remaining > price) {
+      setFormData((prev) => ({
+        ...prev,
+        subscriptionRemaining: formData.subscriptionPrice,
+      }));
+    }
+  }, [formData.subscriptionPrice, formData.subscriptionRemaining]);
 
   if (loading) {
     return (
@@ -506,15 +533,12 @@ export default function EditAdherentPage() {
                   <Input
                     id="subscriptionPrice"
                     type="number"
-                    step="0.01"
                     value={formData.subscriptionPrice}
                     onChange={(e) =>
                       handleInputChange("subscriptionPrice", e.target.value)
                     }
                     placeholder="0"
-                    className={`border-gray-200 focus:border-gray-400 transition-colors ${
-                      errors.subscriptionPrice ? "border-red-500" : ""
-                    }`}
+                    className={errors.subscriptionPrice ? "border-red-500" : ""}
                   />
                   {errors.subscriptionPrice && (
                     <p className="text-sm text-red-500">

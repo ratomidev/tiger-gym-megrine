@@ -50,6 +50,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       defaultValues: {
         plan: "personnalisé",
         price: 50,
+        remaining: 0, // Default value for remaining amount
         startDate: today,
         endDate: nextMonth,
         status: "actif",
@@ -58,7 +59,10 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       },
     });
 
-    // === Utility: Calculate end date based on plan ===
+    // Watch price to calculate remaining
+    const watchedPrice = watch("price");
+    const watchedRemaining = watch("remaining");
+
     const calculateEndDate = (plan: string, start: Date) => {
       switch (plan) {
         case "1 mois":
@@ -110,7 +114,20 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       setValue("endDate", initialEndDate);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // === Ref exposure ===
+    // Effect to validate remaining amount when price changes
+    useEffect(() => {
+      // Ensure both values are treated as numbers
+      const remainingVal =
+        watchedRemaining === undefined || watchedRemaining === null
+          ? 0
+          : Number(watchedRemaining);
+      const priceVal = Number(watchedPrice);
+
+      if (remainingVal > priceVal) {
+        setValue("remaining", priceVal);
+      }
+    }, [watchedPrice, watchedRemaining, setValue]);
+
     useImperativeHandle(ref, () => ({
       validateAndGetValues: async () => {
         return new Promise((resolve) => {
@@ -124,7 +141,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
 
     // === Render ===
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 bg-card dark:bg-gray-900 text-card-foreground dark:text-white p-6 rounded-lg shadow-md dark:shadow-xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Plan */}
           <div className="space-y-2">
@@ -145,47 +162,106 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
               </SelectContent>
             </Select>
             {errors.plan && (
-              <p className="text-red-500 text-sm">{errors.plan.message}</p>
+              <p className="text-destructive dark:text-red-400 text-sm">
+                {errors.plan.message}
+              </p>
             )}
           </div>
 
-          {/* Price */}
+          {/* Prix and Montant Restant combined in one column */}
           <div className="space-y-2">
-            <Label htmlFor="price">Prix</Label>
-            <Input
-              id="price"
-              type="number"
-              step="0.01"
-              placeholder="0.00"
-              {...register("price", {
-                required: "Le prix est requis",
-                min: { value: 0, message: "Le prix doit être positif" },
-              })}
-              className="border-gray-200 focus:border-gray-400 transition-colors"
-            />
-            {errors.price && (
-              <p className="text-red-500 text-sm">{errors.price.message}</p>
-            )}
+            <div className="flex gap-4">
+              {/* Prix */}
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="price">
+                  Prix
+                </Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  {...register("price", {
+                    required: "Le prix est requis",
+                    min: { value: 0, message: "Le prix doit être positif" },
+                  })}
+                  placeholder="0.00"
+                  className="border-input dark:border-gray-700 bg-background dark:bg-gray-900 text-foreground dark:text-white focus:border-primary dark:focus:border-gray-500 transition-colors"
+                />
+                {errors.price && (
+                  <p className="text-destructive dark:text-red-400 text-sm">
+                    {errors.price.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Montant Restant */}
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="remaining">
+                  Montant Restant
+                </Label>
+                <Input
+                  id="remaining"
+                  type="number"
+                  step="0.01"
+                  {...register("remaining", {
+                    min: {
+                      value: 0,
+                      message:
+                        "Le montant restant ne peut pas être négatif",
+                    },
+                    validate: (value) => {
+                      // Convert to number and handle undefined/null
+                      const numValue =
+                        value === undefined || value === null
+                          ? 0
+                          : Number(value);
+                      return (
+                        numValue <= watchedPrice ||
+                        "Le montant restant ne peut pas dépasser le prix total"
+                      );
+                    },
+                  })}
+                  placeholder="0.00"
+                  className="border-input dark:border-gray-700 bg-background dark:bg-gray-900 text-foreground dark:text-white focus:border-primary dark:focus:border-gray-500 transition-colors"
+                  max={watchedPrice}
+                />
+                {errors.remaining && (
+                  <p className="text-destructive dark:text-red-400 text-sm">
+                    {errors.remaining.message}
+                  </p>
+                )}
+              </div>
+            </div>
+            <p className="text-muted-foreground dark:text-gray-400 text-xs">
+              Montant restant à payer (0 = payé intégralement). Ne peut pas
+              dépasser {watchedPrice} DT.
+            </p>
           </div>
 
           {/* Start Date */}
           <div className="space-y-2">
-            <Label htmlFor="startDate">Date de Début</Label>
+            <Label htmlFor="startDate">
+              Date de Début
+            </Label>
             <Input
               id="startDate"
               type="date"
               value={formattedStartDate}
               onChange={handleStartDateChange}
-              className="border-gray-200 focus:border-gray-400 transition-colors"
+              className="border-input dark:border-gray-700 bg-background dark:bg-gray-900 text-foreground dark:text-white focus:border-primary dark:focus:border-gray-500 transition-colors"
             />
             {errors.startDate && (
-              <p className="text-red-500 text-sm">{errors.startDate.message}</p>
+              <p className="text-destructive dark:text-red-400 text-sm">
+                {errors.startDate.message}
+              </p>
             )}
           </div>
 
           {/* End Date */}
           <div className="space-y-2">
-            <Label htmlFor="endDate">Date de Fin</Label>
+            <Label htmlFor="endDate">
+              Date de Fin
+            </Label>
             <Input
               id="endDate"
               type="date"
@@ -195,7 +271,9 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
               className="border-gray-200 focus:border-gray-400 transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
             />
             {errors.endDate && (
-              <p className="text-red-500 text-sm">{errors.endDate.message}</p>
+              <p className="text-destructive dark:text-red-400 text-sm">
+                {errors.endDate.message}
+              </p>
             )}
             <p className="text-xs text-gray-500">
               {watch("plan") === "personnalisé"
@@ -206,23 +284,27 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
 
           {/* Status */}
           <div className="space-y-2">
-            <Label htmlFor="status">Statut</Label>
+            <Label htmlFor="status">
+              Statut
+            </Label>
             <Select
               defaultValue="actif"
               onValueChange={(value) =>
                 setValue("status", value as "actif" | "expiré")
               }
             >
-              <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
+              <SelectTrigger className="border-input dark:border-gray-700 bg-background dark:bg-gray-900 text-foreground dark:text-white focus:border-primary dark:focus:border-gray-500 transition-colors">
                 <SelectValue placeholder="Sélectionner un statut" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover dark:bg-gray-900 text-popover-foreground dark:text-white border-border dark:border-gray-700">
                 <SelectItem value="actif">Actif</SelectItem>
                 <SelectItem value="expiré">Expiré</SelectItem>
               </SelectContent>
             </Select>
             {errors.status && (
-              <p className="text-red-500 text-sm">{errors.status.message}</p>
+              <p className="text-destructive dark:text-red-400 text-sm">
+                {errors.status.message}
+              </p>
             )}
           </div>
         </div>
@@ -238,7 +320,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
                 onCheckedChange={(checked) =>
                   setValue("hasCardioMusculation", checked === true)
                 }
-                className="border-gray-300"
+                className="border-input dark:border-gray-600 data-[state=checked]:bg-primary dark:data-[state=checked]:bg-blue-600"
               />
               <Label
                 htmlFor="hasCardioMusculation"
@@ -254,7 +336,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
                 onCheckedChange={(checked) =>
                   setValue("hasCours", checked === true)
                 }
-                className="border-gray-300"
+                className="border-input dark:border-gray-600 data-[state=checked]:bg-primary dark:data-[state=checked]:bg-blue-600"
               />
               <Label
                 htmlFor="hasCours"
