@@ -46,10 +46,11 @@ export async function PUT(
     const { id } = await params;
     const data = await request.json();
 
-    // Separate adherent data from subscription data
+    // Separate adherent data from subscription data - ADD subscriptionRemaining to this list
     const {
       subscriptionPlan,
       subscriptionPrice,
+      subscriptionRemaining, // Add this field to be destructured
       subscriptionStatus,
       subscriptionStartDate,
       subscriptionEndDate,
@@ -97,6 +98,7 @@ export async function PUT(
     if (
       subscriptionPlan ||
       subscriptionPrice ||
+      subscriptionRemaining !== undefined || // Add this condition
       subscriptionStatus ||
       subscriptionStartDate ||
       subscriptionEndDate ||
@@ -106,6 +108,7 @@ export async function PUT(
       const subscriptionUpdateData: {
         plan?: string;
         price?: number;
+        remaining?: number; // Add this field
         status?: string;
         startDate?: Date;
         endDate?: Date;
@@ -117,6 +120,7 @@ export async function PUT(
         adherentId: string;
         plan: string;
         price: number;
+        remaining: number; // Add this field
         status: string;
         startDate: Date;
         endDate: Date;
@@ -126,6 +130,7 @@ export async function PUT(
         adherentId: id,
         plan: subscriptionPlan || "1 mois",
         price: subscriptionPrice ? parseFloat(subscriptionPrice) : 0,
+        remaining: subscriptionRemaining ? parseFloat(subscriptionRemaining) : 0, // Add this line
         status: subscriptionStatus || "actif",
         startDate: subscriptionStartDate
           ? new Date(subscriptionStartDate)
@@ -140,6 +145,8 @@ export async function PUT(
       if (subscriptionPlan) subscriptionUpdateData.plan = subscriptionPlan;
       if (subscriptionPrice)
         subscriptionUpdateData.price = parseFloat(subscriptionPrice);
+      if (subscriptionRemaining !== undefined) // Add this condition
+        subscriptionUpdateData.remaining = parseFloat(subscriptionRemaining);
       if (subscriptionStatus)
         subscriptionUpdateData.status = subscriptionStatus;
       if (subscriptionStartDate)

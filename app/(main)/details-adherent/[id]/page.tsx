@@ -409,7 +409,7 @@ export default function DetailsAdherent() {
                             } else if (daysRemaining === 0) {
                               return (
                                 <p className="text-red-600 dark:text-red-400 font-medium">
-                                  Expire aujourd'hui
+                                  Expire aujourd`&apos;`hui
                                 </p>
                               );
                             } else if (daysRemaining === 1) {
