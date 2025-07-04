@@ -30,6 +30,7 @@ model Subscription {
   endDate              DateTime
   plan                 String
   price                Decimal  @db.Decimal(10, 3)
+  remaining            Decimal  @default(0) @db.Decimal(10, 3)  // New field for tracking unpaid amount
   status               String   @default("actif")
   hasCardioMusculation Boolean  @default(false)
   hasCours             Boolean  @default(false)
