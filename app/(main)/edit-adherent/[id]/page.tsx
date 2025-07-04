@@ -527,24 +527,56 @@ export default function EditAdherentPage() {
                   </Select>
                 </div>
 
-                {/* Subscription Price */}
-                <div className="space-y-2">
-                  <Label htmlFor="subscriptionPrice">Prix (DT)</Label>
-                  <Input
-                    id="subscriptionPrice"
-                    type="number"
-                    value={formData.subscriptionPrice}
-                    onChange={(e) =>
-                      handleInputChange("subscriptionPrice", e.target.value)
-                    }
-                    placeholder="0"
-                    className={errors.subscriptionPrice ? "border-red-500" : ""}
-                  />
-                  {errors.subscriptionPrice && (
-                    <p className="text-sm text-red-500">
-                      {errors.subscriptionPrice}
-                    </p>
-                  )}
+                {/* Subscription Price and Remaining Amount - combined in one cell */}
+                <div className="space-y-2 col-span-1">
+                  <div className="flex gap-4">
+                    {/* Subscription Price */}
+                    <div className="flex-1 space-y-2">
+                      <Label htmlFor="subscriptionPrice">Prix (DT)</Label>
+                      <Input
+                        id="subscriptionPrice"
+                        type="number"
+                        value={formData.subscriptionPrice}
+                        onChange={(e) =>
+                          handleInputChange("subscriptionPrice", e.target.value)
+                        }
+                        placeholder="0"
+                        className={errors.subscriptionPrice ? "border-red-500" : ""}
+                      />
+                      {errors.subscriptionPrice && (
+                        <p className="text-sm text-red-500">
+                          {errors.subscriptionPrice}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Subscription Remaining */}
+                    <div className="flex-1 space-y-2">
+                      <Label htmlFor="subscriptionRemaining">
+                        Montant Restant
+                      </Label>
+                      <Input
+                        id="subscriptionRemaining"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={formData.subscriptionRemaining}
+                        onChange={(e) =>
+                          handleInputChange("subscriptionRemaining", e.target.value)
+                        }
+                        placeholder="0"
+                        className={errors.subscriptionRemaining ? "border-red-500" : ""}
+                      />
+                      {errors.subscriptionRemaining && (
+                        <p className="text-sm text-red-500">
+                          {errors.subscriptionRemaining}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Montant restant à payer (0 = payé intégralement)
+                  </p>
                 </div>
 
                 {/* Start Date */}
