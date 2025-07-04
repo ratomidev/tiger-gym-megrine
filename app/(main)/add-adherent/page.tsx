@@ -103,29 +103,33 @@ export default function Page() {
           className: "rounded-md",
           // @ts-expect-error - sonner types are not complete
           success: {
-            className: "bg-green-50 text-green-800 border-green-500",
-            descriptionClassName: "text-green-700",
+            className:
+              "bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 border-green-500",
+            descriptionClassName: "text-green-700 dark:text-green-300",
           },
           error: {
-            className: "bg-red-50 text-red-800 border-red-500",
-            descriptionClassName: "text-red-700",
+            className:
+              "bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-200 border-red-500",
+            descriptionClassName: "text-red-700 dark:text-red-300",
           },
         }}
       />
 
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Ajouter un Adhérent</h1>
+        <h1 className="text-3xl font-bold text-foreground dark:text-white">
+          Ajouter un Adhérent
+        </h1>
       </div>
 
       {/* Forms Container */}
-      <div className="space-y-12">
+      <div className="space-y-12 mb-24"> {/* Added bottom margin to make room for floating button */}
         {/* Member Information Section */}
-        <div className="bg-white rounded-lg p-6 border border-gray-200">
-          <h2 className="text-lg font-medium mb-1">
+        <div className="bg-card dark:bg-gray-900 rounded-lg p-6 border border-border dark:border-gray-800 shadow-sm dark:shadow-lg">
+          <h2 className="text-lg font-medium mb-1 text-foreground dark:text-white">
             Informations Personnelles
           </h2>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-muted-foreground dark:text-gray-400 mb-4">
             Détails de l&apos;adhérent
           </p>
           <div className="mt-6">
@@ -134,19 +138,21 @@ export default function Page() {
         </div>
 
         {/* Subscription Section */}
-        <div className="bg-white rounded-lg p-6 relative border border-gray-200">
-          <h2 className="text-lg font-medium mb-1">
+        <div className="bg-card dark:bg-gray-900 rounded-lg p-6 relative border border-border dark:border-gray-800 shadow-sm dark:shadow-lg">
+          <h2 className="text-lg font-medium mb-1 text-foreground dark:text-white">
             Détails de l&apos;Abonnement
           </h2>
-          <p className="text-sm text-gray-500 mb-4">Plan, durée et options</p>
+          <p className="text-sm text-muted-foreground dark:text-gray-400 mb-4">
+            Plan, durée et options
+          </p>
           <div className="mt-6">
             <SubscriptionRegistrationForm ref={subscriptionFormRef} />
           </div>
           {isLoading && (
-            <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-md">
+            <div className="absolute inset-0 bg-background/70 dark:bg-black/70 flex items-center justify-center rounded-md">
               <div className="flex flex-col items-center gap-2">
-                <div className="h-8 w-8 rounded-full border-2 border-black border-t-transparent animate-spin"></div>
-                <p className="text-sm font-medium text-gray-600">
+                <div className="h-8 w-8 rounded-full border-2 border-primary dark:border-white border-t-transparent animate-spin"></div>
+                <p className="text-sm font-medium text-foreground dark:text-gray-200">
                   Chargement...
                 </p>
               </div>
@@ -155,27 +161,25 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Save Button - Sticky at Bottom */}
-      <div className="sticky bottom-4 mt-10 pt-4 bg-white flex justify-end">
-        <Button
-          size="lg"
-          onClick={handleSubmit}
-          disabled={isLoading}
-          className="px-8 py-6 bg-black hover:bg-gray-800 text-white flex items-center gap-2 shadow-md"
-        >
-          {isLoading ? (
-            <>
-              <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin mr-2"></div>
-              Enregistrement...
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4" />
-              Enregistrer l&apos;adhérent
-            </>
-          )}
-        </Button>
-      </div>
+      {/* Floating Save Button */}
+      <Button
+        size="lg"
+        onClick={handleSubmit}
+        disabled={isLoading}
+        className="fixed bottom-8 right-8 px-8 py-6 bg-primary hover:bg-primary/90 dark:bg-blue-600 dark:hover:bg-blue-700 text-primary-foreground flex items-center gap-2 shadow-xl rounded-full z-50"
+      >
+        {isLoading ? (
+          <>
+            <div className="h-4 w-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin mr-2"></div>
+            Enregistrement...
+          </>
+        ) : (
+          <>
+            <Save className="h-4 w-4" />
+            Enregistrer l&apos;adhérent
+          </>
+        )}
+      </Button>
     </div>
   );
 }
