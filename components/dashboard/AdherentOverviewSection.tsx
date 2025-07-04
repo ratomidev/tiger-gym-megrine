@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { startOfMonth, endOfMonth, subMonths, addDays, format } from "date-fns";
 import { fr } from "date-fns/locale"; // Importation du locale français
 import { 
