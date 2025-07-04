@@ -12,10 +12,12 @@ import SubscriptionRegistrationForm from "@/components/subscription/subscription
 export default function Page() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isPhotoUploading, setIsPhotoUploading] = useState(false);
 
   // References to form methods
   const adherentFormRef = useRef<{
     validateAndGetValues: () => Promise<AdherentFormValues | null>;
+    getUploadingState?: () => boolean;
   }>(null);
 
   const subscriptionFormRef = useRef<{
@@ -23,6 +25,12 @@ export default function Page() {
   }>(null);
 
   const handleSubmit = async () => {
+    // Check if photo is still uploading
+    if (isPhotoUploading) {
+      toast.error("Veuillez attendre que la photo soit téléchargée");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -123,7 +131,7 @@ export default function Page() {
       </div>
 
       {/* Forms Container */}
-      <div className="space-y-12 mb-24"> {/* Added bottom margin to make room for floating button */}
+      <div className="space-y-12 mb-24">
         {/* Member Information Section */}
         <div className="bg-card dark:bg-gray-900 rounded-lg p-6 border border-border dark:border-gray-800 shadow-sm dark:shadow-lg">
           <h2 className="text-lg font-medium mb-1 text-foreground dark:text-white">
@@ -133,7 +141,10 @@ export default function Page() {
             Détails de l&apos;adhérent
           </p>
           <div className="mt-6">
-            <AdherentRegistrationForm ref={adherentFormRef} />
+            <AdherentRegistrationForm
+              ref={adherentFormRef}
+              onUploadStateChange={setIsPhotoUploading}
+            />
           </div>
         </div>
 
@@ -148,12 +159,14 @@ export default function Page() {
           <div className="mt-6">
             <SubscriptionRegistrationForm ref={subscriptionFormRef} />
           </div>
-          {isLoading && (
+          {(isLoading || isPhotoUploading) && (
             <div className="absolute inset-0 bg-background/70 dark:bg-black/70 flex items-center justify-center rounded-md">
               <div className="flex flex-col items-center gap-2">
                 <div className="h-8 w-8 rounded-full border-2 border-primary dark:border-white border-t-transparent animate-spin"></div>
                 <p className="text-sm font-medium text-foreground dark:text-gray-200">
-                  Chargement...
+                  {isPhotoUploading
+                    ? "Téléchargement de la photo..."
+                    : "Chargement..."}
                 </p>
               </div>
             </div>
@@ -165,13 +178,13 @@ export default function Page() {
       <Button
         size="lg"
         onClick={handleSubmit}
-        disabled={isLoading}
+        disabled={isLoading || isPhotoUploading}
         className="fixed bottom-8 right-8 px-8 py-6 bg-primary hover:bg-primary/90 dark:bg-blue-600 dark:hover:bg-blue-700 text-primary-foreground flex items-center gap-2 shadow-xl rounded-full z-50"
       >
-        {isLoading ? (
+        {isLoading || isPhotoUploading ? (
           <>
             <div className="h-4 w-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin mr-2"></div>
-            Enregistrement...
+            {isPhotoUploading ? "Téléchargement..." : "Enregistrement..."}
           </>
         ) : (
           <>
