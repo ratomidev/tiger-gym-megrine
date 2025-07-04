@@ -79,7 +79,7 @@ function LoginForm() {
    */
   const handleAuthSuccess = (user: User) => {
     login(user);
-    toast.success("Bon retour ! " + (user.name || user.email));
+    toast.success(`Connexion réussie, Bienvenue ${user.name || user.email} !`);
 
     // Delay navigation to allow toast to be seen
     setTimeout(() => {
@@ -162,7 +162,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={<div>Chargement...</div>}>
       <LoginForm />
-      <Toaster position="top-center" />
+      <Toaster position="top-right" />
     </Suspense>
   );
 }
