@@ -311,15 +311,18 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                       <TableCell>
                         {adherent.subscription ? (
                           <div>
-                            <p className="font-medium">
-                              {adherent.subscription.plan}
-                            </p>
-                            <p className="text-xs text-gray-500">{`${adherent.subscription.price} DT`}</p>
+                            <div>{adherent.subscription.plan}</div>
+                            <div className="text-sm text-gray-500">
+                              {`${adherent.subscription.price} DT`}
+                              {adherent.subscription.remaining > 0 && (
+                                <span className="text-amber-600 ml-1">
+                                  (Reste: {adherent.subscription.remaining} DT)
+                                </span>
+                              )}
+                            </div>
                           </div>
                         ) : (
-                          <Badge variant="outline" className="bg-gray-100">
-                            Sans abonnement
-                          </Badge>
+                          "N/A"
                         )}
                       </TableCell>
                     )}

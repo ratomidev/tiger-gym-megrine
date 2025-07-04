@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
       const subscriptionData = {
         plan: body.plan,
         price: parseFloat(body.price),
+        remaining: body.remaining !== undefined ? parseFloat(body.remaining) : 0, // Handle the new field
         startDate: new Date(body.startDate),
         endDate: new Date(body.endDate),
         status: body.status || "actif",

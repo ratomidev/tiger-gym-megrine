@@ -46,6 +46,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       defaultValues: {
         plan: "1 mois",
         price: 50,
+        remaining: 0, // Default value for remaining amount
         startDate: today,
         endDate: nextMonth,
         status: "actif",
@@ -53,6 +54,17 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
         hasCours: false,
       },
     });
+
+    // Watch price to calculate remaining
+    const watchedPrice = watch("price");
+    const watchedRemaining = watch("remaining");
+
+    // Calculate remaining amount
+    const calculateRemaining = (newRemaining: number) => {
+      if (newRemaining > watchedPrice) {
+        setValue("remaining", watchedPrice);
+      }
+    };
 
     const calculateEndDate = (plan: string, start: Date) => {
       switch (plan) {
@@ -100,6 +112,20 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
 
       initializeEndDate();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Effect to validate remaining amount when price changes
+    useEffect(() => {
+      // Ensure both values are treated as numbers
+      const remainingVal =
+        watchedRemaining === undefined || watchedRemaining === null
+          ? 0
+          : Number(watchedRemaining);
+      const priceVal = Number(watchedPrice);
+
+      if (remainingVal > priceVal) {
+        setValue("remaining", priceVal);
+      }
+    }, [watchedPrice, watchedRemaining, setValue]);
 
     useImperativeHandle(ref, () => ({
       validateAndGetValues: async () => {
@@ -155,6 +181,34 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
             {errors.price && (
               <p className="text-red-500 text-sm">{errors.price.message}</p>
             )}
+          </div>
+
+          {/* New field: Remaining Amount */}
+          <div className="space-y-2">
+            <Label htmlFor="remaining">Montant Restant</Label>
+            <Input
+              id="remaining"
+              type="number"
+              step="0.01"
+              {...register("remaining", {
+                min: { value: 0, message: "Le montant restant ne peut pas être négatif" },
+                validate: value => {
+                  // Convert to number and handle undefined/null
+                  const numValue = value === undefined || value === null ? 0 : Number(value);
+                  return numValue <= watchedPrice || 
+                    "Le montant restant ne peut pas dépasser le prix total";
+                }
+              })}
+              placeholder="0.00"
+              className="border-gray-200 focus:border-gray-400 transition-colors"
+              max={watchedPrice}
+            />
+            {errors.remaining && (
+              <p className="text-red-500 text-sm">{errors.remaining.message}</p>
+            )}
+            <p className="text-xs text-gray-500">
+              Montant restant à payer (0 = payé intégralement). Ne peut pas dépasser {watchedPrice} DT.
+            </p>
           </div>
 
           {/* Start Date */}

@@ -6,21 +6,23 @@ export interface Subscription {
   startDate: Date;
   endDate: Date;
   plan: string;
-  price: number; // Using number instead of Decimal for TypeScript
+  price: number; 
+  remaining: number; // New field
   status: string;
   hasCardioMusculation: boolean;
   hasCours: boolean;
-  adherent?: Adherent; // Optional relation
+  adherent?: Adherent;
 }
 
 // For forms and API requests
 export interface SubscriptionFormValues {
-  adherentId?: string; // Optional when creating via adherent relation
+  adherentId?: string;
   startDate: Date;
   endDate: Date;
   plan: string;
   price: number;
-  status: 'actif' | 'inactif' | 'suspendu' | 'expiré'; // Using string literals for better type safety
+  remaining?: number; // Optional with default value of 0
+  status: 'actif' | 'expiré';
   hasCardioMusculation: boolean;
   hasCours: boolean;
 }
