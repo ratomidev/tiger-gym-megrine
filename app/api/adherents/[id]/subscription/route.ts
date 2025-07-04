@@ -5,15 +5,16 @@ const prisma = new PrismaClient();
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     const {
       plan,
       price,
+      remaining = 0,
       startDate,
       endDate,
       status,
@@ -59,6 +60,7 @@ export async function POST(
       data: {
         plan,
         price: parseFloat(price),
+        remaining: parseFloat(remaining),
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         status,
