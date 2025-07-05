@@ -12,6 +12,7 @@ const PUBLIC_PATHS = [
   "/api/auth/register",
   "/api/register",
   "/api/upload/photo",
+  "/landing",
 ];
 
 // Static assets should also be public
@@ -34,7 +35,9 @@ const isPublicPath = (path: string) => {
 
 // Check if request to /api/adherents is a POST request (which should be public)
 const isPublicAdherentRequest = (request: NextRequest) => {
-  return request.nextUrl.pathname === "/api/adherents" && request.method === "POST";
+  return (
+    request.nextUrl.pathname === "/api/adherents" && request.method === "POST"
+  );
 };
 
 export async function middleware(request: NextRequest) {

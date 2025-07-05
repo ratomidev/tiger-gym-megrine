@@ -1,7 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
-import MemberRegistrationForm from "@/components/member/form/MemberRegistrationForm";
+import MemberRegistrationForm from "@/components/landing/register-form";
 import RegistrationSuccess from "@/components/member/RegistrationSuccess";
+import BackgroundCarousel from "@/components/landing/background-carousel";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -94,58 +95,65 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
-      <div className="flex flex-col items-center justify-center">
-        {/* Logo/Branding Area */}
-        <div className="mb-3 text-center">
-          <Image
-            src="/images/logo.jpg"
-            alt="Tiger Gym Megrine"
-            width={120}
-            height={120}
-            className="mx-auto"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-          />
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background with overlay */}
+      <BackgroundCarousel />
+      <div className="absolute inset-0 bg-black/50 z-5"></div>
+
+      {/* Main Content */}
+      <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
+        <div className="flex flex-col items-center justify-center">
+          {/* Logo/Branding Area */}
+          <div className="mb-6 text-center">
+            <Image
+              src="/images/logo.jpg"
+              alt="Tiger Gym Megrine"
+              width={120}
+              height={120}
+              className="mx-auto rounded-full border-4 border-white/20 shadow-2xl"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          </div>
+
+          {/* Conditionally render either the registration form or success message */}
+          {isSuccess ? (
+            <RegistrationSuccess onReset={handleReset} />
+          ) : (
+            <Card className="w-full max-w-3xl shadow-2xl border-white/10 bg-white/95 backdrop-blur-lg">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
+                  Inscription Adhérent
+                </CardTitle>
+                <CardDescription className="text-gray-600 text-lg">
+                  Remplissez le formulaire ci-dessous pour vous inscrire
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="pt-4">
+                <MemberRegistrationForm ref={adherentFormRef} />
+              </CardContent>
+
+              <CardFooter className="flex justify-end space-x-4 pt-6 pb-6">
+                <Button
+                  className="bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-900 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Envoi...
+                    </>
+                  ) : (
+                    "S'inscrire"
+                  )}
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
         </div>
-
-        {/* Conditionally render either the registration form or success message */}
-        {isSuccess ? (
-          <RegistrationSuccess onReset={handleReset} />
-        ) : (
-          <Card className="w-full max-w-3xl shadow-lg border-gray-200">
-            <CardHeader className="text-center pb-2">
-              <CardTitle className="text-2xl font-bold text-gray-800">
-                Inscription Adhérent
-              </CardTitle>
-              <CardDescription className="text-gray-600">
-                Remplissez le formulaire ci-dessous pour vous inscrire
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent className="pt-4">
-              <MemberRegistrationForm ref={adherentFormRef} />
-            </CardContent>
-
-            <CardFooter className="flex justify-end space-x-4 pt-2 pb-6">
-              <Button
-                className="bg-black hover:bg-black text-white"
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Envoi...
-                  </>
-                ) : (
-                  "S'inscrire"
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
-        )}
       </div>
     </div>
   );

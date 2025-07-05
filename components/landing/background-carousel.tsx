@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
+// Using gym-themed stock images or your provided images
 const IMAGES = [
-  "/images/pexels-bertellifotografia-799443.jpg",
-  "/images/pexels-deepu-b-iyer-40465.jpg",
-  "/images/pexels-eberhardgross-1366919.jpg",
-  "/images/pexels-maxandrey-1366630.jpg",
-  "/images/pexels-todd-trapani-488382-1535162.jpg",
+  "/images/photo3v3.png",
+  "/images/photo1.jpg",
+  "/images/photo2v3.png",
 ];
+
 export default function BackgroundCarousel() {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % IMAGES.length);
-    }, 3000);
+    }, 4000); // Slower transition for better UX
     return () => clearInterval(timer);
   }, []);
 
@@ -23,15 +23,16 @@ export default function BackgroundCarousel() {
       {IMAGES.map((src, i) => (
         <div
           key={i}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
+          className={`absolute inset-0 transition-opacity duration-1500 ${
             index === i ? "opacity-100" : "opacity-0"
           }`}
         >
           <Image
             src={src}
-            alt={`Slide ${i + 1}`}
+            alt={`Ambiance gym ${i + 1}`}
             fill
             style={{ objectFit: "cover" }}
+            priority={i === 0}
           />
         </div>
       ))}

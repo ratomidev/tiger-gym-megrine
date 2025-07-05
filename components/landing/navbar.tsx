@@ -7,9 +7,12 @@ import MobileMenu from "./mobile-menu";
 import { Menu as MenuIcon, X as XIcon } from "lucide-react";
 
 const LINKS = [
-  { label: "Home", href: "/" },
+  { label: "Accueil", href: "/" },
+  { label: "Programmes", href: "/programs" },
+  { label: "Entraîneurs", href: "/trainers" },
+  { label: "Adhésion", href: "/membership" },
+  { label: "À Propos", href: "/about" },
   { label: "Contact", href: "/contact" },
-  { label: "About Us", href: "/about" },
 ];
 
 export default function Navbar() {
@@ -18,12 +21,14 @@ export default function Navbar() {
 
   return (
     <nav className="relative flex items-center justify-between p-6">
-      <div className="text-white text-2xl font-bold">Ryx</div>
+      <div className="text-white text-2xl font-bold">
+        <span className="text-red-500">TIGER</span> GYM
+      </div>
 
       {isMobile ? (
         <>
           <button
-            className="text-white p-2 "
+            className="text-white p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <XIcon /> : <MenuIcon />}
@@ -43,7 +48,7 @@ export default function Navbar() {
             <Link
               key={href}
               href={href}
-              className="text-white hover:text-gray-300 "
+              className="text-white hover:text-red-500 transition-colors duration-200"
             >
               {label}
             </Link>
