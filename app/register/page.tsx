@@ -29,6 +29,7 @@ export default function RegisterPage() {
   }>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   /**
    * Handle form submission
@@ -109,8 +110,6 @@ export default function RegisterPage() {
       {/* Main Content */}
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
         <div className="flex flex-col items-center justify-center">
-          {/* Logo/Branding Area */}
-
           {/* Conditionally render either the registration form or success message */}
           {isSuccess ? (
             <RegistrationSuccess onReset={handleReset} />
@@ -126,19 +125,27 @@ export default function RegisterPage() {
               </CardHeader>
 
               <CardContent className="pt-4">
-                <MemberRegistrationForm ref={adherentFormRef} />
+                <MemberRegistrationForm
+                  ref={adherentFormRef}
+                  onUploadStateChange={setIsImageUploading}
+                />
               </CardContent>
 
               <CardFooter className="flex justify-end space-x-4 pt-6 pb-6">
                 <Button
-                  className="bg-white hover:bg-gray-100 text-black px-8 py-3 text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  className="bg-white hover:bg-gray-100 text-black px-8 py-3 text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   onClick={handleSubmit}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isImageUploading}
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Envoi...
+                    </>
+                  ) : isImageUploading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Image en cours...
                     </>
                   ) : (
                     "S'inscrire"
