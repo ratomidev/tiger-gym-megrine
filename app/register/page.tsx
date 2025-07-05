@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import MemberRegistrationForm from "@/components/landing/register-form";
 import RegistrationSuccess from "@/components/member/RegistrationSuccess";
 import BackgroundCarousel from "@/components/landing/background-carousel";
+import Navbar from "@/components/landing/navbar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Image from "next/image";
+
 import { AdherentFormValues } from "@/types";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -100,22 +101,15 @@ export default function RegisterPage() {
       <BackgroundCarousel />
       <div className="absolute inset-0 bg-black/50 z-5"></div>
 
+      {/* Navigation */}
+      <div className="relative z-100">
+        <Navbar />
+      </div>
+
       {/* Main Content */}
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
         <div className="flex flex-col items-center justify-center">
           {/* Logo/Branding Area */}
-          <div className="mb-6 text-center">
-            <Image
-              src="/images/logo.jpg"
-              alt="Tiger Gym Megrine"
-              width={120}
-              height={120}
-              className="mx-auto rounded-full border-4 border-white/20 shadow-2xl"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
-          </div>
 
           {/* Conditionally render either the registration form or success message */}
           {isSuccess ? (

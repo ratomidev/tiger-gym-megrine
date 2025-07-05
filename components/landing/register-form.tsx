@@ -315,7 +315,7 @@ const AdherentRegistrationForm = forwardRef<
   };
 
   return (
-    <div className="space-y-6 bg-transparent p-6 rounded-lg">
+    <div className="space-y-8 bg-transparent p-8 rounded-xl">
       {/* Photo Modal */}
       <Dialog open={showPhotoModal} onOpenChange={setShowPhotoModal}>
         <DialogContent className="sm:max-w-lg md:max-w-2xl w-full h-full sm:h-auto max-h-screen sm:max-h-[90vh] p-0 sm:p-6 flex flex-col">
@@ -522,10 +522,13 @@ const AdherentRegistrationForm = forwardRef<
         </DialogContent>
       </Dialog>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* First Name */}
-        <div className="space-y-2">
-          <Label htmlFor="firstName" className="text-white">
+        <div className="space-y-3">
+          <Label
+            htmlFor="firstName"
+            className="text-white font-semibold text-base tracking-wide uppercase text-shadow-sm"
+          >
             Prénom
           </Label>
           <Input
@@ -533,37 +536,43 @@ const AdherentRegistrationForm = forwardRef<
             {...register("firstName", {
               required: "Le prénom est requis",
             })}
-            placeholder="Prénom"
-            className="border-white/30 focus:border-white bg-white/90 text-gray-800"
+            placeholder="Entrez votre prénom"
+            className="border-2 border-white/40 focus:border-white focus:ring-2 focus:ring-white/50 bg-white/15 backdrop-blur-md text-white placeholder:text-white/70 transition-all duration-300 hover:bg-white/20 focus:bg-white/25 h-14 text-lg rounded-xl shadow-lg"
           />
           {errors.firstName && (
-            <p className="text-white text-sm bg-red-700 p-1 rounded">
+            <p className="text-red-300 text-sm font-medium bg-red-900/30 backdrop-blur-sm rounded-lg px-3 py-2 border border-red-500/30">
               {errors.firstName.message}
             </p>
           )}
         </div>
 
         {/* Last Name */}
-        <div className="space-y-2">
-          <Label htmlFor="lastName" className="text-white">
+        <div className="space-y-3">
+          <Label
+            htmlFor="lastName"
+            className="text-white font-semibold text-base tracking-wide uppercase text-shadow-sm"
+          >
             Nom
           </Label>
           <Input
             id="lastName"
             {...register("lastName", { required: "Le nom est requis" })}
-            placeholder="Nom"
-            className="border-white/30 focus:border-white bg-white/90 text-gray-800"
+            placeholder="Entrez votre nom"
+            className="border-2 border-white/40 focus:border-white focus:ring-2 focus:ring-white/50 bg-white/15 backdrop-blur-md text-white placeholder:text-white/70 transition-all duration-300 hover:bg-white/20 focus:bg-white/25 h-14 text-lg rounded-xl shadow-lg"
           />
           {errors.lastName && (
-            <p className="text-white text-sm bg-red-700 p-1 rounded">
+            <p className="text-red-300 text-sm font-medium bg-red-900/30 backdrop-blur-sm rounded-lg px-3 py-2 border border-red-500/30">
               {errors.lastName.message}
             </p>
           )}
         </div>
 
         {/* Email */}
-        <div className="space-y-2">
-          <Label htmlFor="email" className="text-white">
+        <div className="space-y-3">
+          <Label
+            htmlFor="email"
+            className="text-white font-semibold text-base tracking-wide uppercase text-shadow-sm"
+          >
             Email
           </Label>
           <Input
@@ -576,19 +585,22 @@ const AdherentRegistrationForm = forwardRef<
                 message: "Format d'email invalide",
               },
             })}
-            placeholder="email@example.com"
-            className="border-white/30 focus:border-white bg-white/90 text-gray-800"
+            placeholder="votre.email@exemple.com"
+            className="border-2 border-white/40 focus:border-white focus:ring-2 focus:ring-white/50 bg-white/15 backdrop-blur-md text-white placeholder:text-white/70 transition-all duration-300 hover:bg-white/20 focus:bg-white/25 h-14 text-lg rounded-xl shadow-lg"
           />
           {errors.email && (
-            <p className="text-white text-sm bg-red-700 p-1 rounded">
+            <p className="text-red-300 text-sm font-medium bg-red-900/30 backdrop-blur-sm rounded-lg px-3 py-2 border border-red-500/30">
               {errors.email.message}
             </p>
           )}
         </div>
 
         {/* Phone */}
-        <div className="space-y-2">
-          <Label htmlFor="phone" className="text-white">
+        <div className="space-y-3">
+          <Label
+            htmlFor="phone"
+            className="text-white font-semibold text-base tracking-wide uppercase text-shadow-sm"
+          >
             Téléphone
           </Label>
           <Input
@@ -596,57 +608,71 @@ const AdherentRegistrationForm = forwardRef<
             {...register("phone", {
               required: "Le numéro de téléphone est requis",
             })}
-            placeholder="Numéro de téléphone"
-            className="border-white/30 focus:border-white bg-white/90 text-gray-800"
+            placeholder="+216 XX XXX XXX"
+            className="border-2 border-white/40 focus:border-white focus:ring-2 focus:ring-white/50 bg-white/15 backdrop-blur-md text-white placeholder:text-white/70 transition-all duration-300 hover:bg-white/20 focus:bg-white/25 h-14 text-lg rounded-xl shadow-lg"
           />
           {errors.phone && (
-            <p className="text-white text-sm bg-red-700 p-1 rounded">
+            <p className="text-red-300 text-sm font-medium bg-red-900/30 backdrop-blur-sm rounded-lg px-3 py-2 border border-red-500/30">
               {errors.phone.message}
             </p>
           )}
         </div>
 
         {/* Birth Date */}
-        <div className="space-y-2">
-          <Label htmlFor="birthDate" className="text-white">
+        <div className="space-y-3">
+          <Label
+            htmlFor="birthDate"
+            className="text-white font-semibold text-base tracking-wide uppercase text-shadow-sm"
+          >
             Date de Naissance
           </Label>
-          <div className="flex gap-2">
-            <Input
-              id="birthDate"
-              type="date"
-              {...register("birthDate", {
-                required: "La date de naissance est requise",
-              })}
-              className="border-white/30 focus:border-white bg-white/90 text-gray-800 flex-1"
-            />
-          </div>
+          <Input
+            id="birthDate"
+            type="date"
+            {...register("birthDate", {
+              required: "La date de naissance est requise",
+            })}
+            className="border-2 border-white/40 focus:border-white focus:ring-2 focus:ring-white/50 bg-white/15 backdrop-blur-md text-white transition-all duration-300 hover:bg-white/20 focus:bg-white/25 h-14 text-lg rounded-xl shadow-lg"
+          />
           {errors.birthDate && (
-            <p className="text-white text-sm bg-red-700 p-1 rounded">
+            <p className="text-red-300 text-sm font-medium bg-red-900/30 backdrop-blur-sm rounded-lg px-3 py-2 border border-red-500/30">
               {errors.birthDate.message}
             </p>
           )}
         </div>
 
         {/* Gender */}
-        <div className="space-y-2">
-          <Label htmlFor="sexe" className="text-white">
+        <div className="space-y-3">
+          <Label
+            htmlFor="sexe"
+            className="text-white font-semibold text-base tracking-wide uppercase text-shadow-sm"
+          >
             Sexe
           </Label>
           <Select
             defaultValue="M"
             onValueChange={(value) => setValue("sexe", value as "M" | "F")}
           >
-            <SelectTrigger className="border-white/30 focus:border-white bg-white/90 text-gray-800">
-              <SelectValue placeholder="Sélectionner" />
+            <SelectTrigger className="border-2 border-white/40 focus:border-white focus:ring-2 focus:ring-white/50 bg-white/15 backdrop-blur-md text-white transition-all duration-300 hover:bg-white/20 h-14 text-lg rounded-xl shadow-lg">
+              <SelectValue placeholder="Sélectionner votre sexe" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectItem value="M">Homme</SelectItem>
-              <SelectItem value="F">Femme</SelectItem>
+            <SelectContent className="bg-white/95 backdrop-blur-xl border-white/30 shadow-2xl rounded-xl">
+              <SelectItem
+                value="M"
+                className="hover:bg-blue-50/80 text-gray-800 text-lg py-3"
+              >
+                Homme
+              </SelectItem>
+              <SelectItem
+                value="F"
+                className="hover:bg-blue-50/80 text-gray-800 text-lg py-3"
+              >
+                Femme
+              </SelectItem>
             </SelectContent>
           </Select>
           {errors.sexe && (
-            <p className="text-white text-sm bg-red-700 p-1 rounded">
+            <p className="text-red-300 text-sm font-medium bg-red-900/30 backdrop-blur-sm rounded-lg px-3 py-2 border border-red-500/30">
               {errors.sexe.message}
             </p>
           )}
@@ -654,46 +680,57 @@ const AdherentRegistrationForm = forwardRef<
       </div>
 
       {/* Address */}
-      <div className="space-y-2">
-        <Label htmlFor="Address" className="text-white">
-          Adresse
+      <div className="space-y-3">
+        <Label
+          htmlFor="Address"
+          className="text-white font-semibold text-base tracking-wide uppercase text-shadow-sm"
+        >
+          Adresse Complète
         </Label>
         <Input
           id="Address"
           {...register("Address", { required: "L'adresse est requise" })}
-          placeholder="Adresse complète"
-          className="border-white/30 focus:border-white bg-white/90 text-gray-800"
+          placeholder="Votre adresse complète (rue, ville, code postal)"
+          className="border-2 border-white/40 focus:border-white focus:ring-2 focus:ring-white/50 bg-white/15 backdrop-blur-md text-white placeholder:text-white/70 transition-all duration-300 hover:bg-white/20 focus:bg-white/25 h-14 text-lg rounded-xl shadow-lg"
         />
         {errors.Address && (
-          <p className="text-white text-sm bg-red-700 p-1 rounded">
+          <p className="text-red-300 text-sm font-medium bg-red-900/30 backdrop-blur-sm rounded-lg px-3 py-2 border border-red-500/30">
             {errors.Address.message}
           </p>
         )}
       </div>
 
       {/* Photo Section */}
-      <div className="space-y-4">
-        <Label className="text-white">Photo (optionnel)</Label>
+      <div className="space-y-6">
+        <div className="text-center">
+          <Label className="text-white font-semibold text-xl tracking-wide uppercase text-shadow-sm">
+            📸 Photo de Profil
+          </Label>
+          <p className="text-white/80 text-sm mt-2 font-medium">
+            Ajoutez une photo pour personnaliser votre profil
+          </p>
+        </div>
 
         {/* Photo Preview */}
         {photoPreview && (
           <div className="flex justify-center">
-            <div className="relative">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/40 to-purple-500/40 rounded-full blur-xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
               <Image
                 src={photoPreview}
                 alt="Aperçu"
                 width={150}
                 height={150}
-                className="object-cover rounded-full border-2 border-white"
+                className="relative object-cover rounded-full border-4 border-white/50 shadow-2xl backdrop-blur-sm"
               />
               <Button
                 type="button"
                 variant="destructive"
                 size="sm"
-                className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 bg-red-700 hover:bg-red-800"
+                className="absolute -top-2 -right-2 h-8 w-8 rounded-full p-0 shadow-lg bg-red-600/90 hover:bg-red-700 backdrop-blur-sm border-2 border-white/30 transition-all duration-200"
                 onClick={removePhoto}
               >
-                <X className="h-3 w-3" />
+                <X className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -716,17 +753,19 @@ const AdherentRegistrationForm = forwardRef<
             type="button"
             variant="outline"
             onClick={openPhotoModal}
-            className="gap-2 border-white text-black hover:bg-white hover:text-black"
+            className="gap-3 border-2 border-white/50 bg-white/10 hover:bg-white/20 text-white hover:text-white backdrop-blur-md transition-all duration-300 px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 rounded-xl"
             disabled={isUploading}
           >
-            <Camera className="h-4 w-4" />
-            Prendre une photo
+            <Camera className="h-6 w-6" />
+            {photoPreview ? "Modifier la photo" : "📷 Ajouter une photo"}
           </Button>
         </div>
 
-        <p className="text-xs text-white text-center">
-          JPG, PNG ou GIF. Maximum 5MB.
-        </p>
+        <div className="text-center">
+          <p className="text-sm text-white/70 bg-white/5 backdrop-blur-sm rounded-xl px-6 py-3 inline-block border border-white/20 shadow-lg">
+            ✨ JPG, PNG ou GIF • Maximum 5MB • Optionnel
+          </p>
+        </div>
       </div>
     </div>
   );
