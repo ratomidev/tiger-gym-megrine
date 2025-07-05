@@ -121,12 +121,12 @@ export default function RegisterPage() {
           {isSuccess ? (
             <RegistrationSuccess onReset={handleReset} />
           ) : (
-            <Card className="w-full max-w-3xl shadow-2xl border-white/10 bg-white/95 backdrop-blur-lg">
+            <Card className="w-full max-w-3xl shadow-2xl border-white/10 bg-transparent ">
               <CardHeader className="text-center pb-4">
-                <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
+                <CardTitle className="text-3xl font-bold text-white mb-2">
                   Inscription Adhérent
                 </CardTitle>
-                <CardDescription className="text-gray-600 text-lg">
+                <CardDescription className="text-white text-lg">
                   Remplissez le formulaire ci-dessous pour vous inscrire
                 </CardDescription>
               </CardHeader>
@@ -137,7 +137,7 @@ export default function RegisterPage() {
 
               <CardFooter className="flex justify-end space-x-4 pt-6 pb-6">
                 <Button
-                  className="bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-900 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  className="bg-white hover:bg-gray-100 text-black px-8 py-3 text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
                 >
