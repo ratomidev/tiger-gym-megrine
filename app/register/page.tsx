@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import MemberRegistrationForm from "@/components/landing/register-form";
-import RegistrationSuccess from "@/components/member/RegistrationSuccess";
+import RegistrationSuccess from "@/components/landing/RegistrationSuccess";
 import BackgroundCarousel from "@/components/landing/background-carousel";
 import Navbar from "@/components/landing/navbar";
 import { Button } from "@/components/ui/button";

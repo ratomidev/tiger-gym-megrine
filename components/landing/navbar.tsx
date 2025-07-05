@@ -7,11 +7,9 @@ import MobileMenu from "./mobile-menu";
 import { Menu as MenuIcon, X as XIcon } from "lucide-react";
 
 const LINKS = [
-  { label: "Accueil", href: "/" },
-  { label: "Programmes", href: "/programs" },
-  { label: "Entraîneurs", href: "/trainers" },
-  { label: "Adhésion", href: "/membership" },
-  { label: "À Propos", href: "/about" },
+  { label: "Accueil", href: "/landing" },
+  { label: "S'inscrire", href: "/register" },
+  { label: "A propos", href: "/contact" },
   { label: "Contact", href: "/contact" },
 ];
 
