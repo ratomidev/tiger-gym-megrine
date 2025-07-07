@@ -177,7 +177,7 @@ export default function AboutPage() {
             </h3>
             <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-2xl mx-auto">
               Transformez votre corps, dépassez vos limites et atteignez vos
-              objectifs avec notre équipe d'experts.
+              objectifs avec notre équipe d&apos;experts.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <a
@@ -191,7 +191,7 @@ export default function AboutPage() {
                 href="/landing"
                 className="group bg-white/10 hover:bg-white/20 text-white font-semibold px-10 py-4 rounded-xl transition-all duration-300 border border-white/30 hover:border-white/50"
               >
-                Retour à l'accueil
+                Retour à l&apos;accueil
               </a>
             </div>
           </div>

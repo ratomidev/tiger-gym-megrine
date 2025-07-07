@@ -14,6 +14,7 @@ const PUBLIC_PATHS = [
   "/api/upload/photo",
   "/landing",
   "/about",
+  "/",
 ];
 
 // Define owner-only paths
