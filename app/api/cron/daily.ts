@@ -1,19 +1,20 @@
-// app/api/cron/daily.ts
+// pages/api/cron/daily.ts
 
-import { NextResponse } from 'next/server';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-export async function GET() {
+export const config = {
+  schedule: '0 0 * * *', // runs daily at midnight UTC
+};
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     console.log("✅ Running daily cron job...");
 
-    // TODO: Add your real logic here (e.g., database updates, cleanup)
+    // Your logic here (e.g., expire subscriptions, cleanup)
 
-    return NextResponse.json({ message: 'Cron job ran successfully ✅' });
+    res.status(200).json({ message: 'Cron job ran successfully ✅' });
   } catch (error) {
     console.error("❌ Cron job error:", error);
-    return NextResponse.json(
-      { error: 'Cron job failed' },
-      { status: 500 }
-    );
+    res.status(500).json({ error: 'Cron job failed' });
   }
 }
