@@ -29,37 +29,44 @@ export async function GET(request: NextRequest) {
     console.log(`📅 Expired ${expiredSubscriptions.count} subscriptions`);
 
     // 2. Mark adherents as inactive if they have no active subscriptions
-    const adherentsWithoutActiveSubscriptions = await prisma.adherent.findMany({
+    const adherentsWithExpiredSubscriptions = await prisma.adherent.findMany({
       where: {
-        subscriptions: {
-          none: {
-            status: 'actif',
-            endDate: {
-              gte: now,
+        subscription: {
+          OR: [
+            {
+              status: 'expire',
             },
-          },
+            {
+              endDate: {
+                lt: now,
+              },
+            },
+          ],
         },
-        isActive: true,
+        isValidated: true,
       },
       select: {
         id: true,
+        firstName: true,
+        lastName: true,
       },
     });
 
-    if (adherentsWithoutActiveSubscriptions.length > 0) {
+    // Update validation status for adherents with expired subscriptions
+    if (adherentsWithExpiredSubscriptions.length > 0) {
       await prisma.adherent.updateMany({
         where: {
           id: {
-            in: adherentsWithoutActiveSubscriptions.map(a => a.id),
+            in: adherentsWithExpiredSubscriptions.map((a: { id: string; firstName: string; lastName: string }) => a.id),
           },
         },
         data: {
-          isActive: false,
+          isValidated: false,
         },
       });
     }
 
-    console.log(`👥 Marked ${adherentsWithoutActiveSubscriptions.length} adherents as inactive`);
+    console.log(`👥 Marked ${adherentsWithExpiredSubscriptions.length} adherents as inactive`);
 
     // 3. Clean up old logs or notifications (optional)
     // Example: Delete logs older than 30 days
@@ -79,7 +86,7 @@ export async function GET(request: NextRequest) {
     const result = {
       timestamp: now.toISOString(),
       expiredSubscriptions: expiredSubscriptions.count,
-      inactiveAdherents: adherentsWithoutActiveSubscriptions.length,
+      inactiveAdherents: adherentsWithExpiredSubscriptions.length,
       status: 'success',
     };
 
