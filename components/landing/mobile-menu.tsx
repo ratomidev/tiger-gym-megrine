@@ -9,7 +9,6 @@ interface MobileMenuProps {
   links: { label: string; href: string }[];
 }
 
-
 export default function MobileMenu({ open, onToggle, links }: MobileMenuProps) {
   const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
@@ -37,7 +36,7 @@ export default function MobileMenu({ open, onToggle, links }: MobileMenuProps) {
         <button
           key={href}
           onClick={() => handleNavigate(href)}
-          className="block w-full text-white text-left px-4 py-3 hover:bg-white/20 "
+          className="block w-full text-white text-left px-4 py-3 hover:bg-white/20  "
         >
           {label}
         </button>

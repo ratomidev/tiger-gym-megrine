@@ -24,7 +24,7 @@ export default function Navbar() {
       {isMobile ? (
         <>
           <button
-            className="text-white p-2"
+            className="text-white p-2 "
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <XIcon /> : <MenuIcon />}

@@ -4,7 +4,6 @@ import Navbar from "@/components/landing/navbar";
 import HeroSection from "@/components/landing/hero-section";
 import BackgroundCarousel from "@/components/landing/background-carousel";
 
-
 export default function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -13,14 +12,12 @@ export default function LandingPage() {
       <div className="absolute inset-0 bg-black/50 z-5"></div>
 
       {/* Navigation */}
-      <div className="relative z-10">
+      <div className="relative z-100">
         <Navbar />
       </div>
 
       {/* Hero Content */}
       <HeroSection />
-
-      
     </div>
   );
 }
