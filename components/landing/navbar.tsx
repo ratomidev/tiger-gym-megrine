@@ -9,8 +9,6 @@ import { Menu as MenuIcon, X as XIcon } from "lucide-react";
 const LINKS = [
   { label: "Accueil", href: "/landing" },
   { label: "S'inscrire", href: "/register" },
-  { label: "A propos", href: "/about" },
-  { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {

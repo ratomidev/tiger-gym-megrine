@@ -22,12 +22,12 @@ export default function HeroSection() {
         >
           Rejoignez-nous
         </Link>
-        <Link
+        {/* <Link
           href="/programs"
           className="px-8 py-3 border-2 border-white hover:bg-white hover:text-black text-white rounded-full font-semibold transition-all duration-200"
         >
           Voir les Programmes
-        </Link>
+        </Link> */}
       </div>
 
       {/* Stats Section */}
