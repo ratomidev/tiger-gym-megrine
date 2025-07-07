@@ -12,6 +12,7 @@ const PUBLIC_PATHS = [
   "/api/auth/register",
   "/api/register",
   "/api/upload/photo",
+  "/api/cron/daily", // Daily cron job API
 ];
 
 // Static assets should also be public
