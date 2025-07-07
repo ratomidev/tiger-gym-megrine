@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/daily",
+      "path": "/api/cron/daily?key=tiger_gym_megrine_cron_key",
       "schedule": "0 0 * * *"
     }
   ]

@@ -3,13 +3,25 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify the request is coming from Vercel Cron
+    // Check authorization from header OR query parameter
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_API_KEY}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const queryKey = request.nextUrl.searchParams.get('key');
+    
+    const hasValidHeader = authHeader === `Bearer ${process.env.CRON_API_KEY}`;
+    const hasValidQuery = queryKey === process.env.CRON_API_KEY;
+    
+    if (!hasValidHeader && !hasValidQuery) {
+      return NextResponse.json({ 
+        error: 'Unauthorized',
+        debug: {
+          hasHeader: !!authHeader,
+          hasQuery: !!queryKey,
+        }
+      }, { status: 401 });
     }
 
     console.log("✅ Running daily cron job...");
+    console.log("Auth method:", hasValidHeader ? "Header" : "Query parameter");
 
     const now = new Date();
     
