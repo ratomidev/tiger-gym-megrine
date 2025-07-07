@@ -4,6 +4,7 @@ import Navbar from "@/components/landing/navbar";
 import HeroSection from "@/components/landing/hero-section";
 import BackgroundCarousel from "@/components/landing/background-carousel";
 
+
 export default function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -18,6 +19,8 @@ export default function LandingPage() {
 
       {/* Hero Content */}
       <HeroSection />
+
+      
     </div>
   );
 }

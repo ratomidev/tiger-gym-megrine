@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SocialContacts from "./social-contacts";
 
 export default function HeroSection() {
   return (
@@ -51,6 +52,15 @@ export default function HeroSection() {
           </div>
           <div className="text-sm md:text-base text-gray-300">Accès</div>
         </div>
+      </div>
+
+      {/* Centered Social Contacts */}
+      <div className="mt-12 flex justify-center">
+        <SocialContacts
+          className="justify-center"
+          iconSize="w-8 h-8"
+          showLabels={false}
+        />
       </div>
     </main>
   );

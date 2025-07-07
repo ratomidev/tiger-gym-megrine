@@ -13,6 +13,7 @@ const PUBLIC_PATHS = [
   "/api/register",
   "/api/upload/photo",
   "/landing",
+  "/about",
 ];
 
 // Static assets should also be public
