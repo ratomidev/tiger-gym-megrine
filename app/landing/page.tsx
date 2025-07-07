@@ -4,6 +4,7 @@ import Navbar from "@/components/landing/navbar";
 import HeroSection from "@/components/landing/hero-section";
 import BackgroundCarousel from "@/components/landing/background-carousel";
 import ProgramsList from "@/components/landing/programs-list";
+import VideoSection from "@/components/landing/videoSection";
 import AboutSection from "@/components/landing/aboutSection";
 
 export default function LandingPage() {
@@ -22,6 +23,9 @@ export default function LandingPage() {
         {/* Hero Content */}
         <HeroSection />
       </div>
+      
+      {/* Video section */}
+      <VideoSection />
       
       {/* Programs section */}
       <ProgramsList />

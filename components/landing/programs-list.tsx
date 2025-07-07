@@ -39,69 +39,21 @@ const programsData: ProgramProps[] = [
 		],
 	},
 	{
-		id: "3",
-		title: "Yoga & Bien-être",
-		description:
-			"Améliorez votre flexibilité, votre équilibre et réduisez votre stress avec ce programme de yoga.",
-		imageUrl: "/images/program-yoga.jpg",
-		duration: "10 semaines",
-		level: "débutant",
-		category: "Bien-être",
-		modules: [
-			"Postures de base du yoga",
-			"Techniques de respiration",
-			"Méditation guidée",
-			"Étirements pour la récupération",
-		],
-	},
-	{
-		id: "4",
-		title: "Perte de Poids",
-		description:
-			"Programme complet combinant exercices et nutrition pour une perte de poids durable.",
-		imageUrl: "/images/program-weight-loss.jpg",
-		duration: "16 semaines",
-		level: "débutant",
-		category: "Fitness",
-		modules: [
-			"Exercices brûle-graisses",
-			"Plan nutritionnel personnalisé",
-			"Suivi des progrès",
-			"Adaptations progressives",
-		],
-	},
-	{
-		id: "5",
-		title: "Cross Training",
-		description:
-			"Entraînement fonctionnel varié pour améliorer vos performances globales et votre condition physique.",
-		imageUrl: "/images/program-cross-training.jpg",
-		duration: "12 semaines",
-		level: "avancé",
-		category: "Fitness",
-		modules: [
-			"Mouvements olympiques",
-			"Entraînement métabolique",
-			"Gymnastique fonctionnelle",
-			"Récupération et mobilité",
-		],
-	},
-	{
-		id: "6",
-		title: "Remise en Forme",
-		description:
-			"Programme idéal pour les débutants souhaitant reprendre une activité physique régulière.",
-		imageUrl: "/images/program-fitness.jpg",
-		duration: "8 semaines",
-		level: "débutant",
-		category: "Fitness",
-		modules: [
-			"Introduction aux exercices de base",
-			"Renforcement musculaire doux",
-			"Cardio adapté",
-			"Étirements essentiels",
-		],
-	},
+    id: "5",
+    title: "Spinning & Cycling",
+    description:
+        "Cours collectifs dynamiques de vélo en salle pour brûler des calories et améliorer votre endurance cardiovasculaire.",
+    imageUrl: "/images/program-spinning.jpg", // You may want to update this image
+    duration: "Sessions de 45 min",
+    level: "débutant",
+    category: "Cours",
+    modules: [
+        "Spinning endurance",
+        "HIIT Cycling",
+        "Power Ride",
+        "Récupération active et étirements",
+    ],
+},
 ];
 
 // All available categories

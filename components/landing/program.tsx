@@ -84,12 +84,6 @@ export default function ProgramCard({
           </div>
         )}
       </CardContent>
-      
-      <CardFooter>
-        <Button variant="default" className="w-full">
-          Voir les détails <ArrowRight className="h-4 w-4 ml-1" />
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
