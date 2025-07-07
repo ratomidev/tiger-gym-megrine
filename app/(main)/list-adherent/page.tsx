@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MemberTable } from "@/components/member/table/AdherentTable";
 import { Toaster } from "sonner";
@@ -11,6 +12,7 @@ import { Adherent } from "@/types";
 export default function MemberListPage() {
   const [adherents, setAdherents] = useState<Adherent[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -51,7 +53,7 @@ export default function MemberListPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Liste des Adhérents</h1>
         <Button
-          onClick={() => (window.location.href = "/add-adherent")}
+          onClick={() => router.push("/add-adherent")}
           className="bg-black hover:bg-gray-800 text-white"
         >
           Ajouter un adhérent
