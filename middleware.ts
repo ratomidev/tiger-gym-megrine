@@ -16,6 +16,9 @@ const PUBLIC_PATHS = [
   "/about",
 ];
 
+// Define owner-only paths
+const OWNER_ONLY_PATHS = ["/home", "/users"];
+
 // Static assets should also be public
 const isStaticAsset = (path: string) => {
   return (
@@ -31,6 +34,13 @@ const isPublicPath = (path: string) => {
     PUBLIC_PATHS.some(
       (publicPath) => path === publicPath || path.startsWith(`${publicPath}/`)
     ) || isStaticAsset(path)
+  );
+};
+
+// Check if a path requires owner role
+const isOwnerOnlyPath = (path: string) => {
+  return OWNER_ONLY_PATHS.some(
+    (ownerPath) => path === ownerPath || path.startsWith(`${ownerPath}/`)
   );
 };
 
@@ -76,7 +86,16 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
-    // User is authenticated, allow request to proceed
+    // Check if the path requires owner role
+    if (isOwnerOnlyPath(pathname)) {
+      if (user.role !== "OWNER") {
+        // Redirect non-owners to a different page (e.g., adherents list or unauthorized page)
+        const redirectUrl = new URL("/list-adherent", request.url);
+        return NextResponse.redirect(redirectUrl);
+      }
+    }
+
+    // User is authenticated and has proper role, allow request to proceed
     return NextResponse.next();
   } catch (error) {
     console.error("Authentication error:", error);
