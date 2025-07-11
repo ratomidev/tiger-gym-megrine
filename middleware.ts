@@ -15,6 +15,7 @@ const PUBLIC_PATHS = [
   "/landing",
   "/about",
   "/",
+  "/api/cron/daily", // Daily cron job API
 ];
 
 // Define owner-only paths
