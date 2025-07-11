@@ -1,40 +1,43 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
     // Check authorization from header OR query parameter
-    const authHeader = request.headers.get('authorization');
-    const queryKey = request.nextUrl.searchParams.get('key');
-    
+    const authHeader = request.headers.get("authorization");
+    const queryKey = request.nextUrl.searchParams.get("key");
+
     const hasValidHeader = authHeader === `Bearer ${process.env.CRON_API_KEY}`;
     const hasValidQuery = queryKey === process.env.CRON_API_KEY;
-    
+
     if (!hasValidHeader && !hasValidQuery) {
-      return NextResponse.json({ 
-        error: 'Unauthorized',
-        debug: {
-          hasHeader: !!authHeader,
-          hasQuery: !!queryKey,
-        }
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          error: "Unauthorized",
+          debug: {
+            hasHeader: !!authHeader,
+            hasQuery: !!queryKey,
+          },
+        },
+        { status: 401 }
+      );
     }
 
     console.log("✅ Running daily cron job...");
     console.log("Auth method:", hasValidHeader ? "Header" : "Query parameter");
 
     const now = new Date();
-    
+
     // 1. Expire subscriptions that have passed their end date
     const expiredSubscriptions = await prisma.subscription.updateMany({
       where: {
         endDate: {
           lt: now,
         },
-        status: 'actif',
+        status: "actif",
       },
       data: {
-        status: 'expire',
+        status: "expiré",
       },
     });
 
@@ -46,7 +49,7 @@ export async function GET(request: NextRequest) {
         subscription: {
           OR: [
             {
-              status: 'expire',
+              status: "expire",
             },
             {
               endDate: {
@@ -69,7 +72,9 @@ export async function GET(request: NextRequest) {
       await prisma.adherent.updateMany({
         where: {
           id: {
-            in: adherentsWithExpiredSubscriptions.map((a: { id: string; firstName: string; lastName: string }) => a.id),
+            in: adherentsWithExpiredSubscriptions.map(
+              (a: { id: string; firstName: string; lastName: string }) => a.id
+            ),
           },
         },
         data: {
@@ -78,7 +83,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    console.log(`👥 Marked ${adherentsWithExpiredSubscriptions.length} adherents as inactive`);
+    console.log(
+      `👥 Marked ${adherentsWithExpiredSubscriptions.length} adherents as inactive`
+    );
 
     // 3. Clean up old logs or notifications (optional)
     // Example: Delete logs older than 30 days
@@ -99,28 +106,27 @@ export async function GET(request: NextRequest) {
       timestamp: now.toISOString(),
       expiredSubscriptions: expiredSubscriptions.count,
       inactiveAdherents: adherentsWithExpiredSubscriptions.length,
-      status: 'success',
+      status: "success",
     };
 
     console.log("✅ Daily cron job completed successfully:", result);
 
-    return NextResponse.json({ 
-      message: 'Daily cron job completed successfully ✅',
+    return NextResponse.json({
+      message: "Daily cron job completed successfully ✅",
       data: result,
     });
-
   } catch (error) {
     console.error("❌ Daily cron job error:", error);
     return NextResponse.json(
-      { 
-        error: 'Daily cron job failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
+      {
+        error: "Daily cron job failed",
+        details: error instanceof Error ? error.message : "Unknown error",
         timestamp: new Date().toISOString(),
-      }, 
+      },
       { status: 500 }
     );
   }
 }
 
 // Ensure this route is treated as dynamic
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
