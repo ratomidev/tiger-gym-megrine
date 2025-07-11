@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import MemberRegistrationForm from "@/components/landing/register-form";
 import RegistrationSuccess from "@/components/landing/RegistrationSuccess";
 import BackgroundCarousel from "@/components/landing/background-carousel";
@@ -33,6 +33,13 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isImageUploading, setIsImageUploading] = useState(false);
+
+  // Scroll to top when success component is rendered
+  useEffect(() => {
+    if (isSuccess) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [isSuccess]);
 
   /**
    * Handle form submission
