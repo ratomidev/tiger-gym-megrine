@@ -11,7 +11,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import {
-  Dumbbell,
   Users,
   Clock,
   MapPin,
@@ -51,11 +50,17 @@ export default function TigerGymLanding() {
       {/* Header */}
       <header className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-red-900/20">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
-              <Dumbbell className="h-6 w-6 text-white" />
+          <div className="flex items-center space-x-0">
+            <div className="rounded-lg  justify-center ">
+              <Image
+                src="/images/logo.png"
+                alt="Tiger Gym Logo"
+                width={400}
+                height={400}
+                className="w-12 h-12 object-contain"
+              />
             </div>
-            <div>
+            <div className="">
               <h1 className="text-xl font-bold text-white">TIGER GYM</h1>
               <p className="text-xs text-red-400">MEGRINE</p>
             </div>
@@ -163,14 +168,15 @@ export default function TigerGymLanding() {
             <Card className="bg-black border-red-900/20 text-white">
               <CardHeader className="text-center">
                 <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Dumbbell className="h-8 w-8 text-white" />
+                  <Users className="h-8 w-8 text-white" />
                 </div>
                 <CardTitle className="text-xl">Équipement Premium</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-400 text-center">
                   Équipement de fitness à la pointe de la technologie des
-                  meilleures marques pour des résultats d&apos;entraînement optimaux
+                  meilleures marques pour des résultats d&apos;entraînement
+                  optimaux
                 </p>
               </CardContent>
             </Card>
@@ -212,7 +218,9 @@ export default function TigerGymLanding() {
       <section id="plans" className="py-20 bg-black">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Formules d&apos;Abonnement</h2>
+            <h2 className="text-4xl font-bold mb-4">
+              Formules d&apos;Abonnement
+            </h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               Choisissez la formule parfaite qui correspond à votre parcours
               fitness et à votre budget
@@ -511,7 +519,8 @@ export default function TigerGymLanding() {
                 <h3 className="text-2xl font-bold mb-4">Suivez-Nous</h3>
                 <p className="text-gray-400 mb-6">
                   Restez connecté et recevez quotidiennement motivation,
-                  conseils d&apos;entraînement et actualités de Tiger Gym Megrine.
+                  conseils d&apos;entraînement et actualités de Tiger Gym
+                  Megrine.
                 </p>
                 <div className="flex space-x-4 items-center justify-center">
                   <Link
@@ -561,8 +570,8 @@ export default function TigerGymLanding() {
             Prêt à Commencer Votre Transformation?
           </h2>
           <p className="text-xl text-red-100 mb-8 max-w-2xl mx-auto">
-            Rejoignez Tiger Gym Megrine aujourd&apos;hui et devenez membre de notre
-            famille fitness. Votre meilleure version vous attend.
+            Rejoignez Tiger Gym Megrine aujourd&apos;hui et devenez membre de
+            notre famille fitness. Votre meilleure version vous attend.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
@@ -588,12 +597,24 @@ export default function TigerGymLanding() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
-                  <Dumbbell className="h-6 w-6 text-white" />
-                </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">TIGER GYM</h3>
-                  <p className="text-xs text-red-400">MEGRINE</p>
+                  <div className="flex items-center space-x-0">
+                    <div className="rounded-lg  justify-center ">
+                      <Image
+                        src="/images/logo.png"
+                        alt="Tiger Gym Logo"
+                        width={400}
+                        height={400}
+                        className="w-12 h-12 object-contain"
+                      />
+                    </div>
+                    <div className="">
+                      <h1 className="text-xl font-bold text-white">
+                        TIGER GYM
+                      </h1>
+                      <p className="text-xs text-red-400">MEGRINE</p>
+                    </div>
+                  </div>
                 </div>
               </div>
               <p className="text-gray-400 text-sm">

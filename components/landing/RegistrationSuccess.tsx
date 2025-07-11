@@ -13,7 +13,7 @@ interface RegistrationSuccessProps {
 
 export default function RegistrationSuccess({}: RegistrationSuccessProps) {
   return (
-    <Card className="w-full max-w-3xl shadow-lg border-white/20 bg-transparent">
+    <Card className="w-full max-w-3xl shadow-lg border-white/20 bg-transparent mt-20">
       <CardHeader className="text-center pb-2">
         <div className="flex justify-center mb-4">
           <CheckCircle2 className="h-16 w-16 text-green-400" />
