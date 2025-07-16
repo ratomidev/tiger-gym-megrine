@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   MapPin,
   Phone,
@@ -12,7 +11,6 @@ import {
 } from "lucide-react";
 
 export default function Footer() {
-  const router = useRouter();
   
   return (
     <footer className="bg-black py-12 border-t border-red-900/20">
