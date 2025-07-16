@@ -34,6 +34,7 @@ export default function RegisterPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isImageUploading, setIsImageUploading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Scroll to top when success component is rendered
   useEffect(() => {
@@ -41,6 +42,27 @@ export default function RegisterPage() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [isSuccess]);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node) &&
+        isMobileMenuOpen
+      ) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
 
   /**
    * Handle form submission
@@ -125,7 +147,10 @@ export default function RegisterPage() {
         <BackgroundCarousel />
         <div className="absolute inset-0 bg-black/50 z-5"></div>
 
-        <header className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-red-900/20">
+        <header
+          className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-red-900/20"
+          ref={mobileMenuRef}
+        >
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center space-x-0">
               <div className="rounded-lg  justify-center ">
