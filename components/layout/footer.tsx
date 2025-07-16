@@ -129,8 +129,28 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-red-900/20 mt-8 pt-8 text-center">
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 text-sm mb-2">
             © {new Date().getFullYear()} Tiger Gym Megrine. Tous droits réservés.
+          </p>
+          <p className="text-gray-500 text-xs flex items-center justify-center">
+            Conçu et développé par 
+            <Link 
+              href="https://ryxlabs.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center ml-1 text-gray-400 hover:text-red-400 transition-colors"
+            >
+              Ryx<span className="text-red-500 font-semibold">Labs</span>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-3 w-3 ml-1" 
+                viewBox="0 0 20 20" 
+                fill="currentColor"
+              >
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+              </svg>
+            </Link>
           </p>
         </div>
       </div>
