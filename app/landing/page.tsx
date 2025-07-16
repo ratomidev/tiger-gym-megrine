@@ -20,6 +20,8 @@ import {
   Instagram,
   Check,
   Star,
+  Menu,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,6 +30,7 @@ import { useRouter } from "next/navigation";
 export default function TigerGymLanding() {
   const router = useRouter();
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const carouselImages = [
     "/images/photo3v3.png",
     "/images/photo1.jpg",
@@ -43,6 +46,14 @@ export default function TigerGymLanding() {
 
   const handleRegisterClick = () => {
     router.push("/register");
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -65,6 +76,8 @@ export default function TigerGymLanding() {
               <p className="text-xs text-red-400">MEGRINE</p>
             </div>
           </div>
+
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
             <Link
               href="#home"
@@ -85,13 +98,66 @@ export default function TigerGymLanding() {
               À Propos
             </Link>
           </nav>
+
+          {/* Desktop CTA Button */}
           <Button
             onClick={handleRegisterClick}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="hidden md:block bg-red-600 hover:bg-red-700 text-white"
           >
             Rejoindre
           </Button>
+
+          {/* Mobile Hamburger Menu Button */}
+          <button
+            onClick={toggleMobileMenu}
+            className="md:hidden text-white hover:text-red-400 transition-colors"
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </button>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-black/95 backdrop-blur-sm border-t border-red-900/20">
+            <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
+              <Link
+                href="#home"
+                onClick={closeMobileMenu}
+                className="text-white hover:text-red-400 transition-colors py-2"
+              >
+                Accueil
+              </Link>
+              <Link
+                href="#plans"
+                onClick={closeMobileMenu}
+                className="text-white hover:text-red-400 transition-colors py-2"
+              >
+                Abonnements
+              </Link>
+              <Link
+                href="#about"
+                onClick={closeMobileMenu}
+                className="text-white hover:text-red-400 transition-colors py-2"
+              >
+                À Propos
+              </Link>
+              <Button
+                onClick={() => {
+                  handleRegisterClick();
+                  closeMobileMenu();
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white mt-4 w-full"
+              >
+                Rejoindre
+              </Button>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Hero Section with Carousel */}

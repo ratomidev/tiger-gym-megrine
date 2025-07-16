@@ -16,7 +16,7 @@ import {
 
 import { AdherentFormValues } from "@/types";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Menu, X } from "lucide-react";
 import Image from "next/image";
 
 import Router from "next/router";
@@ -33,6 +33,7 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isImageUploading, setIsImageUploading] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Scroll to top when success component is rendered
   useEffect(() => {
@@ -109,6 +110,14 @@ export default function RegisterPage() {
     Router.push("/register");
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <>
       <div className="relative min-h-screen overflow-hidden">
@@ -133,33 +142,88 @@ export default function RegisterPage() {
                 <p className="text-xs text-red-400">MEGRINE</p>
               </div>
             </div>
+
+            {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-8">
               <Link
-                href="#home"
+                href="/landing#home"
                 className="text-white hover:text-red-400 transition-colors"
               >
                 Accueil
               </Link>
               <Link
-                href="#plans"
+                href="/landing#plans"
                 className="text-white hover:text-red-400 transition-colors"
               >
                 Abonnements
               </Link>
               <Link
-                href="#about"
+                href="/landing#about"
                 className="text-white hover:text-red-400 transition-colors"
               >
                 À Propos
               </Link>
             </nav>
+
+            {/* Desktop CTA Button */}
             <Button
               onClick={handleRegisterClick}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="hidden md:block bg-red-600 hover:bg-red-700 text-white"
             >
               Rejoindre
             </Button>
+
+            {/* Mobile Hamburger Menu Button */}
+            <button
+              onClick={toggleMobileMenu}
+              className="md:hidden text-white hover:text-red-400 transition-colors"
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
           </div>
+
+          {/* Mobile Navigation Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden bg-black/95 backdrop-blur-sm border-t border-red-900/20">
+              <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
+                <Link
+                  href="/landing#home"
+                  onClick={closeMobileMenu}
+                  className="text-white hover:text-red-400 transition-colors py-2"
+                >
+                  Accueil
+                </Link>
+                <Link
+                  href="/landing#plans"
+                  onClick={closeMobileMenu}
+                  className="text-white hover:text-red-400 transition-colors py-2"
+                >
+                  Abonnements
+                </Link>
+                <Link
+                  href="/landing#about"
+                  onClick={closeMobileMenu}
+                  className="text-white hover:text-red-400 transition-colors py-2"
+                >
+                  À Propos
+                </Link>
+                <Button
+                  onClick={() => {
+                    handleRegisterClick();
+                    closeMobileMenu();
+                  }}
+                  className="bg-red-600 hover:bg-red-700 text-white mt-4 w-full"
+                >
+                  Rejoindre
+                </Button>
+              </nav>
+            </div>
+          )}
         </header>
 
         {/* Main Content */}
