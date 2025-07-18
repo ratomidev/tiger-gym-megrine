@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+
 import {
   Users,
   Clock,
@@ -21,28 +21,14 @@ import {
   Check,
   Star,
 } from "lucide-react";
-import Image from "next/image";
+
 import Link from "next/link";
 import Footer from "@/components/landing/footer";
 
 import Navbar from "@/components/landing/navbar";
+import BackgroundCarousel from "@/components/landing/background-carousel";
 
 export default function TigerGymLanding() {
-  const [carouselIndex, setCarouselIndex] = useState(0);
-
-  const carouselImages = [
-    "/images/photo3v3.png",
-    "/images/photo1.jpg",
-    "/images/photo2v3.png",
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCarouselIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [carouselImages.length]);
-
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -50,30 +36,14 @@ export default function TigerGymLanding() {
       <header className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-red-900/20">
         <Navbar />
       </header>
+
       {/* Hero Section with Carousel */}
       <section
         id="home"
-        className="relative h-screen flex items-center justify-center overflow-hidden"
+        className="relative h-screen flex items-center justify-center overflow-hidden "
       >
-        <div className="absolute inset-0 z-0">
-          {carouselImages.map((src, i) => (
-            <div
-              key={i}
-              className={`absolute inset-0 transition-opacity duration-1500 ${
-                carouselIndex === i ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <Image
-                src={src}
-                alt={`Fond de Gym ${i + 1}`}
-                fill
-                className="object-cover"
-                priority={i === 0}
-              />
-            </div>
-          ))}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-red-900/40"></div>
-        </div>
+        <BackgroundCarousel />
+        <div className="absolute inset-0 bg-black/50 z-5"></div>
 
         <div className="relative z-10 text-center max-w-4xl mx-auto px-4 -mt-20">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
