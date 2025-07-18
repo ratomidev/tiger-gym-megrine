@@ -16,4 +16,5 @@ export interface AuthCredentials {
 export interface AuthResponse {
   user: User;
   message: string;
+  
 }
