@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -40,7 +39,7 @@ export default function TigerGymLanding() {
       {/* Hero Section with Carousel */}
       <section
         id="home"
-        className="relative h-screen flex items-center justify-center overflow-hidden "
+        className="relative h-screen flex items-center justify-center overflow-hidden mt-18"
       >
         <BackgroundCarousel />
         <div className="absolute inset-0 bg-black/50 z-5"></div>
@@ -499,21 +498,6 @@ export default function TigerGymLanding() {
             Rejoignez Tiger Gym Megrine aujourd&apos;hui et devenez membre de
             notre famille fitness. Votre meilleure version vous attend.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              className="bg-white text-red-600 hover:bg-gray-100 px-8 py-4 text-lg"
-            >
-              Essai Gratuit
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-red-600 px-8 py-4 text-lg bg-transparent"
-            >
-              Visiter la Salle
-            </Button>
-          </div>
         </div>
       </section>
 
