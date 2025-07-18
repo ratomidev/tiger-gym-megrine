@@ -5,16 +5,16 @@
 ## 📷 Captures d'écran
 
 ### Page d'accueil
-![Page d'accueil](screenshots/landing-page.jpeg)
+![Page d'accueil](screenshots/landing-page.jpg)
 
 ### Tableau de bord administrateur
-![Tableau de bord](screenshots/dashboard.jpeg)
+![Tableau de bord](screenshots/dashboard.jpg)
 
 ### Liste des adherents
-![Tableau de bord](screenshots/dashboard2.jpeg)
+![liste des adherents](screenshots/dashboard2.jpg)
 
 ### Page d'inscription
-![Page d'inscription](screenshots/register.jpeg)
+![Page d'inscription](screenshots/register.jpg)
 
 ## 📝 Description
 
