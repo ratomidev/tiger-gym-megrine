@@ -54,7 +54,7 @@ export default function MemberListPage() {
         <h1 className="text-3xl font-bold">Liste des Adhérents</h1>
         <Button
           onClick={() => router.push("/add-adherent")}
-          className="bg-black hover:bg-gray-800 text-white"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           Ajouter un adhérent
         </Button>

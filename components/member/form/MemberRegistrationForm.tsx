@@ -340,7 +340,7 @@ const AdherentRegistrationForm = forwardRef<
                     onClick={() => {
                       fileInputRef.current?.click();
                     }}
-                    className="gap-2 bg-blue-600 hover:bg-blue-700"
+                    className="gap-2"
                   >
                     <Upload className="h-4 w-4" />
                     Choisir dans la galerie

@@ -179,7 +179,7 @@ export default function Page() {
         size="lg"
         onClick={handleSubmit}
         disabled={isLoading || isPhotoUploading}
-        className="fixed bottom-8 right-8 px-8 py-6 bg-primary hover:bg-primary/90 dark:bg-blue-600 dark:hover:bg-blue-700 text-primary-foreground flex items-center gap-2 shadow-xl rounded-full z-50"
+        className="fixed bottom-8 right-8 px-8 py-6 bg-primary hover:bg-primary/90  text-primary-foreground flex items-center gap-2 shadow-xl rounded-2xl z-50"
       >
         {isLoading || isPhotoUploading ? (
           <>

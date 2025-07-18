@@ -126,16 +126,16 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   };
 
   const getStatusColor = (status: string | undefined) => {
-    if (!status) return "bg-gray-100 text-gray-500 border-gray-200";
+    if (!status) return "bg-muted text-muted-foreground border-border";
     switch (status.toLowerCase()) {
       case "actif":
-        return "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100";
+        return "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900";
       case "suspendu":
-        return "bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100";
+        return "bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-800 dark:hover:bg-amber-900";
       case "expired":
-        return "bg-red-50 text-red-600 border-red-200 hover:bg-red-100";
+        return "bg-red-50 text-red-600 border-red-200 hover:bg-red-100 dark:bg-red-950 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900";
       default:
-        return "bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200";
+        return "bg-muted text-muted-foreground border-border hover:bg-muted/80";
     }
   };
 
@@ -143,7 +143,9 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   const handleDeleteClick = (adherent: Adherent) => {
     // First ensure any lingering dialog elements are cleaned up
     document.querySelectorAll('[role="dialog"]').forEach((el) => el.remove());
-    document.querySelectorAll('[data-radix-focus-guard]').forEach((el) => el.remove());
+    document
+      .querySelectorAll("[data-radix-focus-guard]")
+      .forEach((el) => el.remove());
     document.body.style.pointerEvents = "";
     document.body.style.overflow = "";
 
@@ -176,8 +178,12 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
       setTimeout(() => {
         setAdherentToDelete(null);
         // Forcefully clean up any lingering dialog elements
-        document.querySelectorAll('[role="dialog"]').forEach((el) => el.remove());
-        document.querySelectorAll('[data-radix-focus-guard]').forEach((el) => el.remove());
+        document
+          .querySelectorAll('[role="dialog"]')
+          .forEach((el) => el.remove());
+        document
+          .querySelectorAll("[data-radix-focus-guard]")
+          .forEach((el) => el.remove());
         document.body.style.pointerEvents = "";
         document.body.style.overflow = "";
       }, 300);
@@ -197,8 +203,12 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
       document.body.style.pointerEvents = "";
       document.body.style.overflow = "";
       document.querySelectorAll('[role="dialog"]').forEach((el) => el.remove());
-      document.querySelectorAll('[data-radix-focus-guard]').forEach((el) => el.remove());
-      document.querySelectorAll('[data-radix-popper-content-wrapper]').forEach((el) => el.remove());
+      document
+        .querySelectorAll("[data-radix-focus-guard]")
+        .forEach((el) => el.remove());
+      document
+        .querySelectorAll("[data-radix-popper-content-wrapper]")
+        .forEach((el) => el.remove());
     };
 
     // Execute cleanup multiple times with increasing delays
@@ -241,7 +251,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
       <div className="rounded-md border">
         <div className="overflow-auto max-h-[500px]">
           <Table>
-            <TableHeader className="bg-white sticky top-0 z-10">
+            <TableHeader className="sticky top-0 z-10">
               <TableRow>
                 <TableHead className="w-[250px]">Nom et Prénom</TableHead>
                 {showPhoneColumn && (
@@ -270,7 +280,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                   <TableRow
                     key={adherent.id}
                     onClick={() => handleRowClick(adherent.id)}
-                    className="cursor-pointer hover:bg-gray-50"
+                    className="cursor-pointer hover:bg-muted/50"
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -291,7 +301,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                         </Avatar>
                         <div>
                           <p className="font-medium">{`${adherent.firstName} ${adherent.lastName}`}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             {adherent.sexe === "M" ? "Homme" : "Femme"}
                           </p>
                         </div>
@@ -312,10 +322,10 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                         {adherent.subscription ? (
                           <div>
                             <div>{adherent.subscription.plan}</div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-muted-foreground">
                               {`${adherent.subscription.price} DT`}
                               {adherent.subscription.remaining > 0 && (
-                                <span className="text-amber-600 ml-1">
+                                <span className="text-amber-600 dark:text-amber-400 ml-1">
                                   (Reste: {adherent.subscription.remaining} DT)
                                 </span>
                               )}
@@ -352,10 +362,10 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                       ) : (
                         <Badge
                           variant="outline"
-                          className="bg-gray-50 text-gray-500 border-gray-200 px-2.5 py-0.5"
+                          className="bg-muted text-muted-foreground border-border px-2.5 py-0.5"
                         >
                           <span className="flex items-center">
-                            <span className="mr-1.5 h-2 w-2 rounded-full bg-gray-400"></span>
+                            <span className="mr-1.5 h-2 w-2 rounded-full bg-muted-foreground"></span>
                             N/A
                           </span>
                         </Badge>
@@ -404,7 +414,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                               </DropdownMenuItem>
                             </Link>
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-destructive"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteClick(adherent);
@@ -431,7 +441,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                         showEndDateColumn,
                       ].filter(Boolean).length + 2
                     }
-                    className="text-center py-6 text-gray-500"
+                    className="text-center py-6 text-muted-foreground"
                   >
                     Aucun adhérent trouvé pour cette recherche
                   </TableCell>
