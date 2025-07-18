@@ -15,6 +15,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -48,11 +49,19 @@ const items = [
 export function SidebarNavigation() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const { setOpenMobile, isMobile } = useSidebar();
 
   // Handle logout click
   const handleLogout = async () => {
     await logout();
     router.push("/auth/login");
+  };
+
+  // Handle menu item click
+  const handleMenuItemClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   // Display name or fallback
@@ -75,7 +84,7 @@ export function SidebarNavigation() {
               {filteredItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url}>
+                    <Link href={item.url} onClick={handleMenuItemClick}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
