@@ -29,7 +29,6 @@ import {
   MapPin,
   Phone,
   Trash,
-  X,
 } from "lucide-react";
 import {
   Dialog,
@@ -48,7 +47,8 @@ export default function DetailsAdherent() {
   const [error, setError] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showAddSubscriptionModal, setShowAddSubscriptionModal] = useState(false);
+  const [showAddSubscriptionModal, setShowAddSubscriptionModal] =
+    useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   useEffect(() => {
     document.title = "Détails Adhérent-Tiger Gym";
@@ -236,7 +236,7 @@ export default function DetailsAdherent() {
       {/* Photo Modal */}
       {adherent?.photoUrl && (
         <Dialog open={showPhotoModal} onOpenChange={setShowPhotoModal}>
-          <DialogContent className="max-w-2xl w-full p-0">
+          <DialogContent className=" p-0">
             <DialogHeader className="p-6 pb-2">
               <DialogTitle className="text-lg font-semibold">
                 Photo de {adherent.firstName} {adherent.lastName}
