@@ -29,7 +29,15 @@ import {
   MapPin,
   Phone,
   Trash,
+  X,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import Image from "next/image";
 
 export default function DetailsAdherent() {
   const params = useParams();
@@ -40,8 +48,8 @@ export default function DetailsAdherent() {
   const [error, setError] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showAddSubscriptionModal, setShowAddSubscriptionModal] =
-    useState(false);
+  const [showAddSubscriptionModal, setShowAddSubscriptionModal] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
   useEffect(() => {
     document.title = "Détails Adhérent-Tiger Gym";
   }, []);
@@ -225,6 +233,30 @@ export default function DetailsAdherent() {
         />
       )}
 
+      {/* Photo Modal */}
+      {adherent?.photoUrl && (
+        <Dialog open={showPhotoModal} onOpenChange={setShowPhotoModal}>
+          <DialogContent className="max-w-2xl w-full p-0">
+            <DialogHeader className="p-6 pb-2">
+              <DialogTitle className="text-lg font-semibold">
+                Photo de {adherent.firstName} {adherent.lastName}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="relative px-6 pb-6">
+              <div className="relative bg-muted rounded-lg overflow-hidden">
+                <Image
+                  src={adherent.photoUrl}
+                  alt={`${adherent.firstName} ${adherent.lastName}`}
+                  width={600}
+                  height={600}
+                  className="w-full h-auto object-cover max-h-[70vh]"
+                />
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
       {/* Delete Confirmation Dialog */}
       <DeleteAdherentDialog
         open={showDeleteDialog}
@@ -262,14 +294,17 @@ export default function DetailsAdherent() {
         <Card className="h-full flex flex-col">
           <CardHeader className="pb-1 pt-4">
             <div className="flex items-center gap-3">
-              <Avatar className="h-14 w-14 border-2 border-gray-100">
+              <Avatar
+                className="h-14 w-14 border-2 border-gray-100 cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => adherent?.photoUrl && setShowPhotoModal(true)}
+              >
                 {adherent.photoUrl ? (
                   <AvatarImage
                     src={adherent.photoUrl}
                     alt={`${adherent.firstName} ${adherent.lastName}`}
                   />
                 ) : (
-                  <AvatarFallback className="bg-black text-white text-xl">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xl">
                     {getInitials(adherent.firstName, adherent.lastName)}
                   </AvatarFallback>
                 )}

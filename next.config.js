@@ -7,6 +7,12 @@ const nextConfig = {
         hostname: 'example.com', // Replace with your actual domain
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'nhkugxbv18ys76te.public.blob.vercel-storage.com',
+        port: '',
+        pathname: '/**',
+      },
       // Add other domains as needed
     ],
   },
