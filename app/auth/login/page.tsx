@@ -1,8 +1,6 @@
-// app/(auth)/login/page.tsx
-
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Toaster, toast } from "sonner";
@@ -12,6 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 function LoginForm() {
+  useEffect(() => {
+    document.title = "Login - Tiger Gym";
+  }, []);
   const router = useRouter();
   const { login } = useAuth();
   const searchParams = useSearchParams();

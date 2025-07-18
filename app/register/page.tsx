@@ -36,6 +36,9 @@ export default function RegisterPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    document.title = "Inscription - Tiger Gym";
+  }, []);
   // Scroll to top when success component is rendered
   useEffect(() => {
     if (isSuccess) {

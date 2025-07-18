@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 import { AdherentFormValues, SubscriptionFormValues } from "@/types";
@@ -13,6 +13,11 @@ export default function Page() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isPhotoUploading, setIsPhotoUploading] = useState(false);
+
+  // Set page title
+  useEffect(() => {
+    document.title = "Ajouter un Adhérent - Tiger Gym";
+  }, []);
 
   // References to form methods
   const adherentFormRef = useRef<{

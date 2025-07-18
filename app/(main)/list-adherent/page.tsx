@@ -14,6 +14,11 @@ export default function MemberListPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Set page title
+  useEffect(() => {
+    document.title = "Liste des Adhérents - Tiger Gym";
+  }, []);
+
   useEffect(() => {
     const fetchMembers = async () => {
       try {

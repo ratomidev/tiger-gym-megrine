@@ -42,7 +42,9 @@ export default function DetailsAdherent() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showAddSubscriptionModal, setShowAddSubscriptionModal] =
     useState(false);
-
+  useEffect(() => {
+    document.title = "Détails Adhérent-Tiger Gym";
+  }, []);
   useEffect(() => {
     const fetchAdherent = async () => {
       try {

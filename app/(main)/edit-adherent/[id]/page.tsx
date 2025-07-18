@@ -65,6 +65,9 @@ export default function EditAdherentPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  useEffect(() => {
+    document.title = "Modifier Adhérent-Tiger Gym";
+  }, []);
 
   useEffect(() => {
     const fetchAdherent = async () => {
@@ -91,7 +94,8 @@ export default function EditAdherentPage() {
             sexe: adherent.sexe || "",
             subscriptionPlan: adherent.subscription?.plan || "",
             subscriptionPrice: adherent.subscription?.price?.toString() || "",
-            subscriptionRemaining: adherent.subscription?.remaining?.toString() || "0",
+            subscriptionRemaining:
+              adherent.subscription?.remaining?.toString() || "0",
             subscriptionStatus: adherent.subscription?.status || "",
             subscriptionStartDate: adherent.subscription?.startDate
               ? format(new Date(adherent.subscription.startDate), "yyyy-MM-dd")
@@ -235,7 +239,8 @@ export default function EditAdherentPage() {
     if (
       formData.subscriptionPrice &&
       formData.subscriptionRemaining &&
-      Number(formData.subscriptionRemaining) > Number(formData.subscriptionPrice)
+      Number(formData.subscriptionRemaining) >
+        Number(formData.subscriptionPrice)
     ) {
       newErrors.subscriptionRemaining =
         "Le montant restant ne peut pas dépasser le prix";
@@ -541,7 +546,9 @@ export default function EditAdherentPage() {
                           handleInputChange("subscriptionPrice", e.target.value)
                         }
                         placeholder="0"
-                        className={errors.subscriptionPrice ? "border-red-500" : ""}
+                        className={
+                          errors.subscriptionPrice ? "border-red-500" : ""
+                        }
                       />
                       {errors.subscriptionPrice && (
                         <p className="text-sm text-red-500">
@@ -562,10 +569,15 @@ export default function EditAdherentPage() {
                         step="0.01"
                         value={formData.subscriptionRemaining}
                         onChange={(e) =>
-                          handleInputChange("subscriptionRemaining", e.target.value)
+                          handleInputChange(
+                            "subscriptionRemaining",
+                            e.target.value
+                          )
                         }
                         placeholder="0"
-                        className={errors.subscriptionRemaining ? "border-red-500" : ""}
+                        className={
+                          errors.subscriptionRemaining ? "border-red-500" : ""
+                        }
                       />
                       {errors.subscriptionRemaining && (
                         <p className="text-sm text-red-500">

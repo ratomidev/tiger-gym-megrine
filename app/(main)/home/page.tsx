@@ -2,7 +2,10 @@ export const dynamic = "force-dynamic";
 
 import RevenueSection from "@/components/dashboard/RevenueSection";
 import AdherentOverviewSection from "@/components/dashboard/AdherentOverviewSection";
-
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Dashboard - Tiger Gym",
+};
 export default function HomePage() {
   return (
     <div className="relative h-full w-full">
