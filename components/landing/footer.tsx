@@ -2,16 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Facebook,
-  Instagram,
-} from "lucide-react";
+import { MapPin, Phone, Mail, Facebook, Instagram } from "lucide-react";
 
 export default function Footer() {
-  
   return (
     <footer className="bg-black py-12 border-t border-red-900/20">
       <div className="container mx-auto px-4">
@@ -103,7 +96,7 @@ export default function Footer() {
                 <Mail className="h-4 w-4 text-red-500 flex-shrink-0" />
                 <p>info@tigergymmegrine.tn</p>
               </div>
-              
+
               <div className="flex space-x-4 items-center mt-4 pt-2">
                 <Link
                   href="https://www.facebook.com/profile.php?id=61573911387157"
@@ -128,21 +121,23 @@ export default function Footer() {
 
         <div className="border-t border-red-900/20 mt-8 pt-8 text-center">
           <p className="text-gray-400 text-sm mb-2">
-            © {new Date().getFullYear()} Tiger Gym Megrine. Tous droits réservés.
+            © {new Date().getFullYear()} Tiger Gym Megrine. Tous droits
+            réservés.
           </p>
           <p className="text-gray-500 text-xs flex items-center justify-center">
-            Conçu et développé par 
-            <Link 
-              href="https://ryxlabs.com" 
-              target="_blank" 
+            Conçu et développé par
+            <Link
+              href="https://.com"
+              target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center ml-1 text-gray-400 hover:text-red-400 transition-colors"
             >
-              Ryx<span className="text-red-500 font-semibold">Labs</span>
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-3 w-3 ml-1" 
-                viewBox="0 0 20 20" 
+              {/* Ryxplore Logo */}
+              <span className="text-red-500 font-semibold">Ryx</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-3 w-3 ml-1"
+                viewBox="0 0 20 20"
                 fill="currentColor"
               >
                 <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
