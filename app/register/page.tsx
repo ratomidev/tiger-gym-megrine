@@ -16,12 +16,10 @@ import {
 
 import { AdherentFormValues } from "@/types";
 import { toast } from "sonner";
-import { Loader2, Menu, X } from "lucide-react";
-import Image from "next/image";
+import { Loader2 } from "lucide-react";
 
-import Router from "next/router";
-import Link from "next/link";
-import Footer from "@/components/layout/footer";
+import Footer from "@/components/landing/footer";
+import Navbar from "@/components/landing/navbar";
 
 /**
  * Public registration page for new gym members
@@ -130,127 +128,15 @@ export default function RegisterPage() {
     // Force reload to reset all form fields
     window.location.reload();
   };
-  const handleRegisterClick = () => {
-    Router.push("/register");
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
 
   return (
     <>
       <div className="relative min-h-screen overflow-hidden">
-        {/* Background with overlay */}
         <BackgroundCarousel />
         <div className="absolute inset-0 bg-black/50 z-5"></div>
 
-        <header
-          className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-red-900/20"
-          ref={mobileMenuRef}
-        >
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-0">
-              <div className="rounded-lg  justify-center ">
-                <Image
-                  src="/images/logo.png"
-                  alt="Tiger Gym Logo"
-                  width={400}
-                  height={400}
-                  className="w-12 h-12 object-contain"
-                />
-              </div>
-              <div className="">
-                <h1 className="text-xl font-bold text-white">TIGER GYM</h1>
-                <p className="text-xs text-red-400">MEGRINE</p>
-              </div>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              <Link
-                href="/landing#home"
-                className="text-white hover:text-red-400 transition-colors"
-              >
-                Accueil
-              </Link>
-              <Link
-                href="/landing#plans"
-                className="text-white hover:text-red-400 transition-colors"
-              >
-                Abonnements
-              </Link>
-              <Link
-                href="/landing#about"
-                className="text-white hover:text-red-400 transition-colors"
-              >
-                À Propos
-              </Link>
-            </nav>
-
-            {/* Desktop CTA Button */}
-            <Button
-              onClick={handleRegisterClick}
-              className="hidden md:block bg-red-600 hover:bg-red-700 text-white"
-            >
-              Rejoindre
-            </Button>
-
-            {/* Mobile Hamburger Menu Button */}
-            <button
-              onClick={toggleMobileMenu}
-              className="md:hidden text-white hover:text-red-400 transition-colors"
-              aria-label="Toggle mobile menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
-          </div>
-
-          {/* Mobile Navigation Menu */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden bg-black/95 backdrop-blur-sm border-t border-red-900/20">
-              <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-                <Link
-                  href="/landing#home"
-                  onClick={closeMobileMenu}
-                  className="text-white hover:text-red-400 transition-colors py-2"
-                >
-                  Accueil
-                </Link>
-                <Link
-                  href="/landing#plans"
-                  onClick={closeMobileMenu}
-                  className="text-white hover:text-red-400 transition-colors py-2"
-                >
-                  Abonnements
-                </Link>
-                <Link
-                  href="/landing#about"
-                  onClick={closeMobileMenu}
-                  className="text-white hover:text-red-400 transition-colors py-2"
-                >
-                  À Propos
-                </Link>
-                <Button
-                  onClick={() => {
-                    handleRegisterClick();
-                    closeMobileMenu();
-                  }}
-                  className="bg-red-600 hover:bg-red-700 text-white mt-4 w-full"
-                >
-                  Rejoindre
-                </Button>
-              </nav>
-            </div>
-          )}
+        <header className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-red-900/20">
+          <Navbar />
         </header>
 
         {/* Main Content */}
@@ -303,8 +189,6 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
-      
-      {/* Footer */}
       <Footer />
     </>
   );

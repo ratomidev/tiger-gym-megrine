@@ -20,18 +20,16 @@ import {
   Instagram,
   Check,
   Star,
-  Menu,
-  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import Footer from "@/components/layout/footer";
+import Footer from "@/components/landing/footer";
+
+import Navbar from "@/components/landing/navbar";
 
 export default function TigerGymLanding() {
-  const router = useRouter();
   const [carouselIndex, setCarouselIndex] = useState(0);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const carouselImages = [
     "/images/photo3v3.png",
     "/images/photo1.jpg",
@@ -45,122 +43,13 @@ export default function TigerGymLanding() {
     return () => clearInterval(timer);
   }, [carouselImages.length]);
 
-  const handleRegisterClick = () => {
-    router.push("/register");
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
-
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
+
       <header className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-sm border-b border-red-900/20">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-0">
-            <div className="rounded-lg  justify-center ">
-              <Image
-                src="/images/logo.png"
-                alt="Tiger Gym Logo"
-                width={400}
-                height={400}
-                className="w-12 h-12 object-contain"
-              />
-            </div>
-            <div className="">
-              <h1 className="text-xl font-bold text-white">TIGER GYM</h1>
-              <p className="text-xs text-red-400">MEGRINE</p>
-            </div>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            <Link
-              href="#home"
-              className="text-white hover:text-red-400 transition-colors"
-            >
-              Accueil
-            </Link>
-            <Link
-              href="#plans"
-              className="text-white hover:text-red-400 transition-colors"
-            >
-              Abonnements
-            </Link>
-            <Link
-              href="#about"
-              className="text-white hover:text-red-400 transition-colors"
-            >
-              À Propos
-            </Link>
-          </nav>
-
-          {/* Desktop CTA Button */}
-          <Button
-            onClick={handleRegisterClick}
-            className="hidden md:block bg-red-600 hover:bg-red-700 text-white"
-          >
-            Rejoindre
-          </Button>
-
-          {/* Mobile Hamburger Menu Button */}
-          <button
-            onClick={toggleMobileMenu}
-            className="md:hidden text-white hover:text-red-400 transition-colors"
-            aria-label="Toggle mobile menu"
-          >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
-        </div>
-
-        {/* Mobile Navigation Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-black/95 backdrop-blur-sm border-t border-red-900/20">
-            <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-              <Link
-                href="#home"
-                onClick={closeMobileMenu}
-                className="text-white hover:text-red-400 transition-colors py-2"
-              >
-                Accueil
-              </Link>
-              <Link
-                href="#plans"
-                onClick={closeMobileMenu}
-                className="text-white hover:text-red-400 transition-colors py-2"
-              >
-                Abonnements
-              </Link>
-              <Link
-                href="#about"
-                onClick={closeMobileMenu}
-                className="text-white hover:text-red-400 transition-colors py-2"
-              >
-                À Propos
-              </Link>
-              <Button
-                onClick={() => {
-                  handleRegisterClick();
-                  closeMobileMenu();
-                }}
-                className="bg-red-600 hover:bg-red-700 text-white mt-4 w-full"
-              >
-                Rejoindre
-              </Button>
-            </nav>
-          </div>
-        )}
+        <Navbar />
       </header>
-
       {/* Hero Section with Carousel */}
       <section
         id="home"
@@ -658,7 +547,6 @@ export default function TigerGymLanding() {
         </div>
       </section>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
