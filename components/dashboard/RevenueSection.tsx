@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { addMonths, format } from "date-fns";
+import { addMonths, format, subMonths } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
   IconArrowUpRight,
@@ -11,24 +11,21 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Select,
+  SelectContent,  
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+ } from "../ui/select";
 
 // Types
 type SubscriptionData = {
   price: number;
-};
-
-type PlanBreakdown = {
-  name: string;
-  revenue: number;
-  count: number;
-  percentage: number;
 };
 
 type RevenueData = {
@@ -56,11 +53,53 @@ export default function RevenueSection() {
   const [data, setData] = useState<RevenueData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+
+  // Définir le type pour les options de mois
+  interface MonthOption {
+    value: string;
+    label: string;
+    date: Date;
+  }
+
+  // Générer la liste des 12 derniers mois
+  const generateMonthOptions = (): MonthOption[] => {
+    const months: MonthOption[] = [];
+    const currentDate = new Date();
+    
+    for (let i = 0; i < 12; i++) {
+      const monthDate = subMonths(currentDate, i);
+      const value = format(monthDate, "yyyy-MM");
+      const label = format(monthDate, "MMMM yyyy", { locale: fr });
+      
+      months.push({
+        value,
+        label: i === 0 ? `${label} (Actuel)` : label,
+        date: monthDate
+      });
+    }
+    
+    return months;
+  };
+
+  const monthOptions = generateMonthOptions();
+
+  useEffect(() => {
+    // Définir le mois actuel comme sélectionné par défaut
+    if (!selectedMonth && monthOptions.length > 0) {
+      setSelectedMonth(monthOptions[0].value);
+    }
+  }, [selectedMonth, monthOptions]);
 
   useEffect(() => {
     const fetchRevenueData = async () => {
       try {
-        const response = await fetch("/api/revenue");
+        // Ajouter le mois sélectionné à la requête API
+        const url = selectedMonth 
+          ? `/api/revenue?month=${selectedMonth}`
+          : "/api/revenue";
+          
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Failed to fetch revenue data");
         }
@@ -73,13 +112,23 @@ export default function RevenueSection() {
       }
     };
 
-    fetchRevenueData();
-  }, []);
+    if (selectedMonth) {
+      setLoading(true);
+      fetchRevenueData();
+    }
+  }, [selectedMonth]);
+
+  const handleMonthChange = (value: string) => {
+    setSelectedMonth(value);
+  };
 
   if (loading) {
     return (
       <div className="space-y-8">
-        <Skeleton className="h-9 w-64" />
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-9 w-64" />
+          <Skeleton className="h-10 w-48" />
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
@@ -117,7 +166,7 @@ export default function RevenueSection() {
     return (
       <div className="space-y-8">
         <h2 className="text-3xl font-bold tracking-tight">
-          Analyse des Revenus
+          Analyse des Revenus 
         </h2>
         <Card>
           <CardContent className="pt-6">
@@ -177,28 +226,34 @@ export default function RevenueSection() {
       ? ((averagePrice - prevAveragePrice) / prevAveragePrice) * 100
       : 0;
 
-  const planBreakdown: PlanBreakdown[] = data.subscriptionsByPlan
-    .map((plan) => ({
-      name: plan.name,
-      revenue: plan.revenue,
-      count: plan.count,
-      percentage:
-        totalRevenueThisMonth > 0
-          ? (plan.revenue / totalRevenueThisMonth) * 100
-          : 0,
-    }))
-    .sort((a, b) => b.revenue - a.revenue);
+  // Obtenir le nom du mois sélectionné pour l'affichage
+  const selectedMonthData = monthOptions.find(m => m.value === selectedMonth);
+  const selectedMonthLabel = selectedMonthData?.label || "Mois sélectionné";
 
   return (
     <div className="space-y-8">
-      <h2 className="text-3xl font-bold tracking-tight">Analyse des Revenus</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold tracking-tight">Analyse des Revenus</h2>
+        <Select value={selectedMonth} onValueChange={handleMonthChange}>
+          <SelectTrigger className="w-64">
+            <SelectValue placeholder="Sélectionner un mois" />
+          </SelectTrigger>
+          <SelectContent>
+            {monthOptions.map((month) => (
+              <SelectItem key={month.value} value={month.value}>
+                {month.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Carte de revenu du mois en cours */}
+        {/* Carte de revenu du mois sélectionné */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Revenu Total ({format(now, "MMMM yyyy", { locale: fr })})
+              Revenu Total ({selectedMonthLabel.replace(" (Actuel)", "")})
             </CardTitle>
             <IconCash className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -218,7 +273,7 @@ export default function RevenueSection() {
                 {Math.abs(revenueChangePercent).toFixed(1)}%
               </Badge>
               <span className="text-xs text-muted-foreground ml-2">
-                par rapport au mois dernier
+                vs. {format(subMonths(selectedMonthData?.date || new Date(), 1), "MMMM yyyy", { locale: fr })}
               </span>
             </div>
           </CardContent>
@@ -251,7 +306,7 @@ export default function RevenueSection() {
                 {Math.abs(projectedChangePercent).toFixed(1)}%
               </Badge>
               <span className="text-xs text-muted-foreground ml-2">
-                vs. mois actuel
+                vs. mois sélectionné
               </span>
             </div>
           </CardContent>
@@ -283,7 +338,7 @@ export default function RevenueSection() {
                 {Math.abs(averagePriceChangePercent).toFixed(1)}%
               </Badge>
               <span className="text-xs text-muted-foreground ml-2">
-                par rapport au mois dernier
+                par rapport au mois précédent
               </span>
             </div>
           </CardContent>
@@ -324,48 +379,12 @@ export default function RevenueSection() {
                 )}
               </Badge>
               <span className="text-xs text-muted-foreground ml-2">
-                par rapport au mois dernier
+                par rapport au mois précédent
               </span>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Répartition des revenus par plan */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Répartition des Revenus par Plan</CardTitle>
-          <CardDescription>
-            Distribution des revenus selon les différents types
-            d&apos;abonnements
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {planBreakdown.map((plan) => (
-              <div key={plan.name} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="font-medium">{plan.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      ({plan.count} abonnements)
-                    </div>
-                  </div>
-                  <div className="font-medium">
-                    {formatCurrency(plan.revenue)}
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Progress value={plan.percentage} className="h-2" />
-                  <div className="text-sm text-muted-foreground">
-                    {plan.percentage.toFixed(1)}%
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
