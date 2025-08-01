@@ -8,20 +8,16 @@ import {
   IconArrowDownRight,
   IconCash,
 } from "@tabler/icons-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Select,
-  SelectContent,  
+import {
+  Select,
+  SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
- } from "../ui/select";
+  SelectValue,
+} from "../ui/select";
 
 // Types
 type SubscriptionData = {
@@ -66,19 +62,19 @@ export default function RevenueSection() {
   const generateMonthOptions = (): MonthOption[] => {
     const months: MonthOption[] = [];
     const currentDate = new Date();
-    
+
     for (let i = 0; i < 12; i++) {
       const monthDate = subMonths(currentDate, i);
       const value = format(monthDate, "yyyy-MM");
       const label = format(monthDate, "MMMM yyyy", { locale: fr });
-      
+
       months.push({
         value,
         label: i === 0 ? `${label} (Actuel)` : label,
-        date: monthDate
+        date: monthDate,
       });
     }
-    
+
     return months;
   };
 
@@ -95,10 +91,10 @@ export default function RevenueSection() {
     const fetchRevenueData = async () => {
       try {
         // Ajouter le mois sélectionné à la requête API
-        const url = selectedMonth 
+        const url = selectedMonth
           ? `/api/revenue?month=${selectedMonth}`
           : "/api/revenue";
-          
+
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Failed to fetch revenue data");
@@ -166,7 +162,7 @@ export default function RevenueSection() {
     return (
       <div className="space-y-8">
         <h2 className="text-3xl font-bold tracking-tight">
-          Analyse des Revenus 
+          Analyse des Revenus
         </h2>
         <Card>
           <CardContent className="pt-6">
@@ -227,15 +223,17 @@ export default function RevenueSection() {
       : 0;
 
   // Obtenir le nom du mois sélectionné pour l'affichage
-  const selectedMonthData = monthOptions.find(m => m.value === selectedMonth);
+  const selectedMonthData = monthOptions.find((m) => m.value === selectedMonth);
   const selectedMonthLabel = selectedMonthData?.label || "Mois sélectionné";
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Analyse des Revenus</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h2 className="text-3xl font-bold tracking-tight">
+          Analyse des Revenus
+        </h2>
         <Select value={selectedMonth} onValueChange={handleMonthChange}>
-          <SelectTrigger className="w-64">
+          <SelectTrigger className="w-fit">
             <SelectValue placeholder="Sélectionner un mois" />
           </SelectTrigger>
           <SelectContent>
@@ -273,7 +271,12 @@ export default function RevenueSection() {
                 {Math.abs(revenueChangePercent).toFixed(1)}%
               </Badge>
               <span className="text-xs text-muted-foreground ml-2">
-                vs. {format(subMonths(selectedMonthData?.date || new Date(), 1), "MMMM yyyy", { locale: fr })}
+                vs.{" "}
+                {format(
+                  subMonths(selectedMonthData?.date || new Date(), 1),
+                  "MMMM yyyy",
+                  { locale: fr }
+                )}
               </span>
             </div>
           </CardContent>
