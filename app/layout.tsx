@@ -14,7 +14,11 @@ export const metadata: Metadata = {
   title: "Tiger Gym",
   description: "Tiger Gym Megrine - Votre salle de sport de référence",
   icons: {
-    icon: "/images/logo.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/images/logo.png", sizes: "32x32", type: "image/png" },
+      { url: "/images/logo.png", sizes: "16x16", type: "image/png" },
+    ],
     shortcut: "/images/logo.png",
     apple: "/images/logo.png",
   },
