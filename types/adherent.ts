@@ -8,7 +8,7 @@ export interface Adherent {
   phone: string;
   birthDate: Date;
   Address: string; // Note: Consider renaming to lowercase 'address' for consistency
-  createdAt: Date;
+  createdAt: Date; 
   isValidated: boolean;
   photoUrl?: string | null;
   sexe: 'M' | 'F'; // Using string literals for better type safety
