@@ -25,7 +25,8 @@ const OWNER_ONLY_PATHS = ["/home", "/users"];
 const isStaticAsset = (path: string) => {
   return (
     path.startsWith("/_next") ||
-    path.startsWith("/favicon.ico") ||
+    path.startsWith("/logo.png") ||
+    path.startsWith("/images/") ||
     path.includes(".") // Files with extensions are typically static assets
   );
 };
@@ -117,8 +118,8 @@ export const config = {
      * 1. /api/auth/* (authentication API routes)
      * 2. /_next/* (Next.js internals)
      * 3. /fonts/* (static font assets)
-     * 4. /favicon.ico, /logo.png, etc (static assets)
+     * 4. /favicon.ico, /logo.png, /images/* etc (static assets)
      */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    "/((?!_next/static|_next/image|favicon.ico|logo.png|images/).*)",
   ],
 };
