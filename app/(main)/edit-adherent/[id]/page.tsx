@@ -139,6 +139,9 @@ export default function EditAdherentPage() {
       case "3 mois":
         endDate.setMonth(endDate.getMonth() + 3);
         break;
+      case "4 mois":
+        endDate.setMonth(endDate.getMonth() + 4);
+        break;
       case "6 mois":
         endDate.setMonth(endDate.getMonth() + 6);
         break;
@@ -380,121 +383,209 @@ export default function EditAdherentPage() {
           <CardHeader>
             <CardTitle>Informations personnelles</CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* First Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom *</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) =>
-                      handleInputChange("firstName", e.target.value)
-                    }
-                    className={errors.firstName ? "border-red-500" : ""}
-                  />
-                  {errors.firstName && (
-                    <p className="text-sm text-red-500">{errors.firstName}</p>
-                  )}
-                </div>
+          <CardContent className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Basic Information Section */}
+              <div className="space-y-4">
+                <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                  Identité
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* First Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                      Prénom *
+                    </Label>
+                    <Input
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={(e) =>
+                        handleInputChange("firstName", e.target.value)
+                      }
+                      className={`h-11 ${
+                        errors.firstName 
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                          : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                      } transition-all`}
+                      placeholder="Entrer le prénom"
+                    />
+                    {errors.firstName && (
+                      <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                        <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                        {errors.firstName}
+                      </p>
+                    )}
+                  </div>
 
-                {/* Last Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom *</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) =>
-                      handleInputChange("lastName", e.target.value)
-                    }
-                    className={errors.lastName ? "border-red-500" : ""}
-                  />
-                  {errors.lastName && (
-                    <p className="text-sm text-red-500">{errors.lastName}</p>
-                  )}
-                </div>
+                  {/* Last Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                      Nom *
+                    </Label>
+                    <Input
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) =>
+                        handleInputChange("lastName", e.target.value)
+                      }
+                      className={`h-11 ${
+                        errors.lastName 
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                          : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                      } transition-all`}
+                      placeholder="Entrer le nom"
+                    />
+                    {errors.lastName && (
+                      <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                        <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                        {errors.lastName}
+                      </p>
+                    )}
+                  </div>
 
-                {/* Email */}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    className={errors.email ? "border-red-500" : ""}
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-red-500">{errors.email}</p>
-                  )}
-                </div>
+                  {/* Birth Date */}
+                  <div className="space-y-2">
+                    <Label htmlFor="birthDate" className="text-sm font-medium text-gray-700">
+                      Date de naissance *
+                    </Label>
+                    <DatePicker
+                      id="birthDate"
+                      value={formData.birthDate}
+                      onChange={(value) => handleInputChange("birthDate", value)}
+                      placeholder="Sélectionner une date"
+                      error={!!errors.birthDate}
+                      className="h-11"
+                    />
+                    {errors.birthDate && (
+                      <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                        <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                        {errors.birthDate}
+                      </p>
+                    )}
+                  </div>
 
-                {/* Phone */}
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Téléphone *</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                    className={errors.phone ? "border-red-500" : ""}
-                  />
-                  {errors.phone && (
-                    <p className="text-sm text-red-500">{errors.phone}</p>
-                  )}
-                </div>
-
-                {/* Birth Date */}
-                <div className="space-y-2">
-                  <DatePicker
-                    id="birthDate"
-                    label="Date de naissance"
-                    value={formData.birthDate}
-                    onChange={(value) => handleInputChange("birthDate", value)}
-                    placeholder="Sélectionner une date"
-                    error={!!errors.birthDate}
-                    required
-                  />
-                  {errors.birthDate && (
-                    <p className="text-sm text-red-500">{errors.birthDate}</p>
-                  )}
-                </div>
-
-                {/* Gender */}
-                <div className="space-y-2">
-                  <Label htmlFor="sexe">Sexe *</Label>
-                  <Select
-                    value={formData.sexe}
-                    onValueChange={(value) => handleInputChange("sexe", value)}
-                  >
-                    <SelectTrigger
-                      className={errors.sexe ? "border-red-500" : ""}
+                  {/* Gender */}
+                  <div className="space-y-2">
+                    <Label htmlFor="sexe" className="text-sm font-medium text-gray-700">
+                      Sexe *
+                    </Label>
+                    <Select
+                      value={formData.sexe}
+                      onValueChange={(value) => handleInputChange("sexe", value)}
                     >
-                      <SelectValue placeholder="Sélectionner le sexe" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="M">Homme</SelectItem>
-                      <SelectItem value="F">Femme</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.sexe && (
-                    <p className="text-sm text-red-500">{errors.sexe}</p>
-                  )}
+                      <SelectTrigger
+                        className={`h-11 ${
+                          errors.sexe 
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                            : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                        } transition-all`}
+                      >
+                        <SelectValue placeholder="Sélectionner le sexe" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="M">
+                          <div className="flex items-center gap-2">
+                            <span>👨</span>
+                            Homme
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="F">
+                          <div className="flex items-center gap-2">
+                            <span>👩</span>
+                            Femme
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {errors.sexe && (
+                      <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                        <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                        {errors.sexe}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Address */}
-              <div className="space-y-2">
-                <Label htmlFor="Address">Adresse *</Label>
-                <Input
-                  id="Address"
-                  value={formData.Address}
-                  onChange={(e) => handleInputChange("Address", e.target.value)}
-                  className={errors.Address ? "border-red-500" : ""}
-                />
-                {errors.Address && (
-                  <p className="text-sm text-red-500">{errors.Address}</p>
-                )}
+              {/* Contact Information Section */}
+              <div className="space-y-4">
+                <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                  Coordonnées
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                      Email *
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      className={`h-11 ${
+                        errors.email 
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                          : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                      } transition-all`}
+                      placeholder="exemple@email.com"
+                    />
+                    {errors.email && (
+                      <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                        <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Phone */}
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                      Téléphone *
+                    </Label>
+                    <Input
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange("phone", e.target.value)}
+                      className={`h-11 ${
+                        errors.phone 
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                          : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                      } transition-all`}
+                      placeholder="+216 XX XXX XXX"
+                    />
+                    {errors.phone && (
+                      <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                        <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                        {errors.phone}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Address - Full Width */}
+                <div className="space-y-2">
+                  <Label htmlFor="Address" className="text-sm font-medium text-gray-700">
+                    Adresse complète *
+                  </Label>
+                  <Input
+                    id="Address"
+                    value={formData.Address}
+                    onChange={(e) => handleInputChange("Address", e.target.value)}
+                    className={`h-11 ${
+                      errors.Address 
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                        : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                    } transition-all`}
+                    placeholder="Rue, ville, code postal..."
+                  />
+                  {errors.Address && (
+                    <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                      <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                      {errors.Address}
+                    </p>
+                  )}
+                </div>
               </div>
             </form>
           </CardContent>
@@ -505,185 +596,233 @@ export default function EditAdherentPage() {
           <CardHeader>
             <CardTitle>Détails de l&apos;Abonnement</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="flex justify-center">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl w-full">
-                  {/* Subscription Plan */}
-                  <div className="space-y-2 w-48">
-                    <Label htmlFor="subscriptionPlan">
-                      Type d&apos;abonnement
-                    </Label>
-                    <Select
-                      value={formData.subscriptionPlan}
-                      onValueChange={(value) =>
-                        handleInputChange("subscriptionPlan", value)
-                      }
-                    >
-                      <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
-                        <SelectValue placeholder="Sélectionner le type d'abonnement" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="personnalisé">Personnalisé</SelectItem>
-                        <SelectItem value="1 mois">1 mois</SelectItem>
-                        <SelectItem value="3 mois">3 mois</SelectItem>
-                        <SelectItem value="6 mois">6 mois</SelectItem>
-                        <SelectItem value="1 an">1 an</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+          <CardContent className="space-y-8">
+            {/* Plan and Duration Section */}
+            <div className="space-y-4">
+              <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                Plan & Durée
+              </h3>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Subscription Plan */}
+                <div className="space-y-2">
+                  <Label htmlFor="subscriptionPlan" className="text-sm font-medium text-gray-700">
+                    Type d&apos;abonnement *
+                  </Label>
+                  <Select
+                    value={formData.subscriptionPlan}
+                    onValueChange={(value) =>
+                      handleInputChange("subscriptionPlan", value)
+                    }
+                  >
+                    <SelectTrigger className="h-11 border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all">
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="personnalisé">Personnalisé</SelectItem>
+                      <SelectItem value="1 mois">1 mois</SelectItem>
+                      <SelectItem value="3 mois">3 mois</SelectItem>
+                      <SelectItem value="4 mois">4 mois</SelectItem>
+                      <SelectItem value="6 mois">6 mois</SelectItem>
+                      <SelectItem value="1 an">1 an</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  {/* Start Date */}
+                {/* Start Date */}
+                <div className="space-y-2">
+                  <Label htmlFor="subscriptionStartDate" className="text-sm font-medium text-gray-700">
+                    Date de début *
+                  </Label>
                   <DatePicker
                     id="subscriptionStartDate"
-                    label="Date de début"
                     value={formData.subscriptionStartDate}
                     onChange={(value) => handleInputChange("subscriptionStartDate", value)}
                     placeholder="Sélectionner une date"
-                    width="w-58"
+                    className="h-11"
                   />
-
-                  {/* End Date */}
-                  <div className="space-y-2">
-                    <DatePicker
-                      id="subscriptionEndDate"
-                      label="Date de fin"
-                      value={formData.subscriptionEndDate}
-                      onChange={(value) => handleInputChange("subscriptionEndDate", value)}
-                      placeholder="Sélectionner une date"
-                      disabled={formData.subscriptionPlan !== "personnalisé"}
-                      width="w-58"
-                    />
-                    {formData.subscriptionPlan !== "personnalisé" && (
-                      <p className="text-xs text-gray-500">
-                        Calculée automatiquement selon le type d&apos;abonnement
-                        et la date de début.
-                      </p>
-                    )}
-                  </div>
                 </div>
-              </div>
 
-              <div className="flex justify-center">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
-                  {/* Subscription Price and Remaining Amount - combined in one cell */}
-                  <div className="space-y-2 col-span-1">
-                    <div className="flex gap-4">
-                      {/* Subscription Price */}
-                      <div className="flex-1 space-y-2">
-                        <Label htmlFor="subscriptionPrice">Prix (DT)</Label>
-                        <Input
-                          id="subscriptionPrice"
-                          type="number"
-                          value={formData.subscriptionPrice}
-                          onChange={(e) =>
-                            handleInputChange("subscriptionPrice", e.target.value)
-                          }
-                          placeholder="0"
-                          className={
-                            errors.subscriptionPrice ? "border-red-500" : ""
-                          }
-                        />
-                        {errors.subscriptionPrice && (
-                          <p className="text-sm text-red-500">
-                            {errors.subscriptionPrice}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Subscription Remaining */}
-                      <div className="flex-1 space-y-2">
-                        <Label htmlFor="subscriptionRemaining">
-                          Montant Restant
-                        </Label>
-                        <Input
-                          id="subscriptionRemaining"
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={formData.subscriptionRemaining}
-                          onChange={(e) =>
-                            handleInputChange(
-                              "subscriptionRemaining",
-                              e.target.value
-                            )
-                          }
-                          placeholder="0"
-                          className={
-                            errors.subscriptionRemaining ? "border-red-500" : ""
-                          }
-                        />
-                        {errors.subscriptionRemaining && (
-                          <p className="text-sm text-red-500">
-                            {errors.subscriptionRemaining}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Montant restant à payer (0 = payé intégralement)
+                {/* End Date */}
+                <div className="space-y-2">
+                  <Label htmlFor="subscriptionEndDate" className="text-sm font-medium text-gray-700">
+                    Date de fin
+                    {formData.subscriptionPlan === "personnalisé" && <span className="text-red-500 ml-1">*</span>}
+                  </Label>
+                  <DatePicker
+                    id="subscriptionEndDate"
+                    value={formData.subscriptionEndDate}
+                    onChange={(value) => handleInputChange("subscriptionEndDate", value)}
+                    placeholder="Sélectionner une date"
+                    disabled={formData.subscriptionPlan !== "personnalisé"}
+                    className="h-11"
+                  />
+                  {formData.subscriptionPlan !== "personnalisé" && (
+                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                      Calculée automatiquement
                     </p>
-                  </div>
-
-                  {/* Subscription Status */}
-                  <div className="space-y-2 w-48">
-                    <Label htmlFor="subscriptionStatus">Statut</Label>
-                    <Select
-                      value={formData.subscriptionStatus}
-                      onValueChange={(value) =>
-                        handleInputChange("subscriptionStatus", value)
-                      }
-                    >
-                      <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
-                        <SelectValue placeholder="Sélectionner le statut" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="actif">Actif</SelectItem>
-                        <SelectItem value="expiré">Expiré</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  )}
                 </div>
               </div>
+            </div>
 
-              {/* Options */}
-              <div className="space-y-4">
-                <Label>Options incluses</Label>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="hasCardioMusculation"
-                      checked={formData.hasCardioMusculation}
-                      onCheckedChange={(checked) =>
-                        handleInputChange(
-                          "hasCardioMusculation",
-                          checked as boolean
-                        )
+            {/* Financial Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                Informations Financières
+              </h3>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Subscription Price */}
+                <div className="space-y-2">
+                  <Label htmlFor="subscriptionPrice" className="text-sm font-medium text-gray-700">
+                    Prix (DT) *
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="subscriptionPrice"
+                      type="number"
+                      step="0.01"
+                      value={formData.subscriptionPrice}
+                      onChange={(e) =>
+                        handleInputChange("subscriptionPrice", e.target.value)
                       }
-                      className="border-gray-300"
+                      placeholder="0.00"
+                      className={`h-11 pr-12 ${
+                        errors.subscriptionPrice 
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                          : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                      } transition-all`}
                     />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 font-medium">
+                      DT
+                    </div>
+                  </div>
+                  {errors.subscriptionPrice && (
+                    <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                      <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                      {errors.subscriptionPrice}
+                    </p>
+                  )}
+                </div>
+
+                {/* Subscription Remaining */}
+                <div className="space-y-2">
+                  <Label htmlFor="subscriptionRemaining" className="text-sm font-medium text-gray-700">
+                    Montant Restant (DT)
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="subscriptionRemaining"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData.subscriptionRemaining}
+                      onChange={(e) =>
+                        handleInputChange("subscriptionRemaining", e.target.value)
+                      }
+                      placeholder="0.00"
+                      className={`h-11 pr-12 ${
+                        errors.subscriptionRemaining 
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                          : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                      } transition-all`}
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 font-medium">
+                      DT
+                    </div>
+                  </div>
+                  {errors.subscriptionRemaining && (
+                    <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                      <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                      {errors.subscriptionRemaining}
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    0 = payé intégralement
+                  </p>
+                </div>
+
+                {/* Subscription Status */}
+                <div className="space-y-2">
+                  <Label htmlFor="subscriptionStatus" className="text-sm font-medium text-gray-700">
+                    Statut *
+                  </Label>
+                  <Select
+                    value={formData.subscriptionStatus}
+                    onValueChange={(value) =>
+                      handleInputChange("subscriptionStatus", value)
+                    }
+                  >
+                    <SelectTrigger className="h-11 border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all">
+                      <SelectValue placeholder="Sélectionner le statut" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="actif">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          Actif
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="expiré">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                          Expiré
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Services & Options Section */}
+            <div className="space-y-4">
+              <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                Services & Options
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                  <Checkbox
+                    id="hasCardioMusculation"
+                    checked={formData.hasCardioMusculation}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("hasCardioMusculation", checked as boolean)
+                    }
+                    className="border-gray-300 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900"
+                  />
+                  <div className="flex-1">
                     <Label
                       htmlFor="hasCardioMusculation"
-                      className="text-sm font-medium leading-none"
+                      className="text-sm font-medium text-gray-700 cursor-pointer"
                     >
                       Cardio & Musculation
                     </Label>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Accès aux équipements de fitness
+                    </p>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="hasCours"
-                      checked={formData.hasCours}
-                      onCheckedChange={(checked) =>
-                        handleInputChange("hasCours", checked as boolean)
-                      }
-                      className="border-gray-300"
-                    />
+                </div>
+                
+                <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                  <Checkbox
+                    id="hasCours"
+                    checked={formData.hasCours}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("hasCours", checked as boolean)
+                    }
+                    className="border-gray-300 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900"
+                  />
+                  <div className="flex-1">
                     <Label
                       htmlFor="hasCours"
-                      className="text-sm font-medium leading-none"
+                      className="text-sm font-medium text-gray-700 cursor-pointer"
                     >
                       Cours collectifs
                     </Label>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Participation aux cours de groupe
+                    </p>
                   </div>
                 </div>
               </div>

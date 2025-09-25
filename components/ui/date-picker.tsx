@@ -29,7 +29,11 @@ function formatDateForInput(date: Date | undefined) {
   if (!date) {
     return "";
   }
-  return date.toISOString().split("T")[0];
+  // Use timezone-safe formatting to avoid date shifting
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function isValidDate(date: Date | undefined) {
@@ -65,12 +69,24 @@ export function DatePicker({
   width = "full",
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [month, setMonth] = React.useState<Date | undefined>(
-    value ? new Date(value) : undefined
-  );
+  const [month, setMonth] = React.useState<Date | undefined>(() => {
+    if (!value) return undefined;
+    if (value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [year, month, day] = value.split('-').map(Number);
+      return new Date(year, month - 1, day); // month is 0-indexed
+    }
+    return new Date(value);
+  });
 
-  // Convert string value to Date for display and calendar
-  const selectedDate = value ? new Date(value) : undefined;
+  // Convert string value to Date for display and calendar - timezone safe
+  const selectedDate = React.useMemo(() => {
+    if (!value) return undefined;
+    if (value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [year, month, day] = value.split('-').map(Number);
+      return new Date(year, month - 1, day); // month is 0-indexed
+    }
+    return new Date(value);
+  }, [value]);
   const displayValue = formatDateForDisplay(selectedDate);
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -85,12 +101,24 @@ export function DatePicker({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     
-    // Try to parse the input as a date
-    const date = new Date(inputValue);
-    if (isValidDate(date) && onChange) {
-      const formattedDate = formatDateForInput(date);
-      onChange(formattedDate);
-      setMonth(date);
+    // For YYYY-MM-DD format, create date without timezone issues
+    if (inputValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [year, month, day] = inputValue.split('-').map(Number);
+      const date = new Date(year, month - 1, day); // month is 0-indexed
+      
+      if (isValidDate(date) && onChange) {
+        const formattedDate = formatDateForInput(date);
+        onChange(formattedDate);
+        setMonth(date);
+      }
+    } else {
+      // Fallback for other formats
+      const date = new Date(inputValue);
+      if (isValidDate(date) && onChange) {
+        const formattedDate = formatDateForInput(date);
+        onChange(formattedDate);
+        setMonth(date);
+      }
     }
   };
 
