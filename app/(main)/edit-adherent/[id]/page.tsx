@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 import Link from "next/link";
 
 interface FormData {
@@ -445,15 +446,14 @@ export default function EditAdherentPage() {
 
                 {/* Birth Date */}
                 <div className="space-y-2">
-                  <Label htmlFor="birthDate">Date de naissance *</Label>
-                  <Input
+                  <DatePicker
                     id="birthDate"
-                    type="date"
+                    label="Date de naissance"
                     value={formData.birthDate}
-                    onChange={(e) =>
-                      handleInputChange("birthDate", e.target.value)
-                    }
-                    className={errors.birthDate ? "border-red-500" : ""}
+                    onChange={(value) => handleInputChange("birthDate", value)}
+                    placeholder="Sélectionner une date"
+                    error={!!errors.birthDate}
+                    required
                   />
                   {errors.birthDate && (
                     <p className="text-sm text-red-500">{errors.birthDate}</p>
@@ -507,151 +507,143 @@ export default function EditAdherentPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Subscription Plan */}
-                <div className="space-y-2">
-                  <Label htmlFor="subscriptionPlan">
-                    Type d&apos;abonnement
-                  </Label>
-                  <Select
-                    value={formData.subscriptionPlan}
-                    onValueChange={(value) =>
-                      handleInputChange("subscriptionPlan", value)
-                    }
-                  >
-                    <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
-                      <SelectValue placeholder="Sélectionner le type d'abonnement" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="personnalisé">Personnalisé</SelectItem>
-                      <SelectItem value="1 mois">1 mois</SelectItem>
-                      <SelectItem value="3 mois">3 mois</SelectItem>
-                      <SelectItem value="6 mois">6 mois</SelectItem>
-                      <SelectItem value="1 an">1 an</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Subscription Price and Remaining Amount - combined in one cell */}
-                <div className="space-y-2 col-span-1">
-                  <div className="flex gap-4">
-                    {/* Subscription Price */}
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor="subscriptionPrice">Prix (DT)</Label>
-                      <Input
-                        id="subscriptionPrice"
-                        type="number"
-                        value={formData.subscriptionPrice}
-                        onChange={(e) =>
-                          handleInputChange("subscriptionPrice", e.target.value)
-                        }
-                        placeholder="0"
-                        className={
-                          errors.subscriptionPrice ? "border-red-500" : ""
-                        }
-                      />
-                      {errors.subscriptionPrice && (
-                        <p className="text-sm text-red-500">
-                          {errors.subscriptionPrice}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Subscription Remaining */}
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor="subscriptionRemaining">
-                        Montant Restant
-                      </Label>
-                      <Input
-                        id="subscriptionRemaining"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={formData.subscriptionRemaining}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "subscriptionRemaining",
-                            e.target.value
-                          )
-                        }
-                        placeholder="0"
-                        className={
-                          errors.subscriptionRemaining ? "border-red-500" : ""
-                        }
-                      />
-                      {errors.subscriptionRemaining && (
-                        <p className="text-sm text-red-500">
-                          {errors.subscriptionRemaining}
-                        </p>
-                      )}
-                    </div>
+              <div className="flex justify-center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl w-full">
+                  {/* Subscription Plan */}
+                  <div className="space-y-2 w-48">
+                    <Label htmlFor="subscriptionPlan">
+                      Type d&apos;abonnement
+                    </Label>
+                    <Select
+                      value={formData.subscriptionPlan}
+                      onValueChange={(value) =>
+                        handleInputChange("subscriptionPlan", value)
+                      }
+                    >
+                      <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
+                        <SelectValue placeholder="Sélectionner le type d'abonnement" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="personnalisé">Personnalisé</SelectItem>
+                        <SelectItem value="1 mois">1 mois</SelectItem>
+                        <SelectItem value="3 mois">3 mois</SelectItem>
+                        <SelectItem value="6 mois">6 mois</SelectItem>
+                        <SelectItem value="1 an">1 an</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Montant restant à payer (0 = payé intégralement)
-                  </p>
-                </div>
 
-                {/* Start Date */}
-                <div className="space-y-2">
-                  <Label htmlFor="subscriptionStartDate">Date de début</Label>
-                  <Input
+                  {/* Start Date */}
+                  <DatePicker
                     id="subscriptionStartDate"
-                    type="date"
+                    label="Date de début"
                     value={formData.subscriptionStartDate}
-                    onChange={(e) =>
-                      handleInputChange("subscriptionStartDate", e.target.value)
-                    }
-                    className="border-gray-200 focus:border-gray-400 transition-colors"
+                    onChange={(value) => handleInputChange("subscriptionStartDate", value)}
+                    placeholder="Sélectionner une date"
+                    width="w-58"
                   />
-                </div>
 
-                {/* End Date */}
-                <div className="space-y-2">
-                  <Label htmlFor="subscriptionEndDate">
-                    Date de fin
-                    {formData.subscriptionPlan !== "personnalisé" &&
-                      " (Calculée automatiquement)"}
-                  </Label>
-                  <Input
-                    id="subscriptionEndDate"
-                    type="date"
-                    value={formData.subscriptionEndDate}
-                    onChange={(e) =>
-                      handleInputChange("subscriptionEndDate", e.target.value)
-                    }
-                    disabled={formData.subscriptionPlan !== "personnalisé"}
-                    className={`border-gray-200 focus:border-gray-400 transition-colors ${
-                      formData.subscriptionPlan !== "personnalisé"
-                        ? "bg-gray-50 disabled:cursor-not-allowed"
-                        : ""
-                    }`}
-                  />
-                  {formData.subscriptionPlan !== "personnalisé" && (
-                    <p className="text-xs text-gray-500">
-                      Calculée automatiquement selon le type d&apos;abonnement
-                      et la date de début.
-                    </p>
-                  )}
+                  {/* End Date */}
+                  <div className="space-y-2">
+                    <DatePicker
+                      id="subscriptionEndDate"
+                      label="Date de fin"
+                      value={formData.subscriptionEndDate}
+                      onChange={(value) => handleInputChange("subscriptionEndDate", value)}
+                      placeholder="Sélectionner une date"
+                      disabled={formData.subscriptionPlan !== "personnalisé"}
+                      width="w-58"
+                    />
+                    {formData.subscriptionPlan !== "personnalisé" && (
+                      <p className="text-xs text-gray-500">
+                        Calculée automatiquement selon le type d&apos;abonnement
+                        et la date de début.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Subscription Status */}
-              <div className="space-y-2">
-                <Label htmlFor="subscriptionStatus">Statut</Label>
-                <Select
-                  value={formData.subscriptionStatus}
-                  onValueChange={(value) =>
-                    handleInputChange("subscriptionStatus", value)
-                  }
-                >
-                  <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
-                    <SelectValue placeholder="Sélectionner le statut" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="actif">Actif</SelectItem>
-                    <SelectItem value="expiré">Expiré</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex justify-center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
+                  {/* Subscription Price and Remaining Amount - combined in one cell */}
+                  <div className="space-y-2 col-span-1">
+                    <div className="flex gap-4">
+                      {/* Subscription Price */}
+                      <div className="flex-1 space-y-2">
+                        <Label htmlFor="subscriptionPrice">Prix (DT)</Label>
+                        <Input
+                          id="subscriptionPrice"
+                          type="number"
+                          value={formData.subscriptionPrice}
+                          onChange={(e) =>
+                            handleInputChange("subscriptionPrice", e.target.value)
+                          }
+                          placeholder="0"
+                          className={
+                            errors.subscriptionPrice ? "border-red-500" : ""
+                          }
+                        />
+                        {errors.subscriptionPrice && (
+                          <p className="text-sm text-red-500">
+                            {errors.subscriptionPrice}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Subscription Remaining */}
+                      <div className="flex-1 space-y-2">
+                        <Label htmlFor="subscriptionRemaining">
+                          Montant Restant
+                        </Label>
+                        <Input
+                          id="subscriptionRemaining"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={formData.subscriptionRemaining}
+                          onChange={(e) =>
+                            handleInputChange(
+                              "subscriptionRemaining",
+                              e.target.value
+                            )
+                          }
+                          placeholder="0"
+                          className={
+                            errors.subscriptionRemaining ? "border-red-500" : ""
+                          }
+                        />
+                        {errors.subscriptionRemaining && (
+                          <p className="text-sm text-red-500">
+                            {errors.subscriptionRemaining}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Montant restant à payer (0 = payé intégralement)
+                    </p>
+                  </div>
+
+                  {/* Subscription Status */}
+                  <div className="space-y-2 w-48">
+                    <Label htmlFor="subscriptionStatus">Statut</Label>
+                    <Select
+                      value={formData.subscriptionStatus}
+                      onValueChange={(value) =>
+                        handleInputChange("subscriptionStatus", value)
+                      }
+                    >
+                      <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
+                        <SelectValue placeholder="Sélectionner le statut" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="actif">Actif</SelectItem>
+                        <SelectItem value="expiré">Expiré</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
 
               {/* Options */}
