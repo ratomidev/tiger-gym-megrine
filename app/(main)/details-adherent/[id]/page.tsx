@@ -21,6 +21,7 @@ import Link from "next/link";
 // Import the new DeleteAdherentDialog component
 import DeleteAdherentDialog from "@/components/member/table/DeleteAdherentDialog";
 import AddSubscriptionModal from "@/components/subscription/AddSubscriptionModal";
+
 import {
   Calendar,
   CreditCard,
