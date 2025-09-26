@@ -14,6 +14,7 @@ import { SubscriptionFormValues } from "@/types/subscription";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -61,7 +62,6 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
 
     // Watch price to calculate remaining
     const watchedPrice = watch("price");
-    const watchedRemaining = watch("remaining");
 
     const calculateEndDate = (plan: string, start: Date) => {
       switch (plan) {
@@ -69,6 +69,8 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
           return addMonths(start, 1);
         case "3 mois":
           return addMonths(start, 3);
+        case "4 mois":
+          return addMonths(start, 4);
         case "6 mois":
           return addMonths(start, 6);
         case "1 an":
@@ -93,47 +95,24 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       updateEndDate(value, new Date(formattedStartDate));
     };
 
-    const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const dateStr = e.target.value;
-      setFormattedStartDate(dateStr);
-      const date = new Date(dateStr);
-      setValue("startDate", date);
-      updateEndDate(watch("plan"), date);
-    };
-
-    const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const dateStr = e.target.value;
-      setFormattedEndDate(dateStr);
-      setValue("endDate", new Date(dateStr));
-    };
-
     // === Effect: Initialize end date on mount ===
     useEffect(() => {
       const initialEndDate = calculateEndDate("personnalisé", today);
       setFormattedEndDate(format(initialEndDate, "yyyy-MM-dd"));
       setValue("endDate", initialEndDate);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [setValue]);
 
-    // Effect to validate remaining amount when price changes
-    useEffect(() => {
-      // Ensure both values are treated as numbers
-      const remainingVal =
-        watchedRemaining === undefined || watchedRemaining === null
-          ? 0
-          : Number(watchedRemaining);
-      const priceVal = Number(watchedPrice);
-
-      if (remainingVal > priceVal) {
-        setValue("remaining", priceVal);
-      }
-    }, [watchedPrice, watchedRemaining, setValue]);
-
+    // === Expose methods to parent ===
     useImperativeHandle(ref, () => ({
       validateAndGetValues: async () => {
         return new Promise((resolve) => {
           handleSubmit(
-            (data) => resolve(data),
-            () => resolve(null)
+            (data) => {
+              resolve(data);
+            },
+            () => {
+              resolve(null);
+            }
           )();
         });
       },
@@ -141,41 +120,121 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
 
     // === Render ===
     return (
-      <div className="space-y-6 bg-card dark:bg-gray-900 text-card-foreground dark:text-white p-6 rounded-lg shadow-md dark:shadow-xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Plan */}
-          <div className="space-y-2">
-            <Label htmlFor="plan">Type d&apos;Abonnement</Label>
-            <Select
-              defaultValue="personnalisé"
-              onValueChange={handlePlanChange}
-            >
-              <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
-                <SelectValue placeholder="Sélectionner une durée" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="personnalisé">Personnalisé</SelectItem>
-                <SelectItem value="1 mois">1 mois</SelectItem>
-                <SelectItem value="3 mois">3 mois</SelectItem>
-                <SelectItem value="6 mois">6 mois</SelectItem>
-                <SelectItem value="1 an">1 an</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.plan && (
-              <p className="text-destructive dark:text-red-400 text-sm">
-                {errors.plan.message}
-              </p>
-            )}
-          </div>
+      <div className="space-y-8">
+        {/* Plan and Duration Section */}
+        <div className="space-y-4">
+          <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+            Plan & Durée
+          </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Subscription Plan */}
+            <div className="space-y-2">
+              <Label htmlFor="plan" className="text-sm font-medium text-gray-700">
+                Type d&apos;abonnement *
+              </Label>
+              <Select
+                defaultValue="personnalisé"
+                onValueChange={handlePlanChange}
+              >
+                <SelectTrigger className="h-11 border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all">
+                  <SelectValue placeholder="Sélectionner le type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="personnalisé">Personnalisé</SelectItem>
+                  <SelectItem value="1 mois">1 mois</SelectItem>
+                  <SelectItem value="3 mois">3 mois</SelectItem>
+                  <SelectItem value="4 mois">4 mois</SelectItem>
+                  <SelectItem value="6 mois">6 mois</SelectItem>
+                  <SelectItem value="1 an">1 an</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.plan && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.plan.message}
+                </p>
+              )}
+            </div>
 
-          {/* Prix and Montant Restant combined in one column */}
-          <div className="space-y-2">
-            <div className="flex gap-4">
-              {/* Prix */}
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="price">
-                  Prix
-                </Label>
+            {/* Start Date */}
+            <div className="space-y-2">
+              <Label htmlFor="startDate" className="text-sm font-medium text-gray-700">
+                Date de début *
+              </Label>
+              <DatePicker
+                id="startDate"
+                value={formattedStartDate}
+                onChange={(dateValue: string) => {
+                  setFormattedStartDate(dateValue);
+                  if (dateValue) {
+                    const [year, month, day] = dateValue.split('-').map(Number);
+                    const date = new Date(year, month - 1, day);
+                    setValue("startDate", date);
+                    updateEndDate(watch("plan"), date);
+                  }
+                }}
+                placeholder="Sélectionner une date"
+                className="h-11"
+                error={!!errors.startDate}
+              />
+              {errors.startDate && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.startDate.message}
+                </p>
+              )}
+            </div>
+
+            {/* End Date */}
+            <div className="space-y-2">
+              <Label htmlFor="endDate" className="text-sm font-medium text-gray-700">
+                Date de fin
+                {watch("plan") === "personnalisé" && <span className="text-red-500 ml-1">*</span>}
+              </Label>
+              <DatePicker
+                id="endDate"
+                value={formattedEndDate}
+                onChange={(dateValue: string) => {
+                  if (watch("plan") === "personnalisé" && dateValue) {
+                    setFormattedEndDate(dateValue);
+                    const [year, month, day] = dateValue.split('-').map(Number);
+                    const date = new Date(year, month - 1, day);
+                    setValue("endDate", date);
+                  }
+                }}
+                placeholder="Sélectionner une date"
+                disabled={watch("plan") !== "personnalisé"}
+                className="h-11"
+                error={!!errors.endDate}
+              />
+              {errors.endDate && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.endDate.message}
+                </p>
+              )}
+              {watch("plan") !== "personnalisé" && (
+                <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                  <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                  Calculée automatiquement
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Financial Information Section */}
+        <div className="space-y-4">
+          <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+            Informations Financières
+          </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Subscription Price */}
+            <div className="space-y-2">
+              <Label htmlFor="price" className="text-sm font-medium text-gray-700">
+                Prix (DT) *
+              </Label>
+              <div className="relative">
                 <Input
                   id="price"
                   type="number"
@@ -185,36 +244,42 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
                     min: { value: 0, message: "Le prix doit être positif" },
                   })}
                   placeholder="0.00"
-                  className="border-input dark:border-gray-700 bg-background dark:bg-gray-900 text-foreground dark:text-white focus:border-primary dark:focus:border-gray-500 transition-colors"
+                  className={`h-11 pr-12 ${
+                    errors.price 
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                      : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                  } transition-all`}
                 />
-                {errors.price && (
-                  <p className="text-destructive dark:text-red-400 text-sm">
-                    {errors.price.message}
-                  </p>
-                )}
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 font-medium">
+                  DT
+                </div>
               </div>
+              {errors.price && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.price.message}
+                </p>
+              )}
+            </div>
 
-              {/* Montant Restant */}
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="remaining">
-                  Montant Restant
-                </Label>
+            {/* Subscription Remaining */}
+            <div className="space-y-2">
+              <Label htmlFor="remaining" className="text-sm font-medium text-gray-700">
+                Montant Restant (DT)
+              </Label>
+              <div className="relative">
                 <Input
                   id="remaining"
                   type="number"
+                  min="0"
                   step="0.01"
                   {...register("remaining", {
                     min: {
                       value: 0,
-                      message:
-                        "Le montant restant ne peut pas être négatif",
+                      message: "Le montant restant ne peut pas être négatif",
                     },
                     validate: (value) => {
-                      // Convert to number and handle undefined/null
-                      const numValue =
-                        value === undefined || value === null
-                          ? 0
-                          : Number(value);
+                      const numValue = value === undefined || value === null ? 0 : Number(value);
                       return (
                         numValue <= watchedPrice ||
                         "Le montant restant ne peut pas dépasser le prix total"
@@ -222,128 +287,115 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
                     },
                   })}
                   placeholder="0.00"
-                  className="border-input dark:border-gray-700 bg-background dark:bg-gray-900 text-foreground dark:text-white focus:border-primary dark:focus:border-gray-500 transition-colors"
-                  max={watchedPrice}
+                  className={`h-11 pr-12 ${
+                    errors.remaining 
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                      : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                  } transition-all`}
                 />
-                {errors.remaining && (
-                  <p className="text-destructive dark:text-red-400 text-sm">
-                    {errors.remaining.message}
-                  </p>
-                )}
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 font-medium">
+                  DT
+                </div>
               </div>
+              {errors.remaining && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.remaining.message}
+                </p>
+              )}
+              <p className="text-xs text-gray-500 flex items-center gap-1">
+                <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                0 = payé intégralement
+              </p>
             </div>
-            <p className="text-muted-foreground dark:text-gray-400 text-xs">
-              Montant restant à payer (0 = payé intégralement). Ne peut pas
-              dépasser {watchedPrice} DT.
-            </p>
-          </div>
 
-          {/* Start Date */}
-          <div className="space-y-2">
-            <Label htmlFor="startDate">
-              Date de Début
-            </Label>
-            <Input
-              id="startDate"
-              type="date"
-              value={formattedStartDate}
-              onChange={handleStartDateChange}
-              className="border-input dark:border-gray-700 bg-background dark:bg-gray-900 text-foreground dark:text-white focus:border-primary dark:focus:border-gray-500 transition-colors"
-            />
-            {errors.startDate && (
-              <p className="text-destructive dark:text-red-400 text-sm">
-                {errors.startDate.message}
-              </p>
-            )}
-          </div>
-
-          {/* End Date */}
-          <div className="space-y-2">
-            <Label htmlFor="endDate">
-              Date de Fin
-            </Label>
-            <Input
-              id="endDate"
-              type="date"
-              value={formattedEndDate}
-              onChange={handleEndDateChange}
-              disabled={watch("plan") !== "personnalisé"}
-              className="border-gray-200 focus:border-gray-400 transition-colors disabled:bg-gray-50 disabled:cursor-not-allowed"
-            />
-            {errors.endDate && (
-              <p className="text-destructive dark:text-red-400 text-sm">
-                {errors.endDate.message}
-              </p>
-            )}
-            <p className="text-xs text-gray-500">
-              {watch("plan") === "personnalisé"
-                ? "Sélectionnez manuellement la date de fin d'abonnement."
-                : "Calculée automatiquement selon le type d'abonnement et la date de début."}
-            </p>
-          </div>
-
-          {/* Status */}
-          <div className="space-y-2">
-            <Label htmlFor="status">
-              Statut
-            </Label>
-            <Select
-              defaultValue="actif"
-              onValueChange={(value) =>
-                setValue("status", value as "actif" | "expiré")
-              }
-            >
-              <SelectTrigger className="border-input dark:border-gray-700 bg-background dark:bg-gray-900 text-foreground dark:text-white focus:border-primary dark:focus:border-gray-500 transition-colors">
-                <SelectValue placeholder="Sélectionner un statut" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover dark:bg-gray-900 text-popover-foreground dark:text-white border-border dark:border-gray-700">
-                <SelectItem value="actif">Actif</SelectItem>
-                <SelectItem value="expiré">Expiré</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.status && (
-              <p className="text-destructive dark:text-red-400 text-sm">
-                {errors.status.message}
-              </p>
-            )}
+            {/* Subscription Status */}
+            <div className="space-y-2">
+              <Label htmlFor="status" className="text-sm font-medium text-gray-700">
+                Statut *
+              </Label>
+              <Select
+                defaultValue="actif"
+                onValueChange={(value) =>
+                  setValue("status", value as "actif" | "expiré")
+                }
+              >
+                <SelectTrigger className="h-11 border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all">
+                  <SelectValue placeholder="Sélectionner le statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="actif">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      Actif
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="expiré">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      Expiré
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.status && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.status.message}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Services */}
-        <div className="space-y-4 pt-2">
-          <Label>Services Inclus</Label>
-          <div className="flex flex-row items-center space-x-6">
-            <div className="flex items-center space-x-2">
+        {/* Services & Options Section */}
+        <div className="space-y-4">
+          <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+            Services & Options
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
               <Checkbox
                 id="hasCardioMusculation"
                 defaultChecked
                 onCheckedChange={(checked) =>
                   setValue("hasCardioMusculation", checked === true)
                 }
-                className="border-input dark:border-gray-600 data-[state=checked]:bg-primary dark:data-[state=checked]:bg-blue-600"
+                className="border-gray-300 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900"
               />
-              <Label
-                htmlFor="hasCardioMusculation"
-                className="text-sm font-medium leading-none"
-              >
-                Cardio & Musculation
-              </Label>
+              <div className="flex-1">
+                <Label
+                  htmlFor="hasCardioMusculation"
+                  className="text-sm font-medium text-gray-700 cursor-pointer"
+                >
+                  Cardio & Musculation
+                </Label>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Accès aux équipements de fitness
+                </p>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
+            
+            <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
               <Checkbox
                 id="hasCours"
                 defaultChecked={false}
                 onCheckedChange={(checked) =>
                   setValue("hasCours", checked === true)
                 }
-                className="border-input dark:border-gray-600 data-[state=checked]:bg-primary dark:data-[state=checked]:bg-blue-600"
+                className="border-gray-300 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900"
               />
-              <Label
-                htmlFor="hasCours"
-                className="text-sm font-medium leading-none"
-              >
-                Cours Collectifs
-              </Label>
+              <div className="flex-1">
+                <Label
+                  htmlFor="hasCours"
+                  className="text-sm font-medium text-gray-700 cursor-pointer"
+                >
+                  Cours collectifs
+                </Label>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Participation aux cours de groupe
+                </p>
+              </div>
             </div>
           </div>
         </div>

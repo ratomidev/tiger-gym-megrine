@@ -19,7 +19,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import Link from "next/link";
-
 interface FormData {
   firstName: string;
   lastName: string;
@@ -402,7 +401,7 @@ export default function EditAdherentPage() {
                       onChange={(e) =>
                         handleInputChange("firstName", e.target.value)
                       }
-                      className={`h-11 ${
+                      className={`h-12 ${
                         errors.firstName 
                           ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
                           : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
@@ -428,7 +427,7 @@ export default function EditAdherentPage() {
                       onChange={(e) =>
                         handleInputChange("lastName", e.target.value)
                       }
-                      className={`h-11 ${
+                      className={`h-12 ${
                         errors.lastName 
                           ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
                           : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
@@ -454,7 +453,7 @@ export default function EditAdherentPage() {
                       onChange={(value) => handleInputChange("birthDate", value)}
                       placeholder="Sélectionner une date"
                       error={!!errors.birthDate}
-                      className="h-11"
+                      className="h-12"
                     />
                     {errors.birthDate && (
                       <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
@@ -474,7 +473,7 @@ export default function EditAdherentPage() {
                       onValueChange={(value) => handleInputChange("sexe", value)}
                     >
                       <SelectTrigger
-                        className={`h-11 ${
+                        className={`h-12 ${
                           errors.sexe 
                             ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
                             : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
@@ -485,13 +484,11 @@ export default function EditAdherentPage() {
                       <SelectContent>
                         <SelectItem value="M">
                           <div className="flex items-center gap-2">
-                            <span>👨</span>
                             Homme
                           </div>
                         </SelectItem>
                         <SelectItem value="F">
                           <div className="flex items-center gap-2">
-                            <span>👩</span>
                             Femme
                           </div>
                         </SelectItem>
@@ -523,7 +520,7 @@ export default function EditAdherentPage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange("email", e.target.value)}
-                      className={`h-11 ${
+                      className={`h-12 ${
                         errors.email 
                           ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
                           : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
@@ -547,7 +544,7 @@ export default function EditAdherentPage() {
                       id="phone"
                       value={formData.phone}
                       onChange={(e) => handleInputChange("phone", e.target.value)}
-                      className={`h-11 ${
+                      className={`h-12 ${
                         errors.phone 
                           ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
                           : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
@@ -572,7 +569,7 @@ export default function EditAdherentPage() {
                     id="Address"
                     value={formData.Address}
                     onChange={(e) => handleInputChange("Address", e.target.value)}
-                    className={`h-11 ${
+                    className={`h-12 ${
                       errors.Address 
                         ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
                         : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
@@ -614,7 +611,7 @@ export default function EditAdherentPage() {
                       handleInputChange("subscriptionPlan", value)
                     }
                   >
-                    <SelectTrigger className="h-11 border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all">
+                    <SelectTrigger className="h-12 border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all">
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -638,7 +635,7 @@ export default function EditAdherentPage() {
                     value={formData.subscriptionStartDate}
                     onChange={(value) => handleInputChange("subscriptionStartDate", value)}
                     placeholder="Sélectionner une date"
-                    className="h-11"
+                    className="h-12"
                   />
                 </div>
 
@@ -654,7 +651,7 @@ export default function EditAdherentPage() {
                     onChange={(value) => handleInputChange("subscriptionEndDate", value)}
                     placeholder="Sélectionner une date"
                     disabled={formData.subscriptionPlan !== "personnalisé"}
-                    className="h-11"
+                    className="h-12"
                   />
                   {formData.subscriptionPlan !== "personnalisé" && (
                     <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
@@ -687,7 +684,7 @@ export default function EditAdherentPage() {
                         handleInputChange("subscriptionPrice", e.target.value)
                       }
                       placeholder="0.00"
-                      className={`h-11 pr-12 ${
+                      className={`h-12 pr-12 ${
                         errors.subscriptionPrice 
                           ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
                           : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
@@ -721,7 +718,7 @@ export default function EditAdherentPage() {
                         handleInputChange("subscriptionRemaining", e.target.value)
                       }
                       placeholder="0.00"
-                      className={`h-11 pr-12 ${
+                      className={`h-12 pr-12 ${
                         errors.subscriptionRemaining 
                           ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
                           : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"

@@ -17,6 +17,7 @@ interface AdherentFormValues extends BaseAdherentFormValues {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 
 import {
   Select,
@@ -522,183 +523,275 @@ const AdherentRegistrationForm = forwardRef<
         </DialogContent>
       </Dialog>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* First Name */}
-        <div className="space-y-2">
-          <Label htmlFor="firstName">Prénom</Label>
-          <Input
-            id="firstName"
-            {...register("firstName", {
-              required: "Le prénom est requis",
-            })}
-            placeholder="Prénom"
-            className="border-gray-200 focus:border-gray-400 transition-colors"
-          />
-          {errors.firstName && (
-            <p className="text-red-500 text-sm">{errors.firstName.message}</p>
-          )}
-        </div>
-
-        {/* Last Name */}
-        <div className="space-y-2">
-          <Label htmlFor="lastName">Nom</Label>
-          <Input
-            id="lastName"
-            {...register("lastName", { required: "Le nom est requis" })}
-            placeholder="Nom"
-            className="border-gray-200 focus:border-gray-400 transition-colors"
-          />
-          {errors.lastName && (
-            <p className="text-red-500 text-sm">{errors.lastName.message}</p>
-          )}
-        </div>
-
-        {/* Email */}
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            {...register("email", {
-              required: "L'email est requis",
-              pattern: {
-                value: /\S+@\S+\.\S+/,
-                message: "Format d'email invalide",
-              },
-            })}
-            placeholder="email@example.com"
-            className="border-gray-200 focus:border-gray-400 transition-colors"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email.message}</p>
-          )}
-        </div>
-
-        {/* Phone */}
-        <div className="space-y-2">
-          <Label htmlFor="phone">Téléphone</Label>
-          <Input
-            id="phone"
-            {...register("phone", {
-              required: "Le numéro de téléphone est requis",
-            })}
-            placeholder="Numéro de téléphone"
-            className="border-gray-200 focus:border-gray-400 transition-colors"
-          />
-          {errors.phone && (
-            <p className="text-red-500 text-sm">{errors.phone.message}</p>
-          )}
-        </div>
-
-        {/* Birth Date */}
-        <div className="space-y-2">
-          <Label htmlFor="birthDate">Date de Naissance</Label>
-          <div className="flex gap-2">
-            <Input
-              id="birthDate"
-              type="date"
-              {...register("birthDate", {
-                required: "La date de naissance est requise",
-              })}
-              className="border-gray-200 focus:border-gray-400 transition-colors flex-1"
-            />
-          </div>
-          {errors.birthDate && (
-            <p className="text-red-500 text-sm">{errors.birthDate.message}</p>
-          )}
-        </div>
-
-        {/* Gender */}
-        <div className="space-y-2">
-          <Label htmlFor="sexe">Sexe</Label>
-          <Select
-            defaultValue="M"
-            onValueChange={(value) => setValue("sexe", value as "M" | "F")}
-          >
-            <SelectTrigger className="border-gray-200 focus:border-gray-400 transition-colors">
-              <SelectValue placeholder="Sélectionner" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="M">Homme</SelectItem>
-              <SelectItem value="F">Femme</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.sexe && (
-            <p className="text-red-500 text-sm">{errors.sexe.message}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Address */}
-      <div className="space-y-2">
-        <Label htmlFor="Address">Adresse</Label>
-        <Input
-          id="Address"
-          {...register("Address", { required: "L'adresse est requise" })}
-          placeholder="Adresse complète"
-          className="border-gray-200 focus:border-gray-400 transition-colors"
-        />
-        {errors.Address && (
-          <p className="text-red-500 text-sm">{errors.Address.message}</p>
-        )}
-      </div>
-
-      {/* Photo Section */}
-      <div className="space-y-4">
-        <Label>Photo (optionnel)</Label>
-
-        {/* Photo Preview */}
-        {photoPreview && (
-          <div className="flex justify-center">
-            <div className="relative">
-              <Image
-                src={photoPreview}
-                alt="Aperçu"
-                width={150}
-                height={150}
-                className="object-cover rounded-full border-2 border-gray-200"
+      <div className="space-y-8">
+        {/* Basic Information Section */}
+        <div className="space-y-4">
+          <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+            Identité
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* First Name */}
+            <div className="space-y-2">
+              <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                Prénom *
+              </Label>
+              <Input
+                id="firstName"
+                {...register("firstName", {
+                  required: "Le prénom est requis",
+                })}
+                placeholder="Entrer le prénom"
+                className={`h-11 ${
+                  errors.firstName 
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                    : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                } transition-all`}
               />
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                onClick={removePhoto}
+              {errors.firstName && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.firstName.message}
+                </p>
+              )}
+            </div>
+
+            {/* Last Name */}
+            <div className="space-y-2">
+              <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                Nom *
+              </Label>
+              <Input
+                id="lastName"
+                {...register("lastName", { required: "Le nom est requis" })}
+                placeholder="Entrer le nom"
+                className={`h-11 ${
+                  errors.lastName 
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                    : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                } transition-all`}
+              />
+              {errors.lastName && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.lastName.message}
+                </p>
+              )}
+            </div>
+
+            {/* Birth Date */}
+            <div className="space-y-2">
+              <Label htmlFor="birthDate" className="text-sm font-medium text-gray-700">
+                Date de naissance *
+              </Label>
+              <DatePicker
+                id="birthDate"
+                value=""
+                onChange={(dateValue: string) => {
+                  if (dateValue) {
+                    const [year, month, day] = dateValue.split('-').map(Number);
+                    const date = new Date(year, month - 1, day);
+                    setValue("birthDate", date);
+                  }
+                }}
+                placeholder="Sélectionner une date"
+                className="h-11"
+                error={!!errors.birthDate}
+              />
+              {errors.birthDate && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.birthDate.message}
+                </p>
+              )}
+            </div>
+
+            {/* Gender */}
+            <div className="space-y-2">
+              <Label htmlFor="sexe" className="text-sm font-medium text-gray-700">
+                Sexe *
+              </Label>
+              <Select
+                defaultValue="M"
+                onValueChange={(value) => setValue("sexe", value as "M" | "F")}
               >
-                <X className="h-3 w-3" />
-              </Button>
+                <SelectTrigger
+                  className={`h-11 ${
+                    errors.sexe 
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                      : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                  } transition-all`}
+                >
+                  <SelectValue placeholder="Sélectionner le sexe" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="M">
+                    <div className="flex items-center gap-2">
+                      Homme
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="F">
+                    <div className="flex items-center gap-2">
+                      Femme
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.sexe && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.sexe.message}
+                </p>
+              )}
             </div>
           </div>
-        )}
-
-        {/* Photo Action Buttons */}
-        <div className="flex justify-center">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              handlePhotoChange(e);
-              setShowPhotoModal(false);
-            }}
-            className="hidden"
-          />
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={openPhotoModal}
-            className="gap-2"
-            disabled={isUploading}
-          >
-            <Camera className="h-4 w-4" />
-            Prendre une photo
-          </Button>
         </div>
 
-        <p className="text-xs text-gray-500 text-center">
-          JPG, PNG ou GIF. Maximum 5MB.
-        </p>
+        {/* Contact Information Section */}
+        <div className="space-y-4">
+          <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+            Coordonnées
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Email */}
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                Email *
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                {...register("email", {
+                  required: "L'email est requis",
+                  pattern: {
+                    value: /\S+@\S+\.\S+/,
+                    message: "Format d'email invalide",
+                  },
+                })}
+                placeholder="exemple@email.com"
+                className={`h-11 ${
+                  errors.email 
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                    : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                } transition-all`}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* Phone */}
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                Téléphone *
+              </Label>
+              <Input
+                id="phone"
+                {...register("phone", {
+                  required: "Le téléphone est requis",
+                })}
+                placeholder="+216 XX XXX XXX"
+                className={`h-11 ${
+                  errors.phone 
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                    : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+                } transition-all`}
+              />
+              {errors.phone && (
+                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                  <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Address - Full Width */}
+          <div className="space-y-2">
+            <Label htmlFor="Address" className="text-sm font-medium text-gray-700">
+              Adresse complète *
+            </Label>
+            <Input
+              id="Address"
+              {...register("Address", { required: "L'adresse est requise" })}
+              placeholder="Rue, ville, code postal..."
+              className={`h-11 ${
+                errors.Address 
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-100" 
+                  : "border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-100"
+              } transition-all`}
+            />
+            {errors.Address && (
+              <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                {errors.Address.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Photo Section */}
+        <div className="space-y-4">
+          <h3 className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
+            Photo de Profil
+          </h3>
+
+          {/* Photo Preview */}
+          {photoPreview && (
+            <div className="flex justify-center">
+              <div className="relative">
+                <Image
+                  src={photoPreview}
+                  alt="Aperçu"
+                  width={150}
+                  height={150}
+                  className="object-cover rounded-full border-2 border-gray-200"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                  onClick={removePhoto}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Photo Action Buttons */}
+          <div className="flex justify-center">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                handlePhotoChange(e);
+                setShowPhotoModal(false);
+              }}
+              className="hidden"
+            />
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={openPhotoModal}
+              className="gap-2 h-11"
+              disabled={isUploading}
+            >
+              <Camera className="h-4 w-4" />
+              Prendre une photo
+            </Button>
+          </div>
+
+          <p className="text-xs text-gray-500 text-center flex items-center justify-center gap-1">
+            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+            JPG, PNG ou GIF. Maximum 5MB.
+          </p>
+        </div>
       </div>
     </div>
   );
