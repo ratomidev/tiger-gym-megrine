@@ -56,7 +56,7 @@ export default function MemberListPage() {
       <Toaster position="top-right" />
 
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Liste des Adhérents</h1>
+        <h1 className="text-xl font-bold">Liste des Adhérents</h1>
         <Button
           onClick={() => router.push("/add-adherent")}
           className="bg-primary hover:bg-primary/90 text-primary-foreground"

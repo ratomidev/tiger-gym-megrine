@@ -28,6 +28,15 @@ import { InputSearch } from "@/components/member/table/InputSearch";
 import { isSameDay } from "date-fns";
 import { useRouter } from "next/navigation";
 import DeleteAdherentDialog from "./DeleteAdherentDialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface MemberTableProps {
   data: Adherent[];
@@ -45,6 +54,10 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   const [showPhoneColumn, setShowPhoneColumn] = useState(true);
   const [showActionsColumn, setShowActionsColumn] = useState(true);
   const [showEndDateColumn, setShowEndDateColumn] = useState(true);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // State for delete dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -108,6 +121,26 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
       return matchesSearchTerm && matchesStatus && matchesDate;
     });
   }, [data, searchTerm, statusFilter, dateFilter]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, dateFilter]);
+
+  // Adjust currentPage if it exceeds totalPages after filtering
+  useEffect(() => {
+    if (totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    } else if (totalPages === 0) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
 
   const handleRowClick = (id: string) => {
     router.push(`/details-adherent/${id}`);
@@ -221,7 +254,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="">
       {/* Delete Confirmation Dialog */}
       <DeleteAdherentDialog
         open={deleteDialogOpen}
@@ -242,9 +275,9 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
           placeholder="Rechercher par nom ou prénom..."
         />
         <div className="text-sm text-gray-500">
-          {filteredData.length} adhérent
-          {filteredData.length !== 1 ? "s" : ""} trouvé
-          {filteredData.length !== 1 ? "s" : ""}
+          {paginatedData.length > 0
+            ? `${startIndex + 1}-${Math.min(endIndex, filteredData.length)} sur ${filteredData.length} adhérent${filteredData.length !== 1 ? "s" : ""}`
+            : `${filteredData.length} adhérent${filteredData.length !== 1 ? "s" : ""} trouvé${filteredData.length !== 1 ? "s" : ""}`}
         </div>
       </div>
 
@@ -275,8 +308,8 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredData.length > 0 ? (
-                filteredData.map((adherent) => (
+              {paginatedData.length > 0 ? (
+                paginatedData.map((adherent) => (
                   <TableRow
                     key={adherent.id}
                     onClick={() => handleRowClick(adherent.id)}
@@ -451,6 +484,112 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
           </Table>
         </div>
       </div>
+      {/* Pagination - outside the border */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center pt-4">
+          <Pagination>
+            <PaginationContent>
+              {(() => {
+                const items: JSX.Element[] = [];
+
+                // Previous button
+                items.push(
+                  <PaginationItem key="prev">
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage((prev) => Math.max(prev - 1, 1));
+                      }}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                );
+
+                // First page (always shown)
+                items.push(
+                  <PaginationItem key={1}>
+                    <PaginationLink
+                      href="#"
+                      isActive={currentPage === 1}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(1);
+                      }}
+                    >
+                      1
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+
+                let lastShownPage = 1;
+
+                // Current page (if not first and not last)
+                if (currentPage !== 1 && currentPage !== totalPages) {
+                  items.push(
+                    <PaginationItem key={currentPage}>
+                      <PaginationLink
+                        href="#"
+                        isActive
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(currentPage);
+                        }}
+                      >
+                        {currentPage}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                  lastShownPage = currentPage;
+                }
+
+                // Ellipsis after last shown page if gap to totalPages > 1
+                if (totalPages - lastShownPage > 1) {
+                  items.push(
+                    <PaginationItem key="ellipsis">
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                }
+
+                // Last page (if different from first and not already shown as current)
+                if (totalPages !== lastShownPage && totalPages > 1) {
+                  items.push(
+                    <PaginationItem key={totalPages}>
+                      <PaginationLink
+                        href="#"
+                        isActive={currentPage === totalPages}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(totalPages);
+                        }}
+                      >
+                        {totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
+
+                // Next button
+                items.push(
+                  <PaginationItem key="next">
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                      }}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                );
+
+                return items;
+              })()}
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 }
