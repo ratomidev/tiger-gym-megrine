@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Edit, Trash, Eye } from "lucide-react";
 import Link from "next/link";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, JSX } from "react";
 import { InputSearch } from "@/components/member/table/InputSearch";
 import { isSameDay } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -282,7 +282,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
       </div>
 
       <div className="rounded-md border">
-        <div className="overflow-auto max-h-[500px]">
+        <div className="overflow-auto max-h-[500px] scrollbar-hide">
           <Table>
             <TableHeader className="sticky top-0 z-10">
               <TableRow>
