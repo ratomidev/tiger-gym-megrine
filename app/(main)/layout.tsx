@@ -1,7 +1,6 @@
 "use client";
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { ModeToggle } from "@/components/home/mode-toggle";
 import { SidebarNavigation } from "@/components/home/sidebar-navigation";
 import { useState, useEffect } from "react";
 // import { UserAuthButton } from "@/components/user-auth-button";
@@ -31,13 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex">
       <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <header className="fixed top-4 right-4 z-50">
-          <div className="flex items-center gap-2">
-            {/* <CommandPalette /> */}
-            <ModeToggle />
-            {/* <UserAuthButton /> */}
-          </div>
-        </header>
+        {/* Header removed - theme toggle moved to sidebar dropdown */}
 
         <aside>
           <SidebarNavigation />
@@ -47,7 +40,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="absolute top-4 left-4 z-50">
             <SidebarTrigger />
           </div>
-          <div className="w-full h-screen pt-20">{children}</div>
+          <div className="w-full h-screen pt-10">{children}</div>
         </main>
       </SidebarProvider>
     </div>

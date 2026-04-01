@@ -1,9 +1,10 @@
 "use client";
 
-import { ChevronUp, Home, LogOut, User2, UserPlus } from "lucide-react";
+import { ChevronUp, Home, LogOut, Moon, Sun, User2, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "next-themes";
 
 import {
   Sidebar,
@@ -27,7 +28,7 @@ import {
 // Menu items with role-based access
 const items = [
   {
-    title: "Dashboard",
+    title: "Statistique",
     url: "/home",
     icon: Home,
     roles: ["OWNER"], // Only owner can see dashboard
@@ -50,11 +51,23 @@ export function SidebarNavigation() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const { setOpenMobile, isMobile } = useSidebar();
+  const { theme, setTheme } = useTheme();
 
   // Handle logout click
   const handleLogout = async () => {
     await logout();
     router.push("/auth/login");
+  };
+
+  // Handle theme toggle
+  const handleThemeToggle = () => {
+    document.documentElement.classList.add("theme-transition");
+    setTimeout(() => {
+      setTheme(theme === "dark" ? "light" : "dark");
+      setTimeout(() => {
+        document.documentElement.classList.remove("theme-transition");
+      }, 300);
+    }, 10);
   };
 
   // Handle menu item click
@@ -75,7 +88,7 @@ export function SidebarNavigation() {
   return (
     <Sidebar>
       <SidebarHeader className="flex items-center justify-between font-bold">
-        TigerGym Megrine
+        Dashboard
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -112,6 +125,11 @@ export function SidebarNavigation() {
               >
                 <DropdownMenuItem>
                   <span>Compte ({user?.role})</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleThemeToggle}>
+                  <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <span>Thème</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
