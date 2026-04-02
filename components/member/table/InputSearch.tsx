@@ -88,8 +88,9 @@ export function InputSearch({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3 w-full">
-      <div className="relative w-full sm:max-w-sm">
+    <div className="flex flex-row flex-wrap gap-3 w-full items-start">
+      {/* div 1 */}
+      <div className="relative w-full sm:w-[320px] lg:w-[380px] shrink-0">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
           <Search className="h-4 w-4 text-gray-400" />
         </div>
@@ -113,7 +114,8 @@ export function InputSearch({
         )}
       </div>
 
-      <div className="flex flex-row flex-wrap gap-2">
+      {/* div 2 */}
+      <div className="flex flex-row flex-wrap gap-2 shrink-0">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white">

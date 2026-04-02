@@ -333,17 +333,19 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
         isDeleting={isDeleting}
       />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0 mb-4">
-        <InputSearch
-          searchTerm={searchTerm}
-          onSearch={handleSearchChange}
-          onStatusFilter={handleStatusChange}
-          onDateFilter={handleDateChange}
-          selectedStatus={statusFilter}
-          selectedDate={dateFilter}
-          placeholder="Rechercher par nom ou prénom..."
-        />
-        <div className="text-sm text-gray-500">
+      <div className="flex flex-row flex-wrap justify-between items-start md:items-center gap-4 shrink-0 mb-4 w-full">
+        <div className="w-full md:w-auto flex-1 min-w-[280px]">
+          <InputSearch
+            searchTerm={searchTerm}
+            onSearch={handleSearchChange}
+            onStatusFilter={handleStatusChange}
+            onDateFilter={handleDateChange}
+            selectedStatus={statusFilter}
+            selectedDate={dateFilter}
+            placeholder="Rechercher par nom ou prénom..."
+          />
+        </div>
+        <div className="text-sm text-gray-500 shrink-0">
           {paginatedData.length > 0
             ? `${startIndex + 1}-${Math.min(endIndex, filteredData.length)} sur ${filteredData.length} adhérent${filteredData.length !== 1 ? "s" : ""}`
             : `${filteredData.length} adhérent${filteredData.length !== 1 ? "s" : ""} trouvé${filteredData.length !== 1 ? "s" : ""}`}
