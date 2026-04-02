@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Edit, Trash, Eye } from "lucide-react";
 import Link from "next/link";
-import { useState, useMemo, useEffect, useRef, JSX } from "react";
+import { useState, useMemo, useEffect, JSX } from "react";
 import { InputSearch } from "@/components/member/table/InputSearch";
 import { isSameDay } from "date-fns";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";

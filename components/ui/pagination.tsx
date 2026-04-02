@@ -4,19 +4,11 @@ import * as React from "react";
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 const PaginationContext = React.createContext<{
   siblingsCount: number;
 } | null>(null);
 
-const usePaginationContext = () => {
-  const context = React.useContext(PaginationContext);
-  if (!context) {
-    throw new Error("usePaginationContext must be used within PaginationContent");
-  }
-  return context;
-};
 
 const Pagination = React.forwardRef<
   HTMLElement,
@@ -24,7 +16,7 @@ const Pagination = React.forwardRef<
     items?: number;
   }
 >(({ className, ...props }, ref) => {
-  const [page, setPage] = React.useState(1);
+  // const [page, setPage] = React.useState(1);
 
   return (
     <PaginationContext.Provider value={{ siblingsCount: 1 }}>
