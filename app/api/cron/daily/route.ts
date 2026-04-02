@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
     console.log("✅ Daily cron job completed successfully:", result);
 
     return NextResponse.json({
-      message: "Daily cron job completed successfully ✅",
+      message: "Daily cron job completed  successfully ✅",
       data: result,
     });
   } catch (error) {
