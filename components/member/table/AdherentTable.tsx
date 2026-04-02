@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Edit, Trash, Eye } from "lucide-react";
 import Link from "next/link";
-import { useState, useMemo, useEffect, JSX } from "react";
+import { useState, useMemo, useEffect, JSX, useCallback } from "react";
 import { InputSearch } from "@/components/member/table/InputSearch";
 import { isSameDay } from "date-fns";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -72,7 +72,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   );
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const updateUrl = (updates: Record<string, string | null | undefined>) => {
+  const updateUrl = useCallback((updates: Record<string, string | null | undefined>) => {
     const params = new URLSearchParams(searchParams.toString());
     let hasChanges = false;
 
@@ -94,7 +94,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
     if (hasChanges) {
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     }
-  };
+  }, [searchParams, pathname, router]);
 
   const handleSearchChange = (val: string) => {
     setSearchTerm(val);
@@ -114,10 +114,10 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
     updateUrl({ date: val ? val.toISOString() : null, page: "1" });
   };
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
     updateUrl({ page: page <= 1 ? null : page.toString() });
-  };
+  }, [updateUrl]);
 
   // Sync state from URL on changes (e.g. Back/Forward navigation)
   useEffect(() => {
@@ -208,7 +208,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
     } else if (totalPages === 0 && currentPage !== 1) {
       handlePageChange(1);
     }
-  }, [totalPages, currentPage]);
+  }, [totalPages, currentPage, handlePageChange]);
 
   const handleRowClick = (id: string) => {
     router.push(`/details-adherent/${id}`);

@@ -100,6 +100,7 @@ const SubscriptionRegistrationForm = forwardRef<SubscriptionFormRef>(
       const initialEndDate = calculateEndDate("personnalisé", today);
       setFormattedEndDate(format(initialEndDate, "yyyy-MM-dd"));
       setValue("endDate", initialEndDate);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setValue]);
 
     // === Expose methods to parent ===
