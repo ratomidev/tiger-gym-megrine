@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/popover";
 
 interface InputSearchProps {
+  searchTerm: string;
   onSearch: (searchTerm: string) => void;
   onStatusFilter: (status: string | null) => void;
   onDateFilter: (date: Date | null) => void;
@@ -38,6 +39,7 @@ interface InputSearchProps {
 }
 
 export function InputSearch({
+  searchTerm,
   onSearch,
   onStatusFilter,
   onDateFilter,
@@ -45,16 +47,12 @@ export function InputSearch({
   selectedStatus,
   selectedDate,
 }: InputSearchProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchTerm(value);
     onSearch(value);
   };
 
   const clearSearch = () => {
-    setSearchTerm("");
     onSearch("");
   };
 

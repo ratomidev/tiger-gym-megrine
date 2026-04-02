@@ -23,10 +23,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Edit, Trash, Eye } from "lucide-react";
 import Link from "next/link";
-import { useState, useMemo, useEffect, JSX } from "react";
+import { useState, useMemo, useEffect, useRef, JSX } from "react";
 import { InputSearch } from "@/components/member/table/InputSearch";
 import { isSameDay } from "date-fns";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import DeleteAdherentDialog from "./DeleteAdherentDialog";
 import {
   Pagination,
@@ -45,9 +45,15 @@ interface MemberTableProps {
 
 export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [dateFilter, setDateFilter] = useState<Date | null>(null);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
+  const [statusFilter, setStatusFilter] = useState<string | null>(searchParams.get("status") || null);
+  const [dateFilter, setDateFilter] = useState<Date | null>(() => {
+    const d = searchParams.get("date");
+    return d ? new Date(d) : null;
+  });
 
   const [showEmailColumn, setShowEmailColumn] = useState(true);
   const [showAbonnementColumn, setShowAbonnementColumn] = useState(true);
@@ -56,7 +62,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   const [showEndDateColumn, setShowEndDateColumn] = useState(true);
 
   // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
   const itemsPerPage = 10;
 
   // State for delete dialog
@@ -65,6 +71,73 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
     null
   );
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const updateUrl = (updates: Record<string, string | null | undefined>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    let hasChanges = false;
+
+    Object.entries(updates).forEach(([key, value]) => {
+      const currentValue = params.get(key);
+      if (value === null || value === undefined || value === "") {
+        if (params.has(key)) {
+          params.delete(key);
+          hasChanges = true;
+        }
+      } else {
+        if (currentValue !== value) {
+          params.set(key, value);
+          hasChanges = true;
+        }
+      }
+    });
+
+    if (hasChanges) {
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+  };
+
+  const handleSearchChange = (val: string) => {
+    setSearchTerm(val);
+    setCurrentPage(1);
+    updateUrl({ search: val, page: "1" });
+  };
+
+  const handleStatusChange = (val: string | null) => {
+    setStatusFilter(val);
+    setCurrentPage(1);
+    updateUrl({ status: val, page: "1" });
+  };
+
+  const handleDateChange = (val: Date | null) => {
+    setDateFilter(val);
+    setCurrentPage(1);
+    updateUrl({ date: val ? val.toISOString() : null, page: "1" });
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    updateUrl({ page: page <= 1 ? null : page.toString() });
+  };
+
+  // Sync state from URL on changes (e.g. Back/Forward navigation)
+  useEffect(() => {
+    const urlSearch = searchParams.get("search") || "";
+    const urlStatus = searchParams.get("status") || null;
+    const urlDateString = searchParams.get("date");
+    const urlDate = urlDateString ? new Date(urlDateString) : null;
+    const urlPage = Number(searchParams.get("page")) || 1;
+
+    setSearchTerm(prev => prev !== urlSearch ? urlSearch : prev);
+    setStatusFilter(prev => prev !== urlStatus ? urlStatus : prev);
+    
+    setDateFilter(prev => {
+      const prevStr = prev?.toISOString() || "";
+      const newStr = urlDate?.toISOString() || "";
+      return prevStr !== newStr ? urlDate : prev;
+    });
+    
+    setCurrentPage(prev => prev !== urlPage ? urlPage : prev);
+  }, [searchParams]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -128,17 +201,12 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, endIndex);
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, statusFilter, dateFilter]);
-
   // Adjust currentPage if it exceeds totalPages after filtering
   useEffect(() => {
     if (totalPages > 0 && currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    } else if (totalPages === 0) {
-      setCurrentPage(1);
+      handlePageChange(totalPages);
+    } else if (totalPages === 0 && currentPage !== 1) {
+      handlePageChange(1);
     }
   }, [totalPages, currentPage]);
 
@@ -267,9 +335,10 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <InputSearch
-          onSearch={setSearchTerm}
-          onStatusFilter={setStatusFilter}
-          onDateFilter={setDateFilter}
+          searchTerm={searchTerm}
+          onSearch={handleSearchChange}
+          onStatusFilter={handleStatusChange}
+          onDateFilter={handleDateChange}
           selectedStatus={statusFilter}
           selectedDate={dateFilter}
           placeholder="Rechercher par nom ou prénom..."
@@ -499,7 +568,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
-                        setCurrentPage((prev) => Math.max(prev - 1, 1));
+                        handlePageChange(Math.max(currentPage - 1, 1));
                       }}
                       className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                     />
@@ -514,7 +583,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                       isActive={currentPage === 1}
                       onClick={(e) => {
                         e.preventDefault();
-                        setCurrentPage(1);
+                        handlePageChange(1);
                       }}
                     >
                       1
@@ -533,7 +602,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                         isActive
                         onClick={(e) => {
                           e.preventDefault();
-                          setCurrentPage(currentPage);
+                          handlePageChange(currentPage);
                         }}
                       >
                         {currentPage}
@@ -561,7 +630,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                         isActive={currentPage === totalPages}
                         onClick={(e) => {
                           e.preventDefault();
-                          setCurrentPage(totalPages);
+                          handlePageChange(totalPages);
                         }}
                       >
                         {totalPages}
@@ -577,7 +646,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
-                        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                        handlePageChange(Math.min(currentPage + 1, totalPages));
                       }}
                       className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                     />
