@@ -36,7 +36,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <SidebarNavigation />
         </aside>
 
-        <main className="flex-1 relative">
+        <main className="flex-1 min-w-0 relative">
           <div className="absolute top-4 left-4 z-50">
             <SidebarTrigger />
           </div>

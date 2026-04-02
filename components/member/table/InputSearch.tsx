@@ -88,8 +88,8 @@ export function InputSearch({
   };
 
   return (
-    <div className="flex flex-wrap gap-2 w-full">
-      <div className="relative flex-grow max-w-sm">
+    <div className="flex flex-col sm:flex-row gap-3 w-full">
+      <div className="relative w-full sm:max-w-sm">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
           <Search className="h-4 w-4 text-gray-400" />
         </div>
@@ -113,11 +113,12 @@ export function InputSearch({
         )}
       </div>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white">
-            <CirclePlus className="h-4 w-4" />
-            <span className="hidden sm:inline">Statut:</span>
+      <div className="flex flex-row flex-wrap gap-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white">
+              <CirclePlus className="h-4 w-4" />
+              <span className="hidden sm:inline">Statut:</span>
             {selectedStatus ? (
               <Badge className={`${getStatusColor(selectedStatus)} ml-1`}>
                 {selectedStatus === "none"
@@ -195,6 +196,7 @@ export function InputSearch({
           )}
         </PopoverContent>
       </Popover>
+      </div>
     </div>
   );
 }

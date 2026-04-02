@@ -52,14 +52,14 @@ export default function MemberListPage() {
   }
 
   return (
-    <div className="w-full max-w-6xl px-4 mx-auto py-6">
+    <div className="w-full max-w-6xl px-4 mx-auto py-6 overflow-x-hidden">
       <Toaster position="top-right" />
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6">
         <h1 className="text-xl font-bold">Liste des Adhérents</h1>
         <Button
           onClick={() => router.push("/add-adherent")}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           Ajouter un adhérent
         </Button>

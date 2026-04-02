@@ -350,8 +350,8 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
         </div>
       </div>
 
-      <div className="rounded-md border">
-        <div className="overflow-auto max-h-[500px] scrollbar-hide">
+      <div className="rounded-md border w-full overflow-hidden">
+        <div className="overflow-x-auto max-h-[500px] scrollbar-hide">
           <Table>
             <TableHeader className="sticky top-0 z-10">
               <TableRow>
