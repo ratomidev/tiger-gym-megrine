@@ -52,10 +52,10 @@ export default function MemberListPage() {
   }
 
   return (
-    <div className="w-full max-w-6xl px-4 mx-auto py-6 overflow-x-hidden">
+    <div className="w-full max-w-6xl px-4 mx-auto pt-6 overflow-x-hidden flex flex-col h-[calc(100vh-theme(spacing.16))]">
       <Toaster position="top-right" />
 
-      <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6 shrink-0">
         <h1 className="text-xl font-bold">Liste des Adhérents</h1>
         <Button
           onClick={() => router.push("/add-adherent")}
@@ -66,9 +66,11 @@ export default function MemberListPage() {
       </div>
 
       {adherents.length > 0 ? (
-        <MemberTable data={adherents} onDataUpdate={handleDataUpdate} />
+        <div className="flex flex-col flex-1 min-h-0">
+          <MemberTable data={adherents} onDataUpdate={handleDataUpdate} />
+        </div>
       ) : (
-        <div className="text-center py-10">
+        <div className="text-center py-10 flex-1">
           <p className="text-gray-500">Aucun adhérent trouvé</p>
         </div>
       )}

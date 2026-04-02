@@ -322,7 +322,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
   };
 
   return (
-    <div className="">
+    <div className="flex flex-col h-full flex-1 w-full ">
       {/* Delete Confirmation Dialog */}
       <DeleteAdherentDialog
         open={deleteDialogOpen}
@@ -333,7 +333,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
         isDeleting={isDeleting}
       />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0 mb-4">
         <InputSearch
           searchTerm={searchTerm}
           onSearch={handleSearchChange}
@@ -350,8 +350,8 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
         </div>
       </div>
 
-      <div className="rounded-md border w-full overflow-hidden">
-        <div className="overflow-x-auto max-h-[500px] scrollbar-hide">
+      <div className="rounded-md border w-full flex-1 flex flex-col min-h-0 bg-background">
+        <div className="overflow-auto flex-1 scrollbar-hide">
           <Table>
             <TableHeader className="sticky top-0 z-10">
               <TableRow>
@@ -555,7 +555,7 @@ export function MemberTable({ data, onDataUpdate }: MemberTableProps) {
       </div>
       {/* Pagination - outside the border */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center pt-4">
+        <div className="flex items-center justify-center mt-auto pt-4 shrink-0">
           <Pagination>
             <PaginationContent>
               {(() => {

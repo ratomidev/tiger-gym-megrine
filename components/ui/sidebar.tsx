@@ -261,9 +261,10 @@ function SidebarTrigger({
   const { toggleSidebar } = useSidebar();
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        data-sidebar="trigger"
+    <div className="flex flex-col w-full pb-3 border-b border-sidebar-border">
+      <div className="flex items-center gap-2">
+        <Button
+          data-sidebar="trigger"
         data-slot="sidebar-trigger"
         variant="ghost"
         size="icon"
@@ -278,6 +279,7 @@ function SidebarTrigger({
         <span className="sr-only">Toggle Sidebar</span>
       </Button>
       <span className="font-bold text-2xl">TigerGym Megrine</span>
+      </div>
     </div>
   );
 }

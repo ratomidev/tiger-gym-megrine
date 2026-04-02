@@ -37,10 +37,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </aside>
 
         <main className="flex-1 min-w-0 relative">
-          <div className="absolute top-4 left-4 z-50">
+          <div className="w-full pt-4 px-4 z-50 bg-background">
             <SidebarTrigger />
           </div>
-          <div className="w-full h-screen pt-10">{children}</div>
+          <div className="w-full h-[calc(100vh-theme(spacing.16))]">{children}</div>
         </main>
       </SidebarProvider>
     </div>
